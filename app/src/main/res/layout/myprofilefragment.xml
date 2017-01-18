@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/txt_contact"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin_left1"
+            android:layout_marginRight="@dimen/margin_right2"
+            android:layout_marginTop="@dimen/margin_top1"
+            android:background="@drawable/light_border"
+            android:clickable="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:gravity="top"
+            android:hint="@string/myprofile_email"
+            android:padding="@dimen/padding" />
+
+        <LinearLayout
+            android:id="@+id/lin_profile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txt_contact"
+            android:layout_marginBottom="@dimen/margin_bottom"
+            android:layout_marginLeft="@dimen/margin_left1"
+            android:layout_marginRight="@dimen/margin_right2"
+            android:layout_marginTop="@dimen/margin_top1"
+            android:background="@drawable/black_border"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/edt_ownername"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:hint="@string/myprofile_name"
+                android:padding="10dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/view_bck" />
+
+            <EditText
+                android:id="@+id/edt_phone1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:hint="@string/myprofile_phone1"
+                android:inputType="number"
+                android:maxLength="10"
+                android:padding="10dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/view_bck" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/txt_change_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin_left1"
+            android:layout_marginRight="@dimen/margin_right2"
+            android:layout_marginTop="@dimen/margin_top1"
+            android:background="@drawable/black_border"
+            android:clickable="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:gravity="top"
+            android:hint="@string/myprofile_change_pass"
+            android:maxLength="20"
+            android:padding="@dimen/padding"
+            android:layout_below="@+id/lin_profile"
+            android:textAppearance="?android:textAppearanceMedium"/>
+
+        <Button
+            android:id="@+id/btn_submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txt_change_password"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/margin_bottom"
+            android:layout_marginTop="@dimen/margin_top1"
+            android:background="@drawable/myprofile_update"
+            android:paddingBottom="@dimen/paddingBottom"
+            android:paddingLeft="@dimen/paddingLeft"
+            android:paddingRight="@dimen/paddingRight"
+            android:paddingTop="@dimen/paddingTop"
+            android:text="@string/myprofile_update"
+            android:textColor="@color/white" />
+
+    </RelativeLayout>
+
+</ScrollView>

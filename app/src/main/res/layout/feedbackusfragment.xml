@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/txt_contact"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/edittext_height"
+        android:layout_marginLeft="@dimen/margin_left1"
+        android:layout_marginRight="@dimen/margin_right2"
+        android:layout_marginTop="@dimen/margin_top1"
+        android:background="@drawable/black_border"
+        android:gravity="top"
+        android:hint="@string/feedback_us_text"
+        android:inputType="textMultiLine"
+        android:maxLength="2000"
+        android:padding="@dimen/padding"/>
+
+    <Button
+        android:id="@+id/sendEmailBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_top1"
+        android:text="@string/contact_send"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:padding="@dimen/padding"
+        android:background="@drawable/forget_btn"
+        android:textColor="@android:color/white"
+        android:layout_below="@+id/txt_contact"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="@dimen/margin_left1"
+        android:layout_marginRight="@dimen/margin_right2"/>
+
+</RelativeLayout>

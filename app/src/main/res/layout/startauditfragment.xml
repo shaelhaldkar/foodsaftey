@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#f3f3f3"
+    android:fillViewport="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/img_back"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="-15dp"
+                    android:src="@mipmap/back" />
+
+                <TextView
+                    android:id="@+id/txt_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/img_back"
+                    android:text="Question No. 1"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:textColor="@android:color/black" />
+
+                <ImageView
+                    android:id="@+id/img_info1"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="8dp"
+                    android:layout_toLeftOf="@+id/img_info"
+                    android:src="@mipmap/info" />
+
+                <ImageView
+                    android:id="@+id/img_info"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="8dp"
+                    android:layout_toLeftOf="@+id/txt_skip"
+                    android:src="@mipmap/info" />
+
+                <CheckBox
+                    android:id="@+id/txt_skip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/skip_toggle"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:paddingBottom="5dp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingTop="5dp"
+                    android:text="SKIP"
+                    android:textAppearance="?android:textAppearanceSmall" />
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.Toolbar>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/toolbar">
+
+            <TextView
+                android:id="@+id/txt_subcat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/margin_left4"
+                android:layout_marginRight="@dimen/margin_right4"
+                android:background="@color/white"
+                android:paddingBottom="@dimen/padding"
+                android:paddingLeft="@dimen/paddingLeft1"
+                android:paddingRight="@dimen/padding"
+                android:paddingTop="@dimen/padding"
+                android:text="@string/audit_subcat"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/black" />
+
+            <TextView
+                android:id="@+id/audit_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txt_subcat"
+                android:layout_marginLeft="@dimen/margin_left4"
+                android:layout_marginRight="@dimen/margin_right4"
+                android:background="@color/audit_title_bck"
+                android:paddingBottom="@dimen/padding"
+                android:paddingLeft="@dimen/paddingLeft1"
+                android:paddingRight="@dimen/padding"
+                android:paddingTop="@dimen/padding"
+                android:text="@string/audit_title"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/audit_title" />
+
+            <TextView
+                android:id="@+id/question"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/audit_date"
+                android:layout_marginBottom="@dimen/margin_bottom2"
+                android:layout_marginLeft="@dimen/margin_left1"
+                android:layout_marginRight="@dimen/margin_right2"
+                android:layout_marginTop="@dimen/margin_top3"
+                android:text="@string/audit_start_question"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/textsize" />
+
+
+            <RelativeLayout
+                android:id="@+id/discription_lay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/question"
+                android:orientation="vertical"
+                android:padding="6dp">
+
+                <TextView
+                    android:id="@+id/discription_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="50dp"
+                    android:text="hello discription"
+                    android:visibility="gone" />
+
+
+                <TextView
+                    android:id="@+id/read_more"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:paddingBottom="4dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="4dp"
+                    android:text="More"
+                    android:textColor="#0553fa" />
+
+            </RelativeLayout>
+
+            <RadioGroup
+                android:id="@+id/rg1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/discription_lay"
+                android:layout_marginLeft="@dimen/margin_left1"
+                android:layout_marginRight="@dimen/margin_right2"
+                android:layout_marginTop="@dimen/margin_top5"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/rdt_yes"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:checked="true"
+                    android:text="Yes"
+                    android:textSize="@dimen/textsize" />
+
+                <RadioButton
+                    android:id="@+id/rdt_no"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="No"
+                    android:textSize="@dimen/textsize" />
+
+                <RadioButton
+                    android:id="@+id/rdt_partial"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Partially"
+                    android:textSize="@dimen/textsize" />
+
+            </RadioGroup>
+
+            <LinearLayout
+                android:id="@+id/lin_audit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/rg1"
+                android:layout_marginBottom="@dimen/margin_bottom2"
+                android:layout_marginLeft="@dimen/margin_left1"
+                android:layout_marginRight="@dimen/margin_right2"
+                android:layout_marginTop="@dimen/margin_top2"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="@dimen/padding">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/audit_sample_no"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/textsize" />
+
+                <Spinner
+                    android:id="@+id/list_sampleno"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.8"
+                    android:gravity="center"
+                    android:spinnerMode="dropdown" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/margin_left2"
+                    android:layout_weight="1.2"
+                    android:text="@string/audit_max_marks"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/textsize" />
+
+                <TextView
+                    android:id="@+id/max_num"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/margin_left3"
+                    android:layout_weight="0.5"
+                    android:text="20"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/textsize" />
+
+            </LinearLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/list_sample"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/lin_audit"
+                android:layout_marginBottom="@dimen/margin_bottom2"
+                android:layout_marginLeft="@dimen/margin_left1"
+                android:layout_marginRight="@dimen/margin_right2"
+                android:layout_marginTop="@dimen/margin_top2"
+                android:scrollbars="vertical"
+                android:visibility="gone" />
+
+            <AutoCompleteTextView
+                android:id="@+id/edt_remark"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/edittext_height1"
+                android:layout_below="@+id/edt_comment"
+                android:layout_marginLeft="@dimen/margin_left1"
+                android:layout_marginRight="@dimen/margin_right2"
+                android:layout_marginTop="@dimen/margin_top2"
+                android:background="@drawable/light_border"
+                android:gravity="top"
+                android:hint="@string/audit_remark"
+                android:inputType="textMultiLine"
+                android:maxLength="400"
+                android:padding="@dimen/padding" />
+
+            <AutoCompleteTextView
+                android:id="@+id/edt_comment"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/edittext_height1"
+                android:layout_below="@+id/list_sample"
+                android:layout_marginLeft="@dimen/margin_left1"
+                android:layout_marginRight="@dimen/margin_right2"
+                android:layout_marginTop="@dimen/margin_top2"
+                android:background="@drawable/light_border"
+                android:gravity="top"
+                android:hint="@string/audit_comment"
+                android:inputType="textMultiLine"
+                android:maxLength="400"
+                android:padding="@dimen/padding" />
+
+
+            <EditText
+                android:id="@+id/actions"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/edittext_height1"
+                android:layout_below="@+id/edt_remark"
+                android:layout_marginLeft="@dimen/margin_left1"
+                android:layout_marginRight="@dimen/margin_right2"
+                android:layout_marginTop="@dimen/margin_top2"
+                android:background="@drawable/light_border"
+                android:gravity="top"
+                android:hint="Corrective Actions"
+                android:inputType="textMultiLine"
+                android:maxLength="350"
+                android:padding="@dimen/padding" />
+
+            <RelativeLayout
+                android:id="@+id/rel_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/actions"
+                android:gravity="center">
+
+                <LinearLayout
+                    android:id="@+id/btn_previous"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_margin="@dimen/margin"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="@dimen/btn_image_size"
+                        android:layout_height="@dimen/btn_image_size"
+                        android:src="@mipmap/backarrow" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="@dimen/padding"
+                        android:text="@string/audit_previous"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@color/register_cmpny" />
+
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/btn_camera"
+                    android:layout_width="@dimen/btn_camera_size"
+                    android:layout_height="@dimen/btn_camera_size"
+                    android:layout_centerInParent="true"
+                    android:layout_marginLeft="@dimen/margin_left2"
+                    android:layout_marginRight="@dimen/margin_left2"
+                    android:paddingBottom="@dimen/paddingBottom"
+                    android:paddingTop="@dimen/paddingTop"
+                    android:src="@mipmap/camera" />
+
+                <LinearLayout
+                    android:id="@+id/btn_next"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_margin="@dimen/margin"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/margin_left1"
+                        android:gravity="center"
+                        android:padding="@dimen/padding"
+                        android:text="@string/audit_next"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@color/register_cmpny" />
+
+                    <ImageView
+                        android:layout_width="@dimen/btn_image_size"
+                        android:layout_height="@dimen/btn_image_size"
+                        android:src="@mipmap/nextarrow" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</ScrollView>

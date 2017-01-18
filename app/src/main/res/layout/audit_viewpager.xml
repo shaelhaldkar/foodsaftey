@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/question_head"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_bottom2"
+        android:layout_marginLeft="@dimen/margin_left2"
+        android:layout_marginTop="@dimen/margin_top4"
+        android:text="@string/audit_start_question_title"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@android:color/black"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/question"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/question_head"
+        android:layout_marginBottom="@dimen/margin_bottom2"
+        android:layout_marginLeft="@dimen/margin_left2"
+        android:text="@string/audit_start_question"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@android:color/black" />
+
+    <RadioGroup
+        android:id="@+id/rg1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/question"
+        android:layout_marginLeft="@dimen/margin_left1"
+        android:layout_marginTop="@dimen/margin_top1"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rdt_yes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="Yes" />
+
+        <RadioButton
+            android:id="@+id/rdt_no"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="No" />
+
+        <RadioButton
+            android:id="@+id/rdt_partial"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Partially" />
+
+    </RadioGroup>
+
+    <ListView
+        android:id="@+id/sample"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin_left1"
+        android:layout_marginRight="@dimen/margin_right2"
+        android:layout_marginTop="@dimen/margin_top2"
+        android:divider="@android:color/transparent"
+        android:scrollbars="none"
+        android:layout_below="@+id/rg1"/>
+
+</RelativeLayout>
