@@ -11,9 +11,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Paint;
 import android.location.Location;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -61,12 +66,17 @@ import com.itgc.foodsafety.db.DBHelper;
 import com.itgc.foodsafety.db.DbManager;
 import com.itgc.foodsafety.utils.AppPrefrences;
 import com.itgc.foodsafety.utils.AppUtils;
+import com.itgc.foodsafety.utils.BitmapHelper;
+import com.itgc.foodsafety.utils.FilePathUtils;
 import com.itgc.foodsafety.utils.Vars;
 
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
@@ -100,6 +110,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     private int count = 1;
     private AuditStartAdapter startAdapter;
     int TAKE_PHOTO_CODE = 0;
+    int GALLERY_IMG = 3;
     private Spinner list_sampleno;
     private ArrayList<StartAudit> audit;
     private ArrayList<Sample_Audit> sampleAudits;
@@ -119,6 +130,13 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     private String Previous_data = "";
     private int Image_count = 0;
     private EditText actions;
+    private AlertDialog d;
+    private static final int PICK_IMAGE_REQUEST_PERMISSION = 1;
+    private Uri fileUri;
+    private String picturePath;
+    private File photoFile;
+    private static int LOAD_CAMERA_RESULTS = 11;
+
 
     static final String[] remarks = new String[]{"No Exceptions Found.", "Not Applicable.",
             "FSSAI License was not displayed at the prominent place; it was displayed in the back room.",
@@ -961,7 +979,8 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 break;
             case R.id.btn_camera:
                 if (imagesarray.size() < 4)
-                    doTakePhotoAction();
+                    //doTakePhotoAction();
+                    checkPermission();
                 else
                     Toast.makeText(getActivity(), "Only four images are allowed", Toast.LENGTH_SHORT).show();
                 break;
@@ -1113,6 +1132,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         }
 
     }
+
     public static Object deserializeObject(byte[] b) {
         try {
             ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(b));
@@ -1485,15 +1505,112 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     }
 
     private void doTakePhotoAction() {
-        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
+//        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+//        startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
+
+        try {
+            photoFile = createImageFile();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        fileUri = Uri.fromFile(photoFile);
+        Intent takePictureIntent = new Intent(
+                MediaStore.ACTION_IMAGE_CAPTURE);
+
+        if (photoFile != null) {
+//            AppPreferences.setPath(getActivity(), photoFile.getAbsolutePath());
+            if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                takePictureIntent.putExtra(
+                        MediaStore.EXTRA_OUTPUT,
+                        Uri.fromFile(photoFile));
+                startActivityForResult(takePictureIntent,
+                        LOAD_CAMERA_RESULTS);
+            }
+        }
+
+    }
+
+    private File createImageFile() throws IOException {
+
+
+        File dir = new File(Environment.getExternalStorageDirectory(), "FoodSafety");
+        if (!dir.exists())
+            dir.mkdir();
+        File pictureFile = new File(dir, "foodsafety_" + System.currentTimeMillis() + ".jpg");
+
+
+//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
+//                Locale.getDefault()).format(new Date());
+//        String imageFileName = "JPEG_" + timeStamp + "_";
+//        File storageDir = Environment
+//                .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+//        if (!storageDir.exists())
+//            storageDir.mkdirs();
+//        File image = File.createTempFile(imageFileName, /* prefix */
+//                ".jpg", /* suffix */
+//                storageDir /* directory */
+//        );
+        return pictureFile;
+    }
+
+    public class SaveImgTask extends AsyncTask<Bitmap, Void, String> {
+
+        ProgressDialog pd;
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd = new ProgressDialog(ctx);
+            pd.setMessage("Please Wait...");
+            pd.setCancelable(false);
+            pd.show();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (pd != null)
+                pd.dismiss();
+        }
+
+        @Override
+        protected String doInBackground(Bitmap... params) {
+            storeImage(params[0]);
+            return null;
+        }
+
+
+    }
+
+    private void storeImage(Bitmap image) {
+        try {
+            File dir = new File(Environment.getExternalStorageDirectory(), "FoodSafety");
+            if (!dir.exists())
+                dir.mkdir();
+            File pictureFile = new File(dir, "foodsafety_" + System.currentTimeMillis() + ".jpg");
+            if (pictureFile == null) {
+                Log.d("",
+                        "Error creating media file, check storage permissions: ");// e.getMessage());
+                return;
+            }
+
+            FileOutputStream fos = new FileOutputStream(pictureFile);
+            image.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.close();
+        } catch (FileNotFoundException e) {
+            Log.d("", "File not found: " + e.getMessage());
+        } catch (IOException e) {
+            Log.d("", "Error accessing file: " + e.getMessage());
+        }
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == TAKE_PHOTO_CODE) {
+        if (requestCode == TAKE_PHOTO_CODE && resultCode == Activity.RESULT_OK && data != null) {
             try {
                 Bitmap photo = (Bitmap) data.getExtras().get("data");
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -1508,9 +1625,65 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        } else if (requestCode == GALLERY_IMG && resultCode == Activity.RESULT_OK && data != null) {
+            try {
+                Uri uri = data.getData();
+
+                String imageUrl = FilePathUtils.getPath(getActivity(), uri);
+                Bitmap scalledBitmap = BitmapHelper.decodeSampledBitmapFromResource(imageUrl, 400, 400); //scall the bitmap into given size
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                scalledBitmap.compress(Bitmap.CompressFormat.JPEG, 70, bos);
+                byte[] dataOfImage = bos.toByteArray();
+                encodedImage = Base64.encodeToString(dataOfImage, Base64.DEFAULT);
+                imagesarray.add(encodedImage);
+                encodedImage = "";
+                int imsize = 0;
+                imsize = imagesarray.size();
+                Toast.makeText(getContext(), imsize + "/4 Images Added", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        } else if (requestCode == LOAD_CAMERA_RESULTS
+                && resultCode == Activity.RESULT_OK) {
+            galleryAddPic();
+            if (photoFile != null) {
+                Log.d("", "imagefilepath notcrop " + photoFile.getAbsolutePath());
+                try {
+                   // Bitmap photo = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+                    Bitmap photo = BitmapHelper.decodeSampledBitmapFromResource(photoFile.getAbsolutePath(), 350, 400); //scall the bitmap into given size
+
+                    if (photo != null) {
+                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                        photo.compress(Bitmap.CompressFormat.JPEG, 60, bos);
+                        byte[] dataOfImage = bos.toByteArray();
+                        encodedImage = Base64.encodeToString(dataOfImage, Base64.DEFAULT);
+                        imagesarray.add(encodedImage);
+                        encodedImage = "";
+                        int imsize = 0;
+                        imsize = imagesarray.size();
+                        Toast.makeText(getContext(), imsize + "/4 Images Added", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), "Unable to save", Toast.LENGTH_SHORT).show();
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+
         }
+
     }
 
+    private void galleryAddPic() {
+        Intent mediaScanIntent = new Intent(
+                Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        mediaScanIntent.setData(fileUri);
+        getActivity().sendBroadcast(mediaScanIntent);
+
+    }
 
     @Override
     public void onResume() {
@@ -1614,4 +1787,62 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
     }
+
+    public void checkPermission() {
+
+
+        if ((ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
+                && (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
+                && (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
+            showOption();
+        } else {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                Toast.makeText(getActivity(), "These permissions requared for accessing you gallery and camera.", Toast.LENGTH_SHORT).show();
+            }
+
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA},
+                    PICK_IMAGE_REQUEST_PERMISSION);
+        }
+    }
+
+    private void showOption() {
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+        dialog.setMessage("Add photo using");
+        dialog.setPositiveButton("Camera",
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        doTakePhotoAction();
+                        d.dismiss();
+                    }
+                });
+
+        dialog.setNeutralButton("Gallery",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        openGallery();
+                    }
+                });
+
+        dialog.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        d.dismiss();
+                    }
+                });
+        d = dialog.create();
+        d.show();
+    }
+
+    void openGallery() {
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(Intent.createChooser(galleryIntent, "Select Photo"), GALLERY_IMG);
+    }
+
+
 }
