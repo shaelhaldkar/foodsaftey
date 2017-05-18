@@ -59,7 +59,7 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
 
     }
 
-    public int getCount(){
+    public int getCount() {
         int count = 0;
 
         Cursor curs = null;

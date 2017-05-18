@@ -521,7 +521,6 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             "Dead Lizard in the decomposed state was found in the Rodent box."
     };
 
-    //  private ArrayList<String> imagesarray = new ArrayList<>();
     private ArrayList<String> imagesarray;
 
     @Override
@@ -1496,10 +1495,8 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         return checked;
     }
 
-    private void doTakePhotoAction() {
-//        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-//        startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
-
+    private void doTakePhotoAction()
+    {
         try {
             photoFile = createImageFile();
         } catch (IOException ex) {
@@ -1516,7 +1513,6 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 startActivityForResult(takePictureIntent, LOAD_CAMERA_RESULTS);
             }
         }
-
     }
 
     private File createImageFile() throws IOException {
@@ -1543,10 +1539,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     }
 
     public class SaveImgTask extends AsyncTask<Bitmap, Void, String> {
-
         ProgressDialog pd;
-
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -1568,28 +1561,29 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             storeImage(params[0]);
             return null;
         }
-
-
     }
 
-    private void storeImage(Bitmap image) {
+    private void storeImage(Bitmap image)
+    {
         try {
             File dir = new File(Environment.getExternalStorageDirectory(), "FoodSafety");
             if (!dir.exists())
                 dir.mkdir();
             File pictureFile = new File(dir, "foodsafety_" + System.currentTimeMillis() + ".jpg");
-            if (pictureFile == null) {
+            if (pictureFile == null)
+            {
                 Log.d("",
                         "Error creating media file, check storage permissions: ");// e.getMessage());
                 return;
             }
-
             FileOutputStream fos = new FileOutputStream(pictureFile);
             image.compress(Bitmap.CompressFormat.JPEG, 100, fos);
             fos.close();
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e)
+        {
             Log.d("", "File not found: " + e.getMessage());
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             Log.d("", "Error accessing file: " + e.getMessage());
         }
     }
@@ -1830,5 +1824,4 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(Intent.createChooser(galleryIntent, "Select Photo"), GALLERY_IMG);
     }
-
 }

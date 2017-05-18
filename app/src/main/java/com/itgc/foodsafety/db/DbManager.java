@@ -23,18 +23,15 @@ public class DbManager {
     private DBHelper dbHelper;
     private Context context;
 
-    public static synchronized void initializeInstance(SQLiteOpenHelper helper,
-                                                       Context context) {
+    public static synchronized void initializeInstance(SQLiteOpenHelper helper, Context context) {
         if (instance == null) {
             instance = new DbManager();
             mDatabaseHelper = helper;
         }
     }
 
-    public static synchronized DbManager getInstance()
-    {
-        if (instance == null)
-        {
+    public static synchronized DbManager getInstance() {
+        if (instance == null) {
             throw new IllegalStateException(DbManager.class.getSimpleName() + " is not initialized, call initializeInstance(..) method first.");
         }
         return instance;
@@ -49,13 +46,11 @@ public class DbManager {
 
     public synchronized void closeDatabase() {
         if (mOpenCounter.decrementAndGet() == 0) {
-            // Closing database
             mDb.close();
         }
     }
 
-    public Cursor getDetails(String query)
-    {
+    public Cursor getDetails(String query) {
         return mDb.rawQuery(query, null);
     }
 
@@ -82,11 +77,10 @@ public class DbManager {
         }
     }
 
-    public void deleteDetails(String pTblName, String wheredata){
-        try{
+    public void deleteDetails(String pTblName, String wheredata) {
+        try {
             mDb.delete(pTblName, wheredata, null);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
 
         }
     }
