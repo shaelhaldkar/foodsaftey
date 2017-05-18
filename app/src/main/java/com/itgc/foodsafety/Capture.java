@@ -126,29 +126,6 @@ public class Capture extends Activity {
     }
 
 
-//    private boolean captureSignature() 
-//    {
-//
-//        boolean error = false;
-//        String errorMessage = "";
-//
-//
-//        if(yourName.getText().toString().equalsIgnoreCase(""))
-//        {
-//            errorMessage = errorMessage + "Please enter your Name\n";
-//            error = true;
-//        }  
-//
-//        if(error)
-//        {
-//            Toast toast = Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT);
-//            toast.setGravity(Gravity.TOP, 105, 50);
-//            toast.show();
-//        }
-//
-//        return error;
-//    }
-
     private String getTodaysDate() {
 
         final Calendar c = Calendar.getInstance();
@@ -222,7 +199,8 @@ public class Capture extends Activity {
             paint.setStrokeWidth(STROKE_WIDTH);
         }
 
-        public void save(View v) {
+        public void save(View v)
+        {
             Log.v("log_tag", "Width: " + v.getWidth());
             Log.v("log_tag", "Height: " + v.getHeight());
             if (mBitmap == null) {
@@ -245,12 +223,6 @@ public class Capture extends Activity {
                 mFileOutStream.flush();
                 mFileOutStream.close();
                 String url = Images.Media.insertImage(getContentResolver(), mBitmap, "title", null);
-                //Log.v("log_tag","url: " + url);
-
-//                //In case you want to delete the file
-//                boolean deleted = mypath.delete();
-//                Log.v("log_tag","deleted: " + mypath.toString() + deleted);
-//                //If you want to convert the image to string use base64 converter
 
             } catch (Exception e) {
                 Log.v("log_tag", e.toString());

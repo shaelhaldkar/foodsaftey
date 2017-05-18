@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.itgc.foodsafety.MainActivity;
 import com.itgc.foodsafety.R;
@@ -149,6 +150,7 @@ public class DraftsFragment extends Fragment {
                     getFragmentManager().beginTransaction().replace(R.id.container_body,fragment)
                             .addToBackStack("Audit").commit();
                 }
+                Toast.makeText(context, draftses.get(position).getDraft_status(), Toast.LENGTH_SHORT).show();
             }
         });
     }

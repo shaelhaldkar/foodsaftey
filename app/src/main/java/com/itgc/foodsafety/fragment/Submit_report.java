@@ -72,8 +72,6 @@ public class Submit_report extends Fragment implements View.OnClickListener {
         ctx = (Activity) context;
     }
 
-
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -269,6 +267,8 @@ public class Submit_report extends Fragment implements View.OnClickListener {
                 params.put("store_id", String.valueOf(Store_id));
                 params.put("expiry_question", expiry);
                 Log.e("Expiry", expiry);
+
+                Log.e("Submit Report Params ",params.toString());
 
                 return params;
             }

@@ -11,8 +11,7 @@ import android.util.Log;
  */
 public class DBHelper extends SQLiteOpenHelper {
 
-    // public final static String DATABASE_NAME = "Android/data/com.itgc.iorderfresh/" + "IOF.sqlite";
-
+    //public final static String DATABASE_NAME = "Android/data/com.itgc.iorderfresh/" + "IOF.sqlite";
     //private final static String DATABASE_NAME = "IOF.sqlite";
     //private final static String DATABASE_NAME = "iof_database";
 
@@ -136,15 +135,12 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String ANSWER_Cat = "ans_category";
     public static final String ANSWER_Type = "ans_type";
 
-    /*
-     * public static final String CAT_DELETED = "cat_deleted"; public static
-	 * final String CAT_DATE = "cat_date";
-	 */
 
     private final String TABLE_ANSWER_CREATE = "CREATE TABLE " + ANSWER_Tbl_NAME + " (" + ANSWER_id + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             ANSWER_Cat_id + " INTEGER, " + ANSWER_value + " BLOB, " + ANSWER_Draft_value + " BLOB, " + ANSWER_DateTime + " TEXT, "
             + ANSWER_Status + " TEXT, " + ANSWER_Store_id + " INTEGER, " + ANSWER_Store + " TEXT, " + ANSWER_Store_reg + " TEXT, " + ANSWER_Type + " INTEGER, " +
             ANSWER_Cat + " TEXT); ";
+
 
     private final String TABLE_Category_CREATE = "CREATE TABLE " + CAT_Tbl_NAME
             + " (" + CAT_id + " INTEGER PRIMARY KEY , " + CAT_NAME
@@ -152,10 +148,12 @@ public class DBHelper extends SQLiteOpenHelper {
             + " TEXT, " + CAT_CREATEDBY + " INTEGER, " + CAT_CREATEDON + " DATE, " + CAT_UPDATEDBY + " INTEGER, "
             + CAT_UPDATEDON + " DATE); ";
 
+
     private final String TABLE_SubCategory_CREATE = "CREATE TABLE " + SUBCAT_Tbl_NAME
             + " (" + SUBCAT_id + " INTEGER PRIMARY KEY , " + SUBCAT_CAT_id + " INTEGER, " + SUBCAT_NAME
             + " TEXT, " + SUBCAT_STATUS + " TEXT, " + SUBCAT_CREATEDBY + " INTEGER, " + SUBCAT_CREATEDON + " DATE, " +
             SUBCAT_UPDATEDBY + " INTERGER, " + SUBCAT_UPDATEDON + " DATE); ";
+
 
     private final String TABLE_Questions_CREATE = "CREATE TABLE " + QUES_Tbl_NAME + " (" + QUES_id + " INTEGER PRIMARY KEY , " +
             QUES_SUBCAT_id + " INTEGER, " +
@@ -163,6 +161,7 @@ public class DBHelper extends SQLiteOpenHelper {
             QUES_CREATEDBY + " INTEGER, " + QUES_CREATEDON + " DATE, " + QUES_UPDATEDBY + " INTEGER, " + QUES_UPDATEDON + " DATE, "
             + QUES_DISCRIPTION + " TEXT, " +
             QUES_NO_SAMPLE + " INTEGER); ";
+
 
     private final String TABLE_Audit_CREATE = "CREATE TABLE " + AUDIT_Tbl_NAME + " (" + AUDIT_id + " INTEGER PRIMARY KEY , " +
             AUDIT_CAT_ID + " INTEGER, " +
@@ -173,14 +172,17 @@ public class DBHelper extends SQLiteOpenHelper {
             AUDIT_ACTIONS + " TEXT," +
             AUDIT_CREATEDON + " DATE); ";
 
+
     private final String TABLE_AuditSample_CREATE = "CREATE TABLE " + AUDIT_SAMPLE_Tbl_NAME + " (" + AUDIT_SAMPLE_id + " INTEGER PRIMARY KEY , " +
             AUDIT_SAMPLE_AUDIT_id + " INTEGER, " +
             AUDIT_SAMPLE_QUES_SAMPLE_id + " INTEGER, " +
             AUDIT_SAMPLE_QUES_SAMPLE_VALUE + " TEXT); ";
 
+
     private final String TABLE_BusinessCategory_CREATE = "CREATE TABLE " + BUSS_CAT_Tbl_NAME + " (" + BUSS_id + " INTEGER PRIMARY KEY, " +
             BUSS_CAT_NAME + " TEXT, " + BUSS_STATUS + " TEXT, " + BUSS_CREATEDBY + " INTEGER, " + BUSS_CREATEDON + " DATE, " +
             BUSS_UPDATEDBY + " INTEGER, " + BUSS_UPDATEDON + " DATE); ";
+
 
     private final String TABLE_Branch_CREATE = "CREATE TABLE " + BRANCH_Tbl_NAME + " (" + BRANCH_id + " INTEGER PRIMARY KEY, " +
             BRANCH_USER_ID + " INTEGER, " +
@@ -189,6 +191,7 @@ public class DBHelper extends SQLiteOpenHelper {
             BRANCH_STATUS + " TEXT, " + BRANCH_CREATEDBY + " INTEGER, " + BRANCH_CREATEDON + " DATE, " +
             BRANCH_UPDATEBY + " INTEGER, " + BRANCH_UPDATEON + " DATE); ";
 
+
     private final String TABLE_User_CREATE = "CREATE TABLE " + USER_Tbl_NAME + " (" + USER_id + " INTEGER PRIMARY KEY, " +
             USER_NAME + " TEXT, " + USER_OWNER_NAME + " TEXT, " + USER_PASS + " TEXT, " + USER_BUSS_CAT + " TEXT, " +
             USER__LICENSE + " INTEGER, " + USER_SHOP_NAME + " TEXT, " + USER_EMAIL + " TEXT, " + USER_MOBILE_NO + " INTEGER, " +
@@ -196,6 +199,7 @@ public class DBHelper extends SQLiteOpenHelper {
             USER_CREATEDBY + " INTEGER, " + USER_CREATEDON + " DATE, " + USER_UPDATEDBY + " INTEGER, " + USER_UPDATEDON + " DATE, " +
             USER_REMEMBERME + " INTEGER, " + USER_DEVICEID + " INTEGER, " + USER_DEVICETYPE + " TEXT, " + USER_LATITUDE + " INTEGER, " +
             USER_LONGITUDE + " INTEGER, " + USER_LAST_LAT + " INTEGER, " + USER_LAST_LON + " INTEGER, " + USER_ROLEID + " INTEGER);  ";
+
 
     private final String TABLE_Category_DROP = "DROP TABLE IF EXISTS "
             + CAT_Tbl_NAME;
@@ -233,17 +237,11 @@ public class DBHelper extends SQLiteOpenHelper {
         mContext = context;
     }
 
-    /**
-     * This method open database for operations
-     **/
     public boolean openDataBase() throws SQLException {
         mDb = this.getWritableDatabase();
         return mDb.isOpen();
     }
 
-    /**
-     * This method close database connection and released occupied memory
-     **/
     @Override
     public synchronized void close() {
         if (mDb != null)
@@ -279,4 +277,5 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(TABLE_Answer_DROP);
         onCreate(db);
     }
+
 }

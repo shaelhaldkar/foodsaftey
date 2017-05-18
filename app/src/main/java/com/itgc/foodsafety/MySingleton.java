@@ -15,7 +15,6 @@ import com.itgc.foodsafety.utils.AppUtils;
 import java.io.File;
 
 import io.fabric.sdk.android.Fabric;
-import io.lookback.sdk.Lookback;
 
 public class MySingleton extends Application {
 
@@ -31,7 +30,6 @@ public class MySingleton extends Application {
 		File f = new File(AppUtils.FOOD_DIR);
 		f.mkdirs();
 
-		Lookback.init(this, "g43qzSQmpGszYosr8");
 
 		if (f.exists()) {
 			try {

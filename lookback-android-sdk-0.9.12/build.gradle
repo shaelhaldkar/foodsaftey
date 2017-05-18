@@ -1,2 +1,0 @@
-configurations.create("default")
-artifacts.add("default", file('lookback-android-sdk-0.9.13.aar'))

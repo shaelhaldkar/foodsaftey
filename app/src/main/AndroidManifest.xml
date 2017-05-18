@@ -47,39 +47,12 @@
             android:name="io.fabric.ApiKey"
             android:value="f6a580e6a20f47644e36b017739fc9fe5646acad" />
 
-        <activity
-            android:name="io.lookback.sdk.ui.recording.AcceptPolicyActivity"
-            android:theme="@style/LookbackAppTheme.Transparent.NoDim"></activity>
-        <activity
-            android:name="io.lookback.sdk.ui.recording.RecordingActivity"
-            android:screenOrientation="nosensor"
-            android:theme="@style/LookbackAppTheme.Transparent"></activity>
-        <activity
-            android:name="io.lookback.sdk.ui.recording.StopRecordingActivity"
-            android:label="@string/lookback_activity_stop_recording_title"
-            android:theme="@style/LookbackAppTheme.Transparent.NoDim"></activity>
-        <activity
-            android:name="io.lookback.sdk.ui.recording.WeAreRecordingActivity"
-            android:theme="@style/LookbackAppTheme.Transparent.NoDim"></activity>
-        <activity
-            android:name="io.lookback.sdk.ui.dashboard.RecordingsActivity"
-            android:label="@string/lookback_activity_recordings_title"
-            android:parentActivityName="io.lookback.sdk.ui.recording.RecordingActivity"
-            android:theme="@style/LookbackAppTheme"></activity>
-        <activity
-            android:name="io.lookback.sdk.ui.preview.PreviewActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/lookback_activity_preview_title"
-            android:theme="@style/LookbackAppTheme"></activity>
-        <activity
-            android:name="io.lookback.sdk.ui.SettingsActivity"
-            android:label="@string/lookback_activity_settings_title"
-            android:parentActivityName="io.lookback.sdk.ui.dashboard.RecordingsActivity"
-            android:theme="@style/LookbackAppTheme"></activity>
+        <receiver android:name=".broadcast.SyncBroadCast">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
 
-        <service
-            android:name="io.lookback.sdk.service.BackgroundService"
-            android:exported="false" />
 
     </application>
 

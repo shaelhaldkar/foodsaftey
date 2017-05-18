@@ -4,8 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/foodsafety_android.iml" filepath="$PROJECT_DIR$/foodsafety_android.iml" />
-      <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
-      <module fileurl="file://$PROJECT_DIR$/lookback-android-sdk-0.9.13/lookback-android-sdk-0.9.13.iml" filepath="$PROJECT_DIR$/lookback-android-sdk-0.9.13/lookback-android-sdk-0.9.13.iml" />
     </modules>
   </component>
 </project>

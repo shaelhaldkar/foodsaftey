@@ -28,8 +28,8 @@ import java.util.ArrayList;
 /**
  * Created by root on 20/11/15.
  */
-public class Store_Fragement extends Fragment {
-
+public class Store_Fragement extends Fragment
+{
     private Context context;
     private ExpandableHeightListView store_list;
     private Fragment fragment;

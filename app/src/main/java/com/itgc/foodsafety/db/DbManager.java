@@ -31,11 +31,11 @@ public class DbManager {
         }
     }
 
-    public static synchronized DbManager getInstance() {
-        if (instance == null) {
-            throw new IllegalStateException(
-                    DbManager.class.getSimpleName()
-                            + " is not initialized, call initializeInstance(..) method first.");
+    public static synchronized DbManager getInstance()
+    {
+        if (instance == null)
+        {
+            throw new IllegalStateException(DbManager.class.getSimpleName() + " is not initialized, call initializeInstance(..) method first.");
         }
         return instance;
     }
@@ -54,7 +54,8 @@ public class DbManager {
         }
     }
 
-    public Cursor getDetails(String query) {
+    public Cursor getDetails(String query)
+    {
         return mDb.rawQuery(query, null);
     }
 

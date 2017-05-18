@@ -561,6 +561,12 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         DbManager.initializeInstance(dbHelper, ctx);
         DbManager.getInstance().openDatabase();
 
+//        Log.e("Cat Id",Cat_id+"");
+//        Log.e("Category",category+"");
+//        Log.e("Store Id",Store_id+"");
+//        Log.e("Store Location",store_loc+"");
+//        Log.e("Store Name",Store_name+"");
+
     }
 
     @Override
@@ -646,21 +652,17 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             else if (getAnswerses.get(count - 1).getAnswer_type() == 3)
                 rg_partial.setChecked(true);
 
-
         } catch (Exception e) {
-
         }
 
         int sample = 0;
         try {
             sample = getAnswerses.get(count - 1).getNo_sample();
             if (sample == 1 && getAnswerses.get(count - 1).getMax_sample() == 0)
-                list_sampleno.setAdapter(new ArrayAdapter<>(ctx, android.R.layout.simple_spinner_item,
-                        getSampleCount(sample)));
+                list_sampleno.setAdapter(new ArrayAdapter<>(ctx, android.R.layout.simple_spinner_item,getSampleCount(sample)));
             else
                 list_sampleno.setSelection(sample - 1);
         } catch (Exception e) {
-
         }
 
         try {
@@ -674,25 +676,21 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         try {
             edt_remark.setText(getAnswerses.get(count - 1).getRemark());
         } catch (Exception e) {
-
         }
 
         try {
             edt_comment.setText(getAnswerses.get(count - 1).getComment());
         } catch (Exception e) {
-
         }
 
         try {
             actions.setText(getAnswerses.get(count - 1).getActions());
         } catch (Exception e) {
-
         }
 
         try {
             skip = getAnswerses.get(count - 1).getQues_skip();
         } catch (Exception e) {
-
         }
 
         try {
@@ -701,7 +699,6 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             else
                 txt_skip.setChecked(false);
         } catch (Exception e) {
-
         }
 
         try {
@@ -714,7 +711,6 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             setAdapter(getAnswerses.get(count - 1).getNo_sample(), getAnswerses.get(count - 1).getSampleAudits());
             isClicked = false;
         } catch (Exception e) {
-
         }
     }
 
@@ -829,15 +825,11 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         rg_no.setOnCheckedChangeListener(this);
         rg_partial.setOnCheckedChangeListener(this);
         txt_skip.setOnClickListener(this);
-
         read_more.setOnClickListener(this);
-
         setData(count);
-
         AppPrefrences.setStartTime(ctx, getDateTime());
 
     }
-
 
     private void setData(int count) {
         imagesarray = new ArrayList<>();
@@ -911,6 +903,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 if (AppUtils.checkInternetConnection(ctx)) {
                     isClicked = true;
                     hideKeyboard(btn_next);
+
                     if (count < audit.size()) {
                         if (AppUtils.isDraft)
                             saveDraftData(count - 1);
@@ -974,7 +967,8 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                             e.printStackTrace();
                         }
                     }
-                } else Toast.makeText(ctx, "Internet is Not connected", Toast.LENGTH_SHORT).show();
+                } else
+                    Toast.makeText(ctx, "Internet is Not connected", Toast.LENGTH_SHORT).show();
 
                 break;
             case R.id.btn_camera:
@@ -1030,7 +1024,6 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 break;
         }
     }
-
 
     public boolean CheckPrevious() {
         lists = new ArrayList<ArrayList<Answers>>();
@@ -1225,7 +1218,6 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                             fragment.setArguments(bundle);
                             getFragmentManager().beginTransaction().replace(R.id.container_body, fragment).addToBackStack("Store").commit();
 
-
                         } catch (Exception e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();
@@ -1234,7 +1226,6 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-
                 }
             }
         }, new Response.ErrorListener() {
@@ -1266,6 +1257,8 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 params.put("enddatetime", getDateTime());
                 params.put("store_id", String.valueOf(Store_id));
                 params.put("expiry_question", "0");
+                JSONObject o = new JSONObject(params);
+                Log.e("Submit Params", o.toString());
                 return params;
             }
         };
@@ -1292,7 +1285,6 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         String formattedDate = new SimpleDateFormat("dd MMM yyyy kk:mm").format(Calendar.getInstance().getTime());
         return formattedDate;
     }
-
 
     private void skipaudit() {
         final AlertDialog.Builder dialog = new AlertDialog.Builder(ctx);
@@ -1519,13 +1511,9 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 MediaStore.ACTION_IMAGE_CAPTURE);
 
         if (photoFile != null) {
-//            AppPreferences.setPath(getActivity(), photoFile.getAbsolutePath());
             if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-                takePictureIntent.putExtra(
-                        MediaStore.EXTRA_OUTPUT,
-                        Uri.fromFile(photoFile));
-                startActivityForResult(takePictureIntent,
-                        LOAD_CAMERA_RESULTS);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+                startActivityForResult(takePictureIntent, LOAD_CAMERA_RESULTS);
             }
         }
 
@@ -1650,7 +1638,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             if (photoFile != null) {
                 Log.d("", "imagefilepath notcrop " + photoFile.getAbsolutePath());
                 try {
-                   // Bitmap photo = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+                    // Bitmap photo = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
                     Bitmap photo = BitmapHelper.decodeSampledBitmapFromResource(photoFile.getAbsolutePath(), 350, 400); //scall the bitmap into given size
 
                     if (photo != null) {
@@ -1772,7 +1760,6 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         return true;
     }
 
-
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         displayLocation();
@@ -1843,6 +1830,5 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(Intent.createChooser(galleryIntent, "Select Photo"), GALLERY_IMG);
     }
-
 
 }

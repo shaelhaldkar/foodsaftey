@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -161,11 +162,8 @@ public class Store_DetailsFragment extends Fragment implements View.OnClickListe
                 if (response != null) {
                     try {
                         JSONObject jsonObject = new JSONObject(response);
-
                         String msg = jsonObject.getString("Message");
-
                         Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
-
                         store_chiller_no.setText("");
                         store_freezer_no.setText("");
                         store_vendor_chiller_no.setText("");
@@ -176,11 +174,9 @@ public class Store_DetailsFragment extends Fragment implements View.OnClickListe
                         store_thermo_no.setText("");
                         store_manager_name.setText("");
                         store_manager_email.setText("");
-
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-
                 }
             }
         }, new Response.ErrorListener() {
@@ -190,7 +186,6 @@ public class Store_DetailsFragment extends Fragment implements View.OnClickListe
                 Toast.makeText(context, "Failed", Toast.LENGTH_LONG).show();
             }
         }) {
-
 
             @Override
             protected Map<String, String> getParams() {
@@ -215,6 +210,5 @@ public class Store_DetailsFragment extends Fragment implements View.OnClickListe
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         MySingleton.getInstance(context).addToRequestQueue(str);
-
     }
 }

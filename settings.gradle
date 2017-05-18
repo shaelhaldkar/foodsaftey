@@ -1,1 +1,1 @@
-include ':app', ':library', ':lookback-android-sdk-0.9.13'
+include ':app'

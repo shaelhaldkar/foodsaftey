@@ -10,7 +10,6 @@ import com.itgc.foodsafety.utils.AppPrefrences;
 import com.itgc.foodsafety.utils.AppUtils;
 import com.itgc.foodsafety.utils.Methods;
 
-import io.lookback.sdk.Lookback;
 
 
 public class SplashActivity extends Activity {
