@@ -273,29 +273,5 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         LocationManager service = (LocationManager) this.getSystemService(this.LOCATION_SERVICE);
         return service.isProviderEnabled(LocationManager.GPS_PROVIDER) && service.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
- /*   public void openLocationDialog(final Context ctx, final String messageID) {
-        final android.support.v7.app.AlertDialog.Builder dialog = new android.support.v7.app.AlertDialog.Builder(ctx);
-        dialog.setMessage(messageID);
-        dialog.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        dialog.setNegativeButton("Enable", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                try {
-                    Intent intent1 = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    ctx.startActivity(intent1);
-                } catch (Exception e) {
-                    Toast.makeText(ctx, e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
 
-            }
-        });
-        // dialog.show();
-        d = dialog.create();
-        d.show();
-    }*/
 }
