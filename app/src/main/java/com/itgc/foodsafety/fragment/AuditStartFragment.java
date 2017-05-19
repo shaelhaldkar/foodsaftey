@@ -658,7 +658,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         try {
             sample = getAnswerses.get(count - 1).getNo_sample();
             if (sample == 1 && getAnswerses.get(count - 1).getMax_sample() == 0)
-                list_sampleno.setAdapter(new ArrayAdapter<>(ctx, android.R.layout.simple_spinner_item,getSampleCount(sample)));
+                list_sampleno.setAdapter(new ArrayAdapter<>(ctx, android.R.layout.simple_spinner_item, getSampleCount(sample)));
             else
                 list_sampleno.setSelection(sample - 1);
         } catch (Exception e) {
@@ -903,27 +903,29 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                     isClicked = true;
                     hideKeyboard(btn_next);
 
-                    if (count < audit.size()) {
+                    if (count < audit.size())
+                    {
                         if (AppUtils.isDraft)
                             saveDraftData(count - 1);
                         else
                             saveData(count - 1);
                         count = count + 1;
-                        if (answerses.size() >= count) {
+                        if (answerses.size() >= count)
+                        {
                             setArrayData();
                         } else
                             setData(count);
-                        restoreToolbar();
+                            restoreToolbar();
                         if (getAnswerses != null && getAnswerses.size() > 0)
                             setValues(count);
-                        insertDraft();
+                            insertDraft();
 
                     } else {
                         if (AppUtils.isDraft)
                             saveDraftData(count - 1);
                         else
                             saveData(count - 1);
-                        insertDraft();
+                            insertDraft();
                         try {
                             if (!AppUtils.isDraft) {
                                 ContentValues cv = new ContentValues();
@@ -935,13 +937,11 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                                 cv.put(DBHelper.ANSWER_DateTime, formattedDate);
                                 cv.put(DBHelper.ANSWER_Status, "Complete");
                                 cv.put(DBHelper.ANSWER_value, serializeObject(answerses));
-
-                                DbManager.getInstance().updateDetails(cv, DBHelper.ANSWER_Tbl_NAME, DBHelper.ANSWER_Cat_id + "='" + Cat_id + "' AND " + DBHelper.ANSWER_Store_id +
-                                        "='" + Store_id + "' ");
-
+                                DbManager.getInstance().updateDetails(cv, DBHelper.ANSWER_Tbl_NAME, DBHelper.ANSWER_Cat_id + "='" + Cat_id + "' AND " + DBHelper.ANSWER_Store_id + "='" + Store_id + "' ");
                                 for (int i = 0; i < answerses.size(); i++)
                                     Log.d("", "final answerses " + answerses.get(i).getImage());
-                            } else {
+                            } else
+                                {
                                 ContentValues cv = new ContentValues();
                                 cv.put(DBHelper.ANSWER_Cat_id, Cat_id);
                                 cv.put(DBHelper.ANSWER_Cat, category);
@@ -951,10 +951,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                                 cv.put(DBHelper.ANSWER_DateTime, formattedDate);
                                 cv.put(DBHelper.ANSWER_Status, "Complete");
                                 cv.put(DBHelper.ANSWER_value, serializeObject(getAnswerses));
-
-                                DbManager.getInstance().updateDetails(cv, DBHelper.ANSWER_Tbl_NAME, DBHelper.ANSWER_Cat_id + "='" + Cat_id + "' AND " + DBHelper.ANSWER_Store_id +
-                                        "='" + Store_id + "' ");
-
+                                DbManager.getInstance().updateDetails(cv, DBHelper.ANSWER_Tbl_NAME, DBHelper.ANSWER_Cat_id + "='" + Cat_id + "' AND " + DBHelper.ANSWER_Store_id + "='" + Store_id + "' ");
                                 for (int i = 0; i < getAnswerses.size(); i++)
                                     Log.d("", "final getAnswerses " + getAnswerses.get(i).getImage());
                             }
@@ -1085,10 +1082,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             String query = "";
 
             try {
-
-                query = "SELECT answer_val FROM answer where ans_catid = '" + Cat_id + "' AND ans_storeid ='" + Store_id + "' AND  (ans_status = 'Skipped' OR " +
-                        "ans_status = 'Complete')";
-
+                query = "SELECT answer_val FROM answer where ans_catid = '" + Cat_id + "' AND ans_storeid ='" + Store_id + "' AND  (ans_status = 'Skipped' OR " + "ans_status = 'Complete')";
             } catch (Exception e) {
 
             }
@@ -1100,16 +1094,12 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 if (curs.moveToFirst()) {
                     if (curs.getCount() > 0) {
                         for (int i = 0; i < curs.getCount(); i++) {
-                            ArrayList<Answers> answersArrayList = (ArrayList<Answers>) deserializeObject(curs.getBlob(curs.getColumnIndex
-                                    (DBHelper.ANSWER_value)));
-
+                            ArrayList<Answers> answersArrayList = (ArrayList<Answers>) deserializeObject(curs.getBlob(curs.getColumnIndex(DBHelper.ANSWER_value)));
                             Log.e("ANSWERS--->>", answersArrayList.toString());
                             Log.e("LISTTT--", answersArrayList.toString());
-
                             Gson gson = new Gson();
                             data1 = gson.toJson(answersArrayList);
-                            Log.e("", "dataaaaaa1 " + data1);
-                            // lists.add(answersArrayList);
+                            Log.e("", "Data " + data1);
                             curs.moveToNext();
                         }
                     }
@@ -1495,8 +1485,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         return checked;
     }
 
-    private void doTakePhotoAction()
-    {
+    private void doTakePhotoAction() {
         try {
             photoFile = createImageFile();
         } catch (IOException ex) {
@@ -1540,6 +1529,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
 
     public class SaveImgTask extends AsyncTask<Bitmap, Void, String> {
         ProgressDialog pd;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -1563,15 +1553,13 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         }
     }
 
-    private void storeImage(Bitmap image)
-    {
+    private void storeImage(Bitmap image) {
         try {
             File dir = new File(Environment.getExternalStorageDirectory(), "FoodSafety");
             if (!dir.exists())
                 dir.mkdir();
             File pictureFile = new File(dir, "foodsafety_" + System.currentTimeMillis() + ".jpg");
-            if (pictureFile == null)
-            {
+            if (pictureFile == null) {
                 Log.d("",
                         "Error creating media file, check storage permissions: ");// e.getMessage());
                 return;
@@ -1579,11 +1567,9 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             FileOutputStream fos = new FileOutputStream(pictureFile);
             image.compress(Bitmap.CompressFormat.JPEG, 100, fos);
             fos.close();
-        } catch (FileNotFoundException e)
-        {
+        } catch (FileNotFoundException e) {
             Log.d("", "File not found: " + e.getMessage());
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             Log.d("", "Error accessing file: " + e.getMessage());
         }
     }

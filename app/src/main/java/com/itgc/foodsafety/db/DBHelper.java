@@ -17,6 +17,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
 
+    public static final String STORE_SIGNATURE_TBL_NAME = "storeSignature";
+    public static final String STORE_SIGNATURE_ID = "singatureId";
+    public static final String STORE_SIGNATURE_IMAGE = "signatureImage";
+
     public static final String CAT_Tbl_NAME = "category";
     public static final String CAT_id = "id";
     public static final String CAT_NAME = "categoryName";
@@ -135,6 +139,9 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String ANSWER_Cat = "ans_category";
     public static final String ANSWER_Type = "ans_type";
 
+    private final String TABLE_STORE_SIGNATUTE_CREATE = "CREATE TABLE " + STORE_SIGNATURE_TBL_NAME + " (" + STORE_SIGNATURE_ID + " INTEGER,"+ STORE_SIGNATURE_IMAGE + " TEXT" +")";
+    private final String TABLE_STORE_SIGNATURE_DROP = "DROP TABLE IF EXISTS " + STORE_SIGNATURE_TBL_NAME;
+
 
     private final String TABLE_ANSWER_CREATE = "CREATE TABLE " + ANSWER_Tbl_NAME + " (" + ANSWER_id + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             ANSWER_Cat_id + " INTEGER, " + ANSWER_value + " BLOB, " + ANSWER_Draft_value + " BLOB, " + ANSWER_DateTime + " TEXT, "
@@ -252,6 +259,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        db.execSQL(TABLE_STORE_SIGNATUTE_CREATE);
         db.execSQL(TABLE_Category_CREATE);
         db.execSQL(TABLE_SubCategory_CREATE);
         db.execSQL(TABLE_Questions_CREATE);
@@ -266,6 +274,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL(TABLE_STORE_SIGNATURE_DROP);
         db.execSQL(TABLE_Category_DROP);
         db.execSQL(TABLE_SubCategory_DROP);
         db.execSQL(TABLE_Questions_DROP);

@@ -3,9 +3,11 @@ package com.itgc.foodsafety.fragment;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -73,16 +75,14 @@ public class Submit_report extends Fragment implements View.OnClickListener {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
-
         b = getArguments();
-
         Store_id = b.getInt("Store_id");
         Store_name = b.getString("Store_name");
-
-
         lists = new ArrayList<>();
+        getStoreSignature(Store_id+"");
     }
 
     @Nullable
@@ -143,23 +143,28 @@ public class Submit_report extends Fragment implements View.OnClickListener {
                 auditerContactNumber = auditerContactNumberEditText.getText()
                         .toString();
 
-                if (auditerName.isEmpty() || auditerName.equals("")) {
+                if (auditerName.isEmpty() || auditerName.equals(""))
+                {
                     message = "Please enter the Auditer name.";
                     Toast.makeText(ctx, message, Toast.LENGTH_LONG).show();
-                } else if (auditerContactNumber.isEmpty()
-                        || auditerContactNumber.equals("")) {
+                } else if (auditerContactNumber.isEmpty() || auditerContactNumber.equals(""))
+                {
                     message = "Please enter the Auditer Contact Number.";
                     Toast.makeText(ctx, message, Toast.LENGTH_LONG).show();
-                } else if (auditerContactNumber.length() > 10 || auditerContactNumber.length() < 10) {
+                } else if (auditerContactNumber.length() > 10 || auditerContactNumber.length() < 10)
+                {
                     message = "Please enter the Auditer Contact Number properly.";
                     Toast.makeText(ctx, message, Toast.LENGTH_LONG).show();
-                } else if (AppUtils.encodedimage.equals("")) {
+                } else if (AppUtils.encodedimage.equals(""))
+                {
                     message = "Please get Auditor sign.";
                     Toast.makeText(ctx, message, Toast.LENGTH_LONG).show();
-                } else if (AppUtils.encodedstoreimage.equals("")) {
+                } else if (AppUtils.encodedstoreimage.equals(""))
+                {
                     message = "Please get Store Manager sign.";
                     Toast.makeText(ctx, message, Toast.LENGTH_LONG).show();
-                } else {
+                } else
+                    {
                     submitReport();
                 }
                 break;
@@ -175,88 +180,75 @@ public class Submit_report extends Fragment implements View.OnClickListener {
             Toast.makeText(ctx, "Please Add Expiry Status", Toast.LENGTH_LONG).show();
         } else
             submitData("");
-
-
     }
 
     private void submitData(final String data1) {
         Log.d("", "data1 " + data1);
-
         pd = new ProgressDialog(ctx);
         pd.setMessage("Please Wait...");
         pd.setCancelable(false);
         pd.show();
-
-        StringRequest str = new StringRequest(Request.Method.POST,
-                Vars.BASE_URL + Vars.SUBMIT_REPORT, new Response.Listener<String>() {
-
+        StringRequest str = new StringRequest(Request.Method.POST,Vars.BASE_URL + Vars.SUBMIT_REPORT, new Response.Listener<String>()
+        {
             @Override
-            public void onResponse(String response) {
+            public void onResponse(String response)
+            {
                 Log.e("SUBMIT_FINAL---", response);
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
-                if (response != null) {
-
-
-                    try {
+                if (response != null)
+                {
+                    try
+                    {
                         JSONObject jsonObject = new JSONObject(response);
-
                         String msg = jsonObject.getString("Message");
+                        if(msg.contains("success"))
+                        {
+                            AppUtils.encodedimage = "";
+                            AppPrefrences.setStartTime(ctx, "");
+                            deleteData();
+                            deleteStoreSignature(String.valueOf(Store_id));
+                        }else
+                        {
+                            //Save Store Manager Signature For Submitting Later Time
 
+                        }
                         Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
-
-                        AppUtils.encodedimage = "";
-                        AppPrefrences.setStartTime(ctx, "");
-                        deleteData();
-                        try {
+                        try
+                        {
                             Intent intent = new Intent("DraftsCount");
                             ctx.sendBroadcast(intent);
-                            getFragmentManager().beginTransaction().replace(R.id.container_body, new Store_Fragement()).
-                                    addToBackStack("Store")
-                                    .commit();
-                        } catch (Exception e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
+                            getFragmentManager().beginTransaction().replace(R.id.container_body, new Store_Fragement()).addToBackStack("Store").commit();
+                        } catch (Exception e) {}
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    } catch (Exception e)
+                    {
                         if (pd != null && pd.isShowing())
                             pd.dismiss();
                     }
-
                 }
             }
         }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError v) {
+            public void onErrorResponse(VolleyError v)
+            {
                 v.printStackTrace();
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
                 Toast.makeText(ctx, "Failed", Toast.LENGTH_LONG).show();
             }
-        }) {
+        })
 
+        {
             @Override
-            protected Map<String, String> getParams() {
+            protected Map<String, String> getParams()
+            {
                 Map<String, String> params = new HashMap<String, String>();
-
-             /* params.put("data", data1);
-                params.put("audit_by", auditerName);
-                params.put("audit_id", AppPrefrences.getUserId(ctx));
-                params.put("audit_no", auditerContactNumber);
-                params.put("audit_sign", AppUtils.encodedimage);
-                params.put("lat", String.valueOf(latitude));
-                params.put("long", String.valueOf(longitude));
-                params.put("startdateTime", AppPrefrences.getStartTime(ctx));
-                params.put("enddatetime", getDateTime());
-                params.put("store_id", String.valueOf(Store_id));*/
-
                 params.put("data", "");
                 params.put("audit_id", AppPrefrences.getAuditId(ctx));
                 params.put("final_submit", "true");
-                params.put("audit_sign", AppUtils.encodedimage);
-                params.put("store_sign", AppUtils.encodedstoreimage);
+                params.put("audit_sign",AppUtils.encodedimage);
+                params.put("store_sign",AppUtils.encodedstoreimage);
                 params.put("cat_id", Cat_id + "");
                 params.put("audit_contact", auditerContactNumberEditText.getText().toString());
                 params.put("auditor_id", AppPrefrences.getUserId(ctx));
@@ -266,18 +258,12 @@ public class Submit_report extends Fragment implements View.OnClickListener {
                 params.put("enddatetime", getDateTime());
                 params.put("store_id", String.valueOf(Store_id));
                 params.put("expiry_question", expiry);
-                Log.e("Expiry", expiry);
-
-                Log.e("Submit Report Params ",params.toString());
-
+                Log.e("Submit Report Params ",new JSONObject(params).toString());
+                saveStoreSignature(String.valueOf(Store_id),AppUtils.encodedstoreimage);
                 return params;
             }
         };
-
-        str.setRetryPolicy(new DefaultRetryPolicy(
-                120000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        str.setRetryPolicy(new DefaultRetryPolicy(120000,DefaultRetryPolicy.DEFAULT_MAX_RETRIES,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         MySingleton.getInstance(ctx).addToRequestQueue(str);
     }
 
@@ -361,4 +347,39 @@ public class Submit_report extends Fragment implements View.OnClickListener {
         alert11.show();
 
     }
+
+    private void saveStoreSignature(String storeId,String imageString)
+    {
+        ContentValues cv = new ContentValues();
+        cv.put(DBHelper.STORE_SIGNATURE_ID, storeId);
+        cv.put(DBHelper.STORE_SIGNATURE_IMAGE, imageString);
+        DbManager.getInstance().insertDetails(cv, DBHelper.STORE_SIGNATURE_TBL_NAME);
+    }
+
+    private void deleteStoreSignature(String storeId)
+    {
+        DbManager.getInstance().deleteDetails(DBHelper.STORE_SIGNATURE_TBL_NAME, DBHelper.STORE_SIGNATURE_ID + "=" + storeId);
+    }
+
+    private void getStoreSignature(String storeId)
+    {
+        String query="SELECT signatureImage FROM storeSignature WHERE singatureId="+storeId;
+        DbManager.getInstance().openDatabase();
+        Cursor cursor = DbManager.getInstance().getDetails(query);
+        Log.e("Item Count", cursor.getCount()+"");
+        try
+        {
+            if(cursor!=null)
+            {
+                cursor.moveToFirst();
+                AppUtils.encodedstoreimage=cursor.getString(0);
+                Log.e("Store Image ",cursor.getString(0));
+            }
+        }catch (Exception e)
+        {
+            Log.e("Store Image Error",e.getMessage());
+        }
+
+    }
+
 }

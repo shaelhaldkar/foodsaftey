@@ -71,7 +71,7 @@ public class DbManager {
     public void insertDetails(ContentValues listcv, String pTblName) {
         try {
             mDb.insert(pTblName, null, listcv);
-            Log.w("Status", "Details inserted Successfully");
+            Log.e("Data Inserted On:> ",pTblName);
         } catch (SQLiteException e) {
 
         }
@@ -80,6 +80,7 @@ public class DbManager {
     public void deleteDetails(String pTblName, String wheredata) {
         try {
             mDb.delete(pTblName, wheredata, null);
+            Log.e("Data Deleted From:> ",pTblName);
         } catch (Exception e) {
 
         }
