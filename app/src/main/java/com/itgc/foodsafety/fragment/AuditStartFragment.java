@@ -604,7 +604,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         DbManager.getInstance().openDatabase();
         curs = DbManager.getInstance().getDetails(query);
         isInserted = curs.moveToFirst();
-        Log.d("Inserted", "" + isInserted + ", " + query);
+        Log.e("Inserted", "" + isInserted + ", " + query);
 
         if (isInserted) {
             ContentValues cv = new ContentValues();
@@ -1679,7 +1679,6 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 cv.put(DBHelper.ANSWER_Type, type);
                 cv.put(DBHelper.ANSWER_value, serializeObject(answerses));
                 cv.put(DBHelper.ANSWER_Draft_value, serializeObject(audit));
-
                 Log.e("SAVED_ANSWERS---->", answerses.toString());
                 DbManager.getInstance().updateDetails(cv, DBHelper.ANSWER_Tbl_NAME, DBHelper.ANSWER_Cat_id + "='" + Cat_id + "' AND " + DBHelper.ANSWER_Store_id + "='" + Store_id + "' ");
             } else {
@@ -1694,7 +1693,6 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 cv.put(DBHelper.ANSWER_Type, type);
                 cv.put(DBHelper.ANSWER_value, serializeObject(getAnswerses));
                 cv.put(DBHelper.ANSWER_Draft_value, serializeObject(audit));
-
                 Log.e("SAVED_ANSWERS2---->", getAnswerses.toString());
                 DbManager.getInstance().updateDetails(cv, DBHelper.ANSWER_Tbl_NAME, DBHelper.ANSWER_Cat_id + "='" + Cat_id + "' AND " + DBHelper.ANSWER_Store_id + "='" + Store_id + "' ");
             }

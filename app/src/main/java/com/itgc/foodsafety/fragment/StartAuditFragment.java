@@ -56,7 +56,7 @@ public class StartAuditFragment extends Fragment implements GetAuditQuestions.Ge
     private ArrayList<Audit> audit;
     private Fragment fragment;
     private Bundle b;
-    private String store_name, store_loc,merchant_id;
+    private String store_name, store_loc, merchant_id;
     private int store_id, page = 1;
     private ArrayList<String> strings = new ArrayList<>();
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
@@ -79,7 +79,7 @@ public class StartAuditFragment extends Fragment implements GetAuditQuestions.Ge
         store_name = b.getString("Store_name");
         store_id = b.getInt("Store_id");
         store_loc = b.getString("Store_region");
-        merchant_id=b.getString("merchant_id");
+        merchant_id = b.getString("merchant_id");
 
     }
 
@@ -174,7 +174,7 @@ public class StartAuditFragment extends Fragment implements GetAuditQuestions.Ge
             } else {
                 fragment = new CheckAuditStatus();
                 Bundle bundle = new Bundle();
-                Log.e("AUDITS---->>",audit.get(position).getAudits().toString());
+                Log.e("AUDITS---->>", audit.get(position).getAudits().toString());
                 bundle.putSerializable("DAO", audit.get(position).getAudits());
                 bundle.putInt("Cat_id", audit.get(position).getCat_id());
                 bundle.putString("Cat_name", audit.get(position).getCategory());

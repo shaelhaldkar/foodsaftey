@@ -150,8 +150,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
 
             @Override
             public void onResponse(String response) {
-
-                Log.e("loginRESPO--", response);
+                Log.e("Login Response--", response);
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
                 if (response != null) {
@@ -208,6 +207,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
                 params.put("password", password);
                 params.put("deviceType", "a");
                 params.put("deviceId", DeviceId);
+                Log.e("Login Params",new JSONObject(params).toString());
                 return params;
             }
         };
