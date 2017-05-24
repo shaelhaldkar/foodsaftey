@@ -17,9 +17,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
 
-    public static final String STORE_SIGNATURE_TBL_NAME = "storeSignature";
-    public static final String STORE_SIGNATURE_ID = "singatureId";
-    public static final String STORE_SIGNATURE_IMAGE = "signatureImage";
 
     public static final String CAT_Tbl_NAME = "category";
     public static final String CAT_id = "id";
@@ -139,9 +136,6 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String ANSWER_Cat = "ans_category";
     public static final String ANSWER_Type = "ans_type";
 
-    private final String TABLE_STORE_SIGNATUTE_CREATE = "CREATE TABLE " + STORE_SIGNATURE_TBL_NAME + " (" + STORE_SIGNATURE_ID + " INTEGER,"+ STORE_SIGNATURE_IMAGE + " TEXT" +")";
-    private final String TABLE_STORE_SIGNATURE_DROP = "DROP TABLE IF EXISTS " + STORE_SIGNATURE_TBL_NAME;
-
 
     private final String TABLE_ANSWER_CREATE = "CREATE TABLE " + ANSWER_Tbl_NAME + " (" + ANSWER_id + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             ANSWER_Cat_id + " INTEGER, " + ANSWER_value + " BLOB, " + ANSWER_Draft_value + " BLOB, " + ANSWER_DateTime + " TEXT, "
@@ -208,32 +202,23 @@ public class DBHelper extends SQLiteOpenHelper {
             USER_LONGITUDE + " INTEGER, " + USER_LAST_LAT + " INTEGER, " + USER_LAST_LON + " INTEGER, " + USER_ROLEID + " INTEGER);  ";
 
 
-    private final String TABLE_Category_DROP = "DROP TABLE IF EXISTS "
-            + CAT_Tbl_NAME;
+    private final String TABLE_Category_DROP = "DROP TABLE IF EXISTS " +  CAT_Tbl_NAME;
 
-    private final String TABLE_SubCategory_DROP = "DROP TABLE IF EXISTS "
-            + SUBCAT_Tbl_NAME;
+    private final String TABLE_SubCategory_DROP = "DROP TABLE IF EXISTS " + SUBCAT_Tbl_NAME;
 
-    private final String TABLE_Questions_DROP = "DROP TABLE IF EXISTS "
-            + QUES_Tbl_NAME;
+    private final String TABLE_Questions_DROP = "DROP TABLE IF EXISTS " + QUES_Tbl_NAME;
 
-    private final String TABLE_Audit_DROP = "DROP TABLE IF EXISTS "
-            + AUDIT_Tbl_NAME;
+    private final String TABLE_Audit_DROP = "DROP TABLE IF EXISTS " + AUDIT_Tbl_NAME;
 
-    private final String TABLE_AuditSample_DROP = "DROP TABLE IF EXISTS "
-            + AUDIT_SAMPLE_Tbl_NAME;
+    private final String TABLE_AuditSample_DROP = "DROP TABLE IF EXISTS " + AUDIT_SAMPLE_Tbl_NAME;
 
-    private final String TABLE_BusinessCategory_DROP = "DROP TABLE IF EXISTS "
-            + BUSS_CAT_Tbl_NAME;
+    private final String TABLE_BusinessCategory_DROP = "DROP TABLE IF EXISTS " + BUSS_CAT_Tbl_NAME;
 
-    private final String TABLE_Branch_DROP = "DROP TABLE IF EXISTS "
-            + BRANCH_Tbl_NAME;
+    private final String TABLE_Branch_DROP = "DROP TABLE IF EXISTS " + BRANCH_Tbl_NAME;
 
-    private final String TABLE_User_DROP = "DROP TABLE IF EXISTS "
-            + USER_Tbl_NAME;
+    private final String TABLE_User_DROP = "DROP TABLE IF EXISTS " + USER_Tbl_NAME;
 
-    private final String TABLE_Answer_DROP = "DROP TABLE IF EXISTS "
-            + ANSWER_Tbl_NAME;
+    private final String TABLE_Answer_DROP = "DROP TABLE IF EXISTS " + ANSWER_Tbl_NAME;
 
     private SQLiteDatabase mDb;
     private final Context mContext;
@@ -259,7 +244,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(TABLE_STORE_SIGNATUTE_CREATE);
         db.execSQL(TABLE_Category_CREATE);
         db.execSQL(TABLE_SubCategory_CREATE);
         db.execSQL(TABLE_Questions_CREATE);
@@ -269,12 +253,16 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(TABLE_Branch_CREATE);
         db.execSQL(TABLE_User_CREATE);
         db.execSQL(TABLE_ANSWER_CREATE);
+
+        db.execSQL(TABLE_STORE_INFO_CREATE);
+        db.execSQL(TABLE_STORE_SIGNATUTE_CREATE);
+        db.execSQL(TABLE_CATEGORY_CREATE);
+        db.execSQL(TABLE_QUESTION_CREATE);
         Log.d("Table created", "Table created");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL(TABLE_STORE_SIGNATURE_DROP);
         db.execSQL(TABLE_Category_DROP);
         db.execSQL(TABLE_SubCategory_DROP);
         db.execSQL(TABLE_Questions_DROP);
@@ -284,7 +272,55 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(TABLE_Branch_DROP);
         db.execSQL(TABLE_User_DROP);
         db.execSQL(TABLE_Answer_DROP);
+
+        db.execSQL(TABLE_STORE_INFO_DROP);
+        db.execSQL(TABLE_STORE_SIGNATURE_DROP);
+        db.execSQL(TABLE_CATEGORY_DROP);
+        db.execSQL(TABLE_QUESTION_DROP);
         onCreate(db);
     }
+
+    // For Store Information
+    public static final String STORE_INFO_TBL_NAME = "storeInfo";
+    public static final String STORE_ID = "storeId";
+    public static final String STORE_NAME = "storeName";
+    public static final String STORE_MARCHANT_ID = "storeMarchantId";
+    public static final String STORE_REGION = "storeRegion";
+
+    private final String TABLE_STORE_INFO_CREATE = "CREATE TABLE " + STORE_INFO_TBL_NAME + " (" + STORE_ID + " INTEGER,"+ STORE_NAME + " TEXT," + STORE_MARCHANT_ID +" INTEGER," + STORE_REGION + " TEXT)";
+    private final String TABLE_STORE_INFO_DROP = "DROP TABLE IF EXISTS " + STORE_INFO_TBL_NAME;
+
+
+    // For Store Signature Information
+    public static final String STORE_SIGNATURE_TBL_NAME = "storeSignature";
+    public static final String STORE_SIGNATURE_ID = "singatureId";
+    public static final String STORE_SIGNATURE_IMAGE = "signatureImage";
+
+    private final String TABLE_STORE_SIGNATUTE_CREATE = "CREATE TABLE " + STORE_SIGNATURE_TBL_NAME + " (" + STORE_SIGNATURE_ID + " INTEGER,"+ STORE_SIGNATURE_IMAGE + " TEXT" +")";
+    private final String TABLE_STORE_SIGNATURE_DROP = "DROP TABLE IF EXISTS " + STORE_SIGNATURE_TBL_NAME;
+
+
+    // For Category Information
+    public static final String CATEGORY_TBL_NAME = "categoryInfo";
+    public static final String CATEGORY_ID = "categoryId";
+    public static final String CATEGORY_NAME = "categoryName";
+    public static final String CATEGORY_TYPE = "categoryType";
+
+    private final String TABLE_CATEGORY_CREATE = "CREATE TABLE " + CATEGORY_TBL_NAME + " (" + STORE_ID + " INTEGER,"+ CATEGORY_ID + " INTEGER,"+ CATEGORY_NAME + " TEXT,"+ CATEGORY_TYPE + " INTEGER" +")";
+    private final String TABLE_CATEGORY_DROP = "DROP TABLE IF EXISTS " + CATEGORY_TBL_NAME;
+
+
+    // For Category Question
+    public static final String QUESTION_TBL_NAME = "questionInfo";
+    public static final String QUESTION_ID="quesId";
+    public static final String QUESTION_SUB_CAT_ID="subCategoryId";
+    public static final String QUESTION_SUB_CAT_NAME="subCategoryName";
+    public static final String QUESTION_TEXT="questionText";
+    public static final String QUESTION_DESC="questionDesc";
+    public static final String QUESTION_SAMPLES="numberOfSamples";
+
+    private final String TABLE_QUESTION_CREATE = "CREATE TABLE " + QUESTION_TBL_NAME + " (" + CATEGORY_ID + " INTEGER,"+ QUESTION_ID + " INTEGER,"+ QUESTION_SUB_CAT_ID + " INTEGER,"+
+                                                                    QUESTION_SUB_CAT_NAME + " TEXT,"+ QUESTION_TEXT + " TEXT,"+ QUESTION_DESC + " TEXT,"+ QUESTION_SAMPLES + " TEXT" +")";
+    private final String TABLE_QUESTION_DROP = "DROP TABLE IF EXISTS " + QUESTION_TBL_NAME;
 
 }

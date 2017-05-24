@@ -2,12 +2,14 @@ package com.itgc.foodsafety.fragment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,8 @@ import com.itgc.foodsafety.MainActivity;
 import com.itgc.foodsafety.R;
 import com.itgc.foodsafety.adapter.StoreAdapter;
 import com.itgc.foodsafety.dao.Stores;
+import com.itgc.foodsafety.db.DBHelper;
+import com.itgc.foodsafety.db.DbManager;
 import com.itgc.foodsafety.ui.ExpandableHeightListView;
 import com.itgc.foodsafety.utils.AppPrefrences;
 import com.itgc.foodsafety.utils.AppUtils;
@@ -62,23 +66,26 @@ public class Store_Fragement extends Fragment
         return view;
     }
 
-    private void getData() {
+    private void getData()
+    {
         stores_list.clear();
-        try {
-            JSONArray array = new JSONArray(AppPrefrences.getStoreJson(context));
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject storeobject = array.getJSONObject(i);
-                Stores stores = new Stores();
-                stores.setStore_id(storeobject.getInt("store_id"));
-                stores.setStore_name(storeobject.getString("storeName"));
-                stores.setStore_loc(storeobject.getString("region"));
-                stores.setMerchant_id(storeobject.getString("merchantId"));
-                stores_list.add(stores);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        DbManager.getInstance().openDatabase();
+        Cursor c= DbManager.getInstance().getDetails("SELECT * FROM "+ DBHelper.STORE_INFO_TBL_NAME);
+        Log.e("Store Count",c.getCount()+"");
 
+        if(c!=null)
+        {
+            c.moveToFirst();
+            do {
+                Log.e("Store Name",c.getString(1));
+                Stores stores = new Stores();
+                stores.setStore_id(c.getInt(0));
+                stores.setStore_name(c.getString(1));
+                stores.setStore_loc(c.getString(3));
+                stores.setMerchant_id(c.getString(2));
+                stores_list.add(stores);
+            }while (c.moveToNext());
+        }
     }
 
     private void setUpView(View view) {

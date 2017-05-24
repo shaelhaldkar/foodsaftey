@@ -36,6 +36,8 @@ import com.google.android.gms.location.LocationServices;
 import com.itgc.foodsafety.MainActivity;
 import com.itgc.foodsafety.MySingleton;
 import com.itgc.foodsafety.R;
+import com.itgc.foodsafety.db.DBHelper;
+import com.itgc.foodsafety.db.DbManager;
 import com.itgc.foodsafety.utils.AppPrefrences;
 import com.itgc.foodsafety.utils.Vars;
 
@@ -63,11 +65,16 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
     private Location mLastLocation;
     private GoogleApiClient mGoogleApiClient;
     private double latitude, longitude;
+    DBHelper dbHelper;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         ctx = (Activity) context;
+        dbHelper = new DBHelper(ctx, "FoodSafety.db");
+        dbHelper.openDataBase();
+        DbManager.initializeInstance(dbHelper, ctx);
+        DbManager.getInstance().openDatabase();
     }
 
     @Override
@@ -146,7 +153,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
         pd.show();
 
         StringRequest str = new StringRequest(Request.Method.POST,
-                Vars.BASE_URL + Vars.LOGIN, new Response.Listener<String>() {
+                Vars.BASE_URL + Vars.OFFLINELOGIN, new Response.Listener<String>() {
 
             @Override
             public void onResponse(String response) {
@@ -162,7 +169,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
 
                         JSONObject payload = jsonObject.getJSONObject("Payload");
 
-                        if (Status) {
+                        if (Status)
+                        {
                             AppPrefrences.setUserId(ctx, payload.getString("UserId"));
                             AppPrefrences.setEmail(ctx, payload.getString("email"));
                             AppPrefrences.setUserName(ctx, payload.getString("userName"));
@@ -171,9 +179,17 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
                             JSONArray jsonArray = payload.getJSONArray("store");
                             AppPrefrences.setStoreJson(ctx, jsonArray.toString());
 
-                            if (jsonArray.length() > 0) {
+                            if (jsonArray.length() > 0)
+                            {
+                                DbManager.getInstance().openDatabase();
+                                DbManager.getInstance().deleteStoreDetails();
                                 JSONObject ob = jsonArray.getJSONObject(0);
                                 AppPrefrences.setMerchantId(ctx, ob.getString("merchantId"));
+
+                                for(int i=0;i<jsonArray.length();i++)
+                                {
+                                    DbManager.getInstance().saveStoreDetails(jsonArray.getJSONObject(i));
+                                }
                             }
 
 

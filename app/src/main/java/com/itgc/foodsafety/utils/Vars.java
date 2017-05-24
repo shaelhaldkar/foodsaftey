@@ -29,5 +29,6 @@ public class Vars {
     public static final String STORE_INFO = "Api/store_information";
     public static final String UPDATE_PROFILE = "Api/updateProfile";
     public static final String CHANGE_PASSWORD = "Api/changePassword";
+    public static final String OFFLINELOGIN = "Api/offlinelogin";
 
 }

@@ -8,6 +8,10 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -50,7 +54,8 @@ public class DbManager {
         }
     }
 
-    public Cursor getDetails(String query) {
+    public Cursor getDetails(String query)
+    {
         return mDb.rawQuery(query, null);
     }
 
@@ -84,6 +89,56 @@ public class DbManager {
         } catch (Exception e) {
 
         }
+    }
+
+    public void deleteStoreDetails()
+    {
+        mDb.execSQL("DELETE FROM " + DBHelper.STORE_INFO_TBL_NAME);
+        mDb.execSQL("DELETE FROM " + DBHelper.CATEGORY_TBL_NAME);
+        mDb.execSQL("DELETE FROM " + DBHelper.QUESTION_TBL_NAME);
+        Log.e("Delete", "Data From StoreInfo,CategoryInfo & StoreInfo Table");
+    }
+
+    public void saveStoreDetails(JSONObject object)
+    {
+        String storeID="",storeName="", marchantId="",storeRegion="";
+        try {
+            storeID=object.getString("store_id");
+            storeName=object.getString("storeName");
+            marchantId=object.getString("merchantId");
+            storeRegion=object.getString("region");
+        }catch (Exception e){Log.e("Error","At saveStoreDetails()");}
+
+        ContentValues c=new ContentValues();
+        c.put(DBHelper.STORE_ID,storeID);
+        c.put(DBHelper.STORE_NAME,storeName);
+        c.put(DBHelper.STORE_MARCHANT_ID,marchantId);
+        c.put(DBHelper.STORE_REGION,storeRegion);
+        mDb.insert(DBHelper.STORE_INFO_TBL_NAME,null,c);
+        Log.e("Insert", "Into StoreInfo Table");
+
+        try
+        {
+            JSONArray array=object.getJSONArray("auditList");
+            for(int i=0;i<array.length();i++)
+            {
+                savecategory(storeID,array.getJSONObject(i));
+            }
+        }catch (Exception e){Log.e("Error","At saveStoreDetails()");}
+    }
+
+    void savecategory(String storeId,JSONObject object)
+    {
+        try
+        {
+            ContentValues c=new ContentValues();
+            c.put(DBHelper.STORE_ID,storeId);
+            c.put(DBHelper.CATEGORY_ID,object.getString("catId"));
+            c.put(DBHelper.CATEGORY_NAME,object.getString("categoryName"));
+            c.put(DBHelper.CATEGORY_TYPE,object.getString("type"));
+            mDb.insert(DBHelper.CATEGORY_TBL_NAME,null,c);
+            Log.e("Insert", "Into CategoryInfo Table");
+        }catch (Exception e){Log.e("Error","At saveCategoty()");}
     }
 
 }
