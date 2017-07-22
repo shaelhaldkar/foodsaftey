@@ -2,11 +2,13 @@ package com.itgc.foodsafety.fragment;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -29,14 +31,17 @@ import com.google.android.gms.location.LocationServices;
 import com.itgc.foodsafety.MainActivity;
 import com.itgc.foodsafety.R;
 import com.itgc.foodsafety.adapter.AuditAdapter;
-import com.itgc.foodsafety.asynctask.GetAuditQuestions;
-import com.itgc.foodsafety.dao.Audit;
+import com.itgc.foodsafety.dao.AuditJson;
+import com.itgc.foodsafety.dao.Categories;
 import com.itgc.foodsafety.db.DBHelper;
 import com.itgc.foodsafety.db.DbManager;
 import com.itgc.foodsafety.ui.ExpandableHeightListView;
 import com.itgc.foodsafety.utils.AppPrefrences;
 import com.itgc.foodsafety.utils.AppUtils;
-import com.itgc.foodsafety.utils.Methods;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,7 +50,7 @@ import java.util.Calendar;
 /**
  * Created by root on 9/10/15.
  */
-public class StartAuditFragment extends Fragment implements GetAuditQuestions.GetAuditQuestionsListener, View.OnClickListener, GoogleApiClient.ConnectionCallbacks,
+public class StartAuditFragment extends Fragment implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
     private Context ctx;
@@ -53,16 +58,17 @@ public class StartAuditFragment extends Fragment implements GetAuditQuestions.Ge
     private ExpandableHeightListView audit_list;
     private Button btn_submit;
     private AuditAdapter adapter;
-    private ArrayList<Audit> audit;
+    private ArrayList<Categories> categoriesArrayList = new ArrayList<>();
     private Fragment fragment;
     private Bundle b;
     private String store_name, store_loc, merchant_id;
-    private int store_id, page = 1;
+    private int store_id, listPosition = 0;
     private ArrayList<String> strings = new ArrayList<>();
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
     private Location mLastLocation;
     private GoogleApiClient mGoogleApiClient;
     private double latitude, longitude;
+    private ProgressDialog pd;
 
     @Override
     public void onAttach(Activity context) {
@@ -73,14 +79,11 @@ public class StartAuditFragment extends Fragment implements GetAuditQuestions.Ge
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        audit = new ArrayList<>();
-
         b = getArguments();
         store_name = b.getString("Store_name");
         store_id = b.getInt("Store_id");
         store_loc = b.getString("Store_region");
         merchant_id = b.getString("merchant_id");
-
     }
 
     @Override
@@ -96,22 +99,17 @@ public class StartAuditFragment extends Fragment implements GetAuditQuestions.Ge
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         restoreToolbar();
-
         View view = inflater.inflate(R.layout.auditfragment, container, false);
         setUpView(view);
-        getData();
-
+        getAllCategories(store_id + "");
         return view;
     }
 
-    private void getData() {
-        if (Methods.checkInternetConnection(ctx)) {
-            new GetAuditQuestions(ctx, StartAuditFragment.this, true, AppPrefrences.getMerchatId(ctx)).execute();
-        } else
-            AppUtils.noInternetDialog(ctx);
-    }
-
-    private void setUpView(View view) {
+    private void setUpView(View view)
+    {
+        pd = new ProgressDialog(ctx);
+        pd.setMessage("Please Wait...");
+        pd.setCancelable(false);
         AppUtils.isDraft = false;
         audit_date = (TextView) view.findViewById(R.id.audit_date);
         String formattedDate = new SimpleDateFormat("dd MMM yyyy HH:mm a").format(Calendar.getInstance().getTime());
@@ -120,15 +118,15 @@ public class StartAuditFragment extends Fragment implements GetAuditQuestions.Ge
         audit_list = (ExpandableHeightListView) view.findViewById(R.id.audit_list);
         audit_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                checkStatus(audit.get(position).getCat_id(), position, audit.get(position).getType());
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                checkStatus(position, Integer.parseInt(categoriesArrayList.get(position).getCategoryType()));
             }
         });
 
         btn_submit = (Button) view.findViewById(R.id.btn_submit);
-
+        //btn_submit.setVisibility(View.INVISIBLE);
         btn_submit.setOnClickListener(this);
-        audit.clear();
 
         if (checkPlayServices()) {
 
@@ -137,61 +135,50 @@ public class StartAuditFragment extends Fragment implements GetAuditQuestions.Ge
         }
     }
 
-    private void checkStatus(int Cat_id, int position, int type) {
-        Cursor curs = null;
-        String query = "";
-        String status = "";
+    private void checkStatus(int position, int type) {
 
-        try {
-            query = "SELECT * FROM answer where ans_catid = '" + Cat_id + "' AND ans_storeid = '" + store_id + "' ";
-        } catch (Exception e) {
-
-        }
-
-        DbManager.getInstance().openDatabase();
-        curs = DbManager.getInstance().getDetails(query);
-
-        while (curs != null && curs.moveToNext()) {
-            status = curs.getString(curs.getColumnIndex(DBHelper.ANSWER_Status));
-        }
-
-        if (status.equals("Complete")) {
+        if (categoriesArrayList.get(position).getCategoryStatus().equalsIgnoreCase("Complete"))
+        {
             Toast.makeText(ctx, "Please submit the current Audit Survey", Toast.LENGTH_LONG).show();
-        } else {
-            if (type == 0) {
+            listPosition=position;
+            //new loadLocalData().execute();
+            //getLocalSavedData(String.valueOf(store_id),String.valueOf(categoriesArrayList.get(position).getCategoryId()));
+        }
+        else
+            {
+
+            if (type == 0)
+            {
                 fragment = new AuditStartFragment();
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("DAO", audit.get(position).getAudits());
-                bundle.putInt("Cat_id", audit.get(position).getCat_id());
-                bundle.putString("Cat_name", audit.get(position).getCategory());
-                bundle.putInt("Type", audit.get(position).getType());
+                bundle.putInt("Cat_id", Integer.parseInt(categoriesArrayList.get(position).getCategoryId()));
+                bundle.putString("Cat_name", categoriesArrayList.get(position).getCategoryName());
+                bundle.putInt("Type", Integer.parseInt(categoriesArrayList.get(position).getCategoryType()));
                 bundle.putInt("Store_id", store_id);
                 bundle.putString("Store_name", store_name);
                 bundle.putString("Store_region", store_loc);
                 fragment.setArguments(bundle);
-                getFragmentManager().beginTransaction().replace(R.id.container_body, fragment)
-                        .addToBackStack("Audit").commit();
-            } else {
+                getFragmentManager().beginTransaction().replace(R.id.container_body, fragment).addToBackStack("Audit").commit();
+            }
+            else
+            {
                 fragment = new CheckAuditStatus();
                 Bundle bundle = new Bundle();
-                Log.e("AUDITS---->>", audit.get(position).getAudits().toString());
-                bundle.putSerializable("DAO", audit.get(position).getAudits());
-                bundle.putInt("Cat_id", audit.get(position).getCat_id());
-                bundle.putString("Cat_name", audit.get(position).getCategory());
-                bundle.putInt("Type", audit.get(position).getType());
+                bundle.putInt("Cat_id", Integer.parseInt(categoriesArrayList.get(position).getCategoryId()));
+                bundle.putString("Cat_name", categoriesArrayList.get(position).getCategoryName());
+                bundle.putInt("Type", Integer.parseInt(categoriesArrayList.get(position).getCategoryType()));
                 bundle.putInt("Store_id", store_id);
                 bundle.putString("Store_name", store_name);
                 bundle.putString("Store_region", store_loc);
                 fragment.setArguments(bundle);
-                getFragmentManager().beginTransaction().replace(R.id.container_body, fragment)
-                        .addToBackStack("Audit").commit();
+                getFragmentManager().beginTransaction().replace(R.id.container_body, fragment).addToBackStack("Audit").commit();
             }
         }
 
     }
 
-    private void setAdapter(ArrayList<Audit> audits, ArrayList<String> strings) {
-        adapter = new AuditAdapter(ctx, audits, store_id, strings);
+    private void setAdapter(ArrayList<Categories> categoriesArrayList) {
+        adapter = new AuditAdapter(ctx, categoriesArrayList, store_id);
         audit_list.setAdapter(adapter);
         audit_list.setExpanded(true);
         audit_list.setFocusable(false);
@@ -216,74 +203,64 @@ public class StartAuditFragment extends Fragment implements GetAuditQuestions.Ge
     }
 
     @Override
-    public void onGetQuestionsFinish(ArrayList<Audit> audits, boolean status) {
-        if (status) {
-            this.audit = audits;
-            for (int i = 0; i < audits.size(); i++) {
-                strings.add(i, checkStatus(audits.get(i).getCat_id()));
-            }
-            setAdapter(audits, strings);
-        }
-    }
-
-    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_submit:
-                Log.d("Status", "CLicked");
-                try {
-                    Cursor curs = null;
-                    String query = "";
+                String completeAudit="SELECT * FROM " + DBHelper.CATEGORY_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + store_id + " AND " + DBHelper.CATEGORY_STATUS + "='Complete'";
+                Cursor completed=DbManager.getInstance().getDetails(completeAudit);
 
-                    try {
-                        query = "SELECT * FROM answer where ans_storeid = '" + store_id + "' AND ans_status = 'Skipped' OR " +
-                                "ans_status = 'Complete' ";
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                    DbManager.getInstance().openDatabase();
-                    curs = DbManager.getInstance().getDetails(query);
-                    curs.getCount();
-                    if (curs != null) {
-                        if (curs.moveToFirst()) {
-                            Fragment fragment = new Submit_report();
-                            Bundle bundle = new Bundle();
-                            bundle.putInt("Store_id", store_id);
-                            bundle.putString("Store_name", store_name);
-                            fragment.setArguments(bundle);
-                            getFragmentManager().beginTransaction().replace(R.id.container_body, fragment).
-                                    addToBackStack("Submit Report")
-                                    .commit();
-                        } else
-                            Toast.makeText(ctx, "No Audit has been completed", Toast.LENGTH_LONG).show();
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+                if(completed.getCount()>0)
+                {
+                    Fragment fragment = new Submit_report();
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("Store_id", store_id);
+                    bundle.putString("Store_name", store_name);
+                    fragment.setArguments(bundle);
+                    getFragmentManager().beginTransaction().replace(R.id.container_body, fragment)
+                            .addToBackStack("Submit Report")
+                            .commit();
+                } else
+                {
+                    Toast.makeText(ctx, "No Audit has been completed", Toast.LENGTH_LONG).show();
                 }
+                Log.d("Status", "CLicked");
+//                try {
+//                    Cursor curs = null;
+//                    String query = "";
+//
+//                    try {
+//                        query = "SELECT * FROM answer where ans_storeid = '" + store_id + "' AND ans_status = 'Skipped' OR " +
+//                                "ans_status = 'Complete' ";
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                    DbManager.getInstance().openDatabase();
+//                    curs = DbManager.getInstance().getDetails(query);
+//                    curs.getCount();
+//                    if (curs != null)
+//                    {
+//                        if (curs.moveToFirst())
+//                        {
+//                            Fragment fragment = new Submit_report();
+//                            Bundle bundle = new Bundle();
+//                            bundle.putInt("Store_id", store_id);
+//                            bundle.putString("Store_name", store_name);
+//                            fragment.setArguments(bundle);
+//                            getFragmentManager().beginTransaction().replace(R.id.container_body, fragment)
+//                                    .addToBackStack("Submit Report")
+//                                    .commit();
+//                        } else
+//                        {
+//                            Toast.makeText(ctx, "No Audit has been completed", Toast.LENGTH_LONG).show();
+//                        }
+//                    }
+//
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
                 break;
         }
-    }
-
-    private String checkStatus(int catid) {
-        //Log.d("Cat_id", "" + catid);
-        Cursor curs = null;
-        String query = "";
-        String status = "";
-        try {
-            query = "SELECT ans_status FROM answer where ans_storeid = '" + store_id + "' AND ans_catid = '" + catid + "' ";
-
-            DbManager.getInstance().openDatabase();
-            curs = DbManager.getInstance().getDetails(query);
-
-            if (curs != null && curs.moveToFirst()) {
-                status = curs.getString(curs.getColumnIndex(DBHelper.ANSWER_Status));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return status;
     }
 
     @Override
@@ -314,9 +291,6 @@ public class StartAuditFragment extends Fragment implements GetAuditQuestions.Ge
                 .addApi(LocationServices.API).build();
     }
 
-    /**
-     * Method to verify google play services on the device
-     */
     private boolean checkPlayServices() {
         int resultCode = GooglePlayServicesUtil
                 .isGooglePlayServicesAvailable(ctx);
@@ -359,4 +333,181 @@ public class StartAuditFragment extends Fragment implements GetAuditQuestions.Ge
 
         Log.d("LatLong", latitude + ", " + longitude);
     }
+
+    private void getAllCategories(String storeId)
+    {
+        DbManager.getInstance().openDatabase();
+        Cursor c = DbManager.getInstance().getDetails("SELECT * FROM " + DBHelper.CATEGORY_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + storeId);
+        Log.e("Category Count", c.getCount() + "");
+
+        if (c != null) {
+            categoriesArrayList.clear();
+            c.moveToFirst();
+            do {
+                Categories categories = new Categories();
+                categories.setCategoryId(c.getString(c.getColumnIndex(DBHelper.CATEGORY_ID)));
+                categories.setCategoryName(c.getString(c.getColumnIndex(DBHelper.CATEGORY_NAME)));
+                categories.setCategoryType(c.getString(c.getColumnIndex(DBHelper.CATEGORY_TYPE)));
+                categories.setCategoryStatus(c.getString(c.getColumnIndex(DBHelper.CATEGORY_STATUS)));
+                categoriesArrayList.add(categories);
+            } while (c.moveToNext());
+        }
+        setAdapter(categoriesArrayList);
+    }
+
+    private void getLocalSavedData(String storeId,String categoryId)
+    {
+        DbManager.getInstance().openDatabase();
+        Cursor c = DbManager.getInstance().getDetails("SELECT * FROM " + DBHelper.ANSWER_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + storeId + " AND " +
+                                                                                                                DBHelper.CATEGORY_ID +"=" + categoryId);
+        //Log.e("Category Count", c.getCount() + "");
+        JSONObject storeObject=new JSONObject();
+        JSONArray array=new JSONArray();
+        JSONObject o;
+        if (c.getCount()>0)
+        {
+            c.moveToFirst();
+            do
+            {
+                o=new JSONObject();
+                try
+                {
+                    o.put("store_id",c.getInt(c.getColumnIndex(DBHelper.STORE_ID)));
+                    o.put("cat_id",c.getInt(c.getColumnIndex(DBHelper.CATEGORY_ID)));
+                    o.put("subcat_id",c.getInt(c.getColumnIndex(DBHelper.ANSWER_SUBCAT_ID)));
+                    o.put("question_id",c.getInt(c.getColumnIndex(DBHelper.QUESTION_ID)));
+                    int quesId=c.getInt(c.getColumnIndex(DBHelper.QUESTION_ID));
+                    int catId=c.getInt(c.getColumnIndex(DBHelper.QUESTION_ID));
+                    int strId=c.getInt(c.getColumnIndex(DBHelper.QUESTION_ID));
+
+                    // For Audit Images
+                    JSONArray imageArray=new JSONArray();
+                    Cursor imageCursor = DbManager.getInstance().getDetails("SELECT answerImage FROM " + DBHelper.ANSWER_IMAGE_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + storeId + " AND " +
+                                                                                                                                                      DBHelper.CATEGORY_ID +"=" + categoryId + " AND " +
+                                                                                                                                                      DBHelper.QUESTION_ID +"=" + quesId);
+                    //Log.e("Image Count", imageCursor.getCount() + "");
+                    if(imageCursor.getCount()>0)
+                    {
+                        imageCursor.moveToFirst();
+                     do {
+                         imageArray.put(imageCursor.getString(imageCursor.getColumnIndex(DBHelper.ANSWER_IMAGE)));
+                     }while (imageCursor.moveToNext());
+                        imageCursor.close();
+                    }
+                    o.put("image",imageArray);
+
+                    // For Sample Audits
+                    JSONArray auditSamples=new JSONArray();
+                    String sampleQuery="SELECT * FROM " + DBHelper.AUDIT_SAMPLE_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + storeId + " AND " +
+                                                                                                       DBHelper.CATEGORY_ID + "=" + categoryId + " AND " +
+                                                                                                       DBHelper.QUESTION_ID + "=" +quesId;
+                    Cursor samplesCursor=DbManager.getInstance().getDetails(sampleQuery);
+                    //Log.e("Total Samples",samplesCursor.getCount()+"");
+                    if(samplesCursor.getCount()>0)
+                    {
+                        samplesCursor.moveToFirst();
+                        do
+                        {
+                            JSONObject auditObject=new JSONObject();
+                            auditObject.put("isclicked",Boolean.parseBoolean(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.SAMPLE_IS_CLICKED))));
+                            auditObject.put("rate_x",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_RATE_X)));
+                            auditObject.put("sample_count",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_COUNT)));
+                            auditObject.put("sample_current_rate",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_CURRENT_RATE)));
+                            auditObject.put("sample_pos",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_POS)));
+                            auditSamples.put(auditObject);
+                        }while (samplesCursor.moveToNext());
+                        samplesCursor.close();
+                    }
+                    o.put("sampleAudits",auditSamples);
+
+                    o.put("comment",c.getString(c.getColumnIndex(DBHelper.ANSWER_COMMENT)));
+                    o.put("remark",c.getString(c.getColumnIndex(DBHelper.ANSWER_REMARK)));
+                    o.put("actions",c.getString(c.getColumnIndex(DBHelper.ANSWER_ACTION)));
+                    o.put("answer_type",c.getInt(c.getColumnIndex(DBHelper.ANSWER_TYPE)));
+                    o.put("cat_skip",c.getString(c.getColumnIndex(DBHelper.ANSWER_CAT_SKIP)));
+                    o.put("isSeen",Boolean.parseBoolean(c.getString(c.getColumnIndex(DBHelper.ANSWER_IS_SEEN))));
+                    o.put("max_no",c.getInt(c.getColumnIndex(DBHelper.ANSWER_MAX_NO)));
+                    o.put("max_sample",c.getInt(c.getColumnIndex(DBHelper.ANSWER_MAX_SAMPLE)));
+                    o.put("no_sample",c.getInt(c.getColumnIndex(DBHelper.ANSWER_NO_SAMPLE)));
+                    o.put("ques_skip",c.getString(c.getColumnIndex(DBHelper.ANSWER_QUES_SKIP)));
+                    o.put("type",c.getInt(c.getColumnIndex(DBHelper.ANSWER_CAT_TYPE)));
+                    o.put("answerDateTime",c.getString(c.getColumnIndex(DBHelper.ANSWER_DATETIME)));
+                    array.put(o);
+
+                    String categoryQuery="SELECT * FROM " + DBHelper.CATEGORY_TBL_NAME + " WHERE " + DBHelper.STORE_ID +"=" + storeId + " AND " + DBHelper.CATEGORY_ID +"=" + categoryId;
+                    Cursor catCursor=DbManager.getInstance().getDetails(categoryQuery);
+                    String startDateTime="",endDateTime="";
+                    if(catCursor.getCount()>0)
+                    {
+                        catCursor.moveToFirst();
+                        startDateTime=catCursor.getString(catCursor.getColumnIndex(DBHelper.CATEGORY_START_DATE));
+                        endDateTime=catCursor.getString(catCursor.getColumnIndex(DBHelper.CATEGORY_END_DATE));
+                    }
+
+                    storeObject.put("store_id",storeId);
+                    storeObject.put("cat_id",categoryId);
+                    storeObject.put("audit_id","0");
+                    storeObject.put("expiry_question","0");
+                    storeObject.put("startdateTime",startDateTime);
+                    storeObject.put("enddatetime",endDateTime);
+                    storeObject.put("data",array);
+                    storeObject.put("store_sign","");
+                    storeObject.put("audit_sign","");
+                    storeObject.put("audit_contact","");
+                    storeObject.put("final_submit","false");
+                    storeObject.put("auditor_id",AppPrefrences.getUserId(ctx));
+                    storeObject.put("lat",AppPrefrences.getLatitude(ctx));
+                    storeObject.put("long",AppPrefrences.getLongitude(ctx));
+
+                } catch (JSONException e)
+                {
+                    Log.e("Data Binding Error ",e.getMessage());
+                }
+            } while (c.moveToNext());
+            c.close();
+
+            Log.e("Data",storeObject.toString());
+            AuditJson.setObject(storeObject);
+
+//            Fragment fragment = new Submit_report();
+//            Bundle bundle = new Bundle();
+//            bundle.putInt("Store_id", store_id);
+//            bundle.putString("Store_name", store_name);
+//            fragment.setArguments(bundle);
+//            getFragmentManager().beginTransaction().replace(R.id.container_body, fragment)
+//                    .addToBackStack("Submit Report")
+//                    .commit();
+        }
+    }
+
+    class loadLocalData extends AsyncTask<Void,Void,Void>
+    {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids)
+        {
+            getLocalSavedData(String.valueOf(store_id),String.valueOf(categoriesArrayList.get(listPosition).getCategoryId()));
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            pd.dismiss();
+            Fragment fragment = new Submit_report();
+            Bundle bundle = new Bundle();
+            bundle.putInt("Store_id", store_id);
+            bundle.putString("Store_name", store_name);
+            fragment.setArguments(bundle);
+            getFragmentManager().beginTransaction().replace(R.id.container_body, fragment)
+                    .addToBackStack("Submit Report")
+                    .commit();
+        }
+    }
+
 }

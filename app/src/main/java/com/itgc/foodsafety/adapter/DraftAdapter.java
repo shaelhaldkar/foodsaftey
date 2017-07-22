@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.itgc.foodsafety.R;
+import com.itgc.foodsafety.dao.DraftDetails;
 import com.itgc.foodsafety.dao.Drafts;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 public class DraftAdapter extends RecyclerView.Adapter<DraftAdapter.DataObjectHolder>
 {
     private static String LOG_TAG = "MyRecyclerViewAdapter";
-    private ArrayList<Drafts> mDataset;
+    private ArrayList<DraftDetails> mDataset;
     private static MyClickListener myClickListener;
     private Context context;
 
@@ -53,7 +54,7 @@ public class DraftAdapter extends RecyclerView.Adapter<DraftAdapter.DataObjectHo
         this.myClickListener = myClickListener;
     }
 
-    public DraftAdapter(ArrayList<Drafts> myDataset, Context context)
+    public DraftAdapter(ArrayList<DraftDetails> myDataset, Context context)
     {
         mDataset = myDataset;
         this.context = context;
@@ -70,11 +71,11 @@ public class DraftAdapter extends RecyclerView.Adapter<DraftAdapter.DataObjectHo
     @Override
     public void onBindViewHolder(DataObjectHolder holder, final int position)
     {
-        holder.txt_surveyid.setText(String.valueOf(mDataset.get(position).getDraft_surveyid()));
-        holder.txt_store.setText(Html.fromHtml(mDataset.get(position).getDraft_storename() + "<small>" + "<font color='#AEAEAE'> (" + mDataset.get(position).getDraft_storeregion() + ") </font></small>"));
-        holder.txt_date.setText(mDataset.get(position).getDraft_date());
+        holder.txt_surveyid.setText((position+1)+"");
+        holder.txt_store.setText(Html.fromHtml(mDataset.get(position).getStoreName() + "<small>" + "<font color='#AEAEAE'> (" + mDataset.get(position).getStoreLocation() + ") </font></small>") +"\n" + mDataset.get(position).getCategoryName());
+        holder.txt_date.setText(mDataset.get(position).getStatrDateTime());
 
-        if (mDataset.get(position).getDraft_status().equals("Complete"))
+        if (mDataset.get(position).getCategoryStatus().equals("Complete"))
             holder.img_task.setImageDrawable(context.getResources().getDrawable(R.mipmap.check));
         else
             holder.img_task.setImageDrawable(context.getResources().getDrawable(R.mipmap.pause));

@@ -82,7 +82,8 @@ public class DbManager {
         }
     }
 
-    public void deleteDetails(String pTblName, String wheredata) {
+    public void deleteDetails(String pTblName, String wheredata)
+    {
         try {
             mDb.delete(pTblName, wheredata, null);
             Log.e("Data Deleted From:> ",pTblName);
@@ -96,7 +97,17 @@ public class DbManager {
         mDb.execSQL("DELETE FROM " + DBHelper.STORE_INFO_TBL_NAME);
         mDb.execSQL("DELETE FROM " + DBHelper.CATEGORY_TBL_NAME);
         mDb.execSQL("DELETE FROM " + DBHelper.QUESTION_TBL_NAME);
-        Log.e("Delete", "Data From StoreInfo,CategoryInfo & StoreInfo Table");
+        mDb.execSQL("DELETE FROM " + DBHelper.ANSWER_TBL_NAME);
+        mDb.execSQL("DELETE FROM " + DBHelper.ANSWER_IMAGE_TBL_NAME);
+        mDb.execSQL("DELETE FROM " + DBHelper.STORE_SIGNATURE_TBL_NAME);
+        mDb.execSQL("DELETE FROM " + DBHelper.AUDIT_SAMPLE_TBL_NAME);
+        Log.e("Delete", "Data From StoreInfo,CategoryInfo & QuestionInfo Table");
+    }
+
+    public void updateCategory(String status,int storeId,int categoryId)
+    {
+        mDb.execSQL("UPDATE " + DBHelper.CATEGORY_TBL_NAME + " SET " + DBHelper.CATEGORY_STATUS +"='" + status + "' WHERE "  + DBHelper.STORE_ID +"=" + storeId + " AND " + DBHelper.CATEGORY_ID +"=" + categoryId);
+        Log.e("Update Successfully", "Category Table");
     }
 
     public void saveStoreDetails(JSONObject object)
@@ -107,7 +118,7 @@ public class DbManager {
             storeName=object.getString("storeName");
             marchantId=object.getString("merchantId");
             storeRegion=object.getString("region");
-        }catch (Exception e){Log.e("Error","At saveStoreDetails()");}
+        }catch (Exception e){Log.e("Error","At saveStoreDetails()"+e.getMessage());}
 
         ContentValues c=new ContentValues();
         c.put(DBHelper.STORE_ID,storeID);
@@ -115,7 +126,7 @@ public class DbManager {
         c.put(DBHelper.STORE_MARCHANT_ID,marchantId);
         c.put(DBHelper.STORE_REGION,storeRegion);
         mDb.insert(DBHelper.STORE_INFO_TBL_NAME,null,c);
-        Log.e("Insert", "Into StoreInfo Table");
+        //Log.e("Insert", "Into StoreInfo Table");
 
         try
         {
@@ -124,21 +135,51 @@ public class DbManager {
             {
                 savecategory(storeID,array.getJSONObject(i));
             }
-        }catch (Exception e){Log.e("Error","At saveStoreDetails()");}
+        }catch (Exception e){Log.e("Error","At Second Catch saveStoreDetails()"+e.getMessage());}
     }
 
     void savecategory(String storeId,JSONObject object)
     {
         try
         {
+            String categoryId=object.getString("catId");
             ContentValues c=new ContentValues();
             c.put(DBHelper.STORE_ID,storeId);
-            c.put(DBHelper.CATEGORY_ID,object.getString("catId"));
+            c.put(DBHelper.CATEGORY_ID,categoryId);
             c.put(DBHelper.CATEGORY_NAME,object.getString("categoryName"));
             c.put(DBHelper.CATEGORY_TYPE,object.getString("type"));
+            c.put(DBHelper.CATEGORY_STATUS,"NULL");
             mDb.insert(DBHelper.CATEGORY_TBL_NAME,null,c);
-            Log.e("Insert", "Into CategoryInfo Table");
-        }catch (Exception e){Log.e("Error","At saveCategoty()");}
+            //Log.e("Insert", "Into CategoryInfo Table");
+
+            JSONArray question=object.getJSONArray("Questions");
+            for(int q=0;q<question.length();q++)
+            {
+                //Log.e("Inserting Into", object.getString("categoryName"));
+                saveCategoryQuestions(storeId,categoryId,question.getJSONObject(q));
+            }
+
+        }catch (Exception e){Log.e("Error","At saveCategoty()"+e.getMessage());}
+    }
+
+    void saveCategoryQuestions(String storeId,String categoryId,JSONObject object)
+    {
+        try
+        {
+            //Log.e("Inserting Question Id", object.getString("quesId"));
+            ContentValues c=new ContentValues();
+            c.put(DBHelper.STORE_ID,storeId);
+            c.put(DBHelper.CATEGORY_ID,categoryId);
+            c.put(DBHelper.QUESTION_ID,object.getString("quesId"));
+            c.put(DBHelper.QUESTION_SUB_CAT_ID,object.getString("subCategoryId"));
+            c.put(DBHelper.QUESTION_SUB_CAT_NAME,object.getString("subCategoryName"));
+            c.put(DBHelper.QUESTION_TEXT,object.getString("questionText"));
+            c.put(DBHelper.QUESTION_DESC,object.getString("questionDesc"));
+            c.put(DBHelper.QUESTION_SAMPLES,object.getString("numberOfSamples"));
+            mDb.insert(DBHelper.QUESTION_TBL_NAME,null,c);
+            Log.e("Insert", storeId + " " + categoryId + " " +object.getString("quesId"));
+
+        }catch (Exception e){Log.e("Error","At saveCategotyQuestion()"+e.getMessage());}
     }
 
 }

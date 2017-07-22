@@ -22,9 +22,8 @@ import com.itgc.foodsafety.dao.Sample_Audit;
 
 import java.util.ArrayList;
 
-public class AuditStartAdapter extends RecyclerView
-        .Adapter<AuditStartAdapter
-        .DataObjectHolder> {
+public class AuditStartAdapter extends RecyclerView.Adapter<AuditStartAdapter.DataObjectHolder>
+{
     private ArrayList<Sample_Audit> sampleAudits;
     private static MyClickListener myClickListener;
     private Context context;

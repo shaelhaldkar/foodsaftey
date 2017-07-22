@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.itgc.foodsafety.R;
-import com.itgc.foodsafety.dao.Audit;
+import com.itgc.foodsafety.dao.Categories;
 
 import java.util.ArrayList;
 
@@ -22,16 +22,14 @@ import java.util.ArrayList;
 public class AuditAdapter extends BaseAdapter {
 
     private Context context;
-    private ArrayList<Audit> audit;
+    private ArrayList<Categories> audit;
     private LayoutInflater mInflater;
     private int store_id;
-    private ArrayList<String> strings;
 
-    public AuditAdapter(Context c, ArrayList<Audit> audit, int store_id, ArrayList<String> strings) {
+    public AuditAdapter(Context c, ArrayList<Categories> audit, int store_id) {
         context = c;
         this.audit = audit;
         this.store_id = store_id;
-        this.strings = strings;
         mInflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -67,15 +65,13 @@ public class AuditAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.txt_cat.setText(audit.get(position).getCategory());
-
-        String Status = strings.get(position).toString();
+        holder.txt_cat.setText(audit.get(position).getCategoryName());
 
         try {
-            if (Status.equals("Complete"))
+            if (audit.get(position).getCategoryStatus().equalsIgnoreCase("Complete"))
                 holder.img_task.setImageDrawable(context.getResources().getDrawable(R.mipmap.check
                 ));
-            else if (Status.equals("Incomplete"))
+            else if (audit.get(position).getCategoryStatus().equalsIgnoreCase("Incomplete"))
                 holder.img_task.setImageDrawable(context.getResources().getDrawable(R.mipmap.pause
                 ));
             else

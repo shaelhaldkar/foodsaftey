@@ -90,7 +90,6 @@ public class Store_Fragement extends Fragment
 
     private void setUpView(View view) {
         store_list = (ExpandableHeightListView) view.findViewById(R.id.store_list);
-
         setAdapter();
     }
 

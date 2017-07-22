@@ -116,16 +116,19 @@ public class CheckAuditStatus extends Fragment implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.btn_submit:
                 hideKeyboard(btn_submit);
-                if (rdt_no.isChecked()) {
+                if (rdt_no.isChecked())
+                {
                     insertSkip();
-                } else if (rdt_yes.isChecked()) {
+                } else if (rdt_yes.isChecked())
+                {
                     auditing();
                 }
                 break;
         }
     }
 
-    private void hideKeyboard(View v) {
+    private void hideKeyboard(View v)
+    {
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
     }

@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.itgc.foodsafety.R;
 import com.itgc.foodsafety.dao.NavDrawerItem;
+import com.itgc.foodsafety.db.DBHelper;
 import com.itgc.foodsafety.db.DbManager;
 import com.itgc.foodsafety.utils.AppPrefrences;
 
@@ -66,7 +67,7 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
         String query = "";
 
         try {
-            query = "SELECT * FROM answer where ans_status = 'Complete' OR ans_status = 'Incomplete' ";
+            query = "SELECT categoryId FROM "  + DBHelper.CATEGORY_TBL_NAME + " WHERE " + DBHelper.CATEGORY_STATUS + " != 'NULL' ";
 
             DbManager.getInstance().openDatabase();
             curs = DbManager.getInstance().getDetails(query);

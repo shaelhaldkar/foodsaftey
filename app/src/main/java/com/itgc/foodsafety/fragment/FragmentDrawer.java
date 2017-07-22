@@ -56,6 +56,8 @@ public class FragmentDrawer extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.w("DANGER", "DraftsCount");
+            //adapter = new NavigationDrawerAdapter(getContext(), getData());
+            //recyclerView.setAdapter(adapter);
             adapter.notifyDataSetChanged();
         }
     };

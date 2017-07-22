@@ -2,7 +2,9 @@ package com.itgc.foodsafety.fragment;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -24,6 +26,8 @@ import com.android.volley.toolbox.StringRequest;
 import com.itgc.foodsafety.MainActivity;
 import com.itgc.foodsafety.MySingleton;
 import com.itgc.foodsafety.R;
+import com.itgc.foodsafety.db.DBHelper;
+import com.itgc.foodsafety.db.DbManager;
 import com.itgc.foodsafety.utils.AppPrefrences;
 import com.itgc.foodsafety.utils.AppUtils;
 import com.itgc.foodsafety.utils.Vars;
@@ -70,7 +74,7 @@ public class Store_DetailsFragment extends Fragment implements View.OnClickListe
         restoreToolbar();
         View view = inflater.inflate(R.layout.store_details, container, false);
         setUpView(view);
-
+        getStoreDetails();
         return view;
     }
 
@@ -119,6 +123,7 @@ public class Store_DetailsFragment extends Fragment implements View.OnClickListe
                                             if (store_flycatcher_no.getText().toString() != null && !store_flycatcher_no.getText().toString().isEmpty()) {
                                                 if (store_aircutter_no.getText().toString() != null && !store_aircutter_no.getText().toString().isEmpty()) {
                                                     if (store_thermo_no.getText().toString() != null && !store_thermo_no.getText().toString().isEmpty()) {
+                                                        saveStoreDetailsLocally();
                                                         sendStoreDetails();
                                                     } else
                                                         Toast.makeText(context, "Please enter No. of Thermometers", Toast.LENGTH_LONG).show();
@@ -164,16 +169,16 @@ public class Store_DetailsFragment extends Fragment implements View.OnClickListe
                         JSONObject jsonObject = new JSONObject(response);
                         String msg = jsonObject.getString("Message");
                         Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
-                        store_chiller_no.setText("");
-                        store_freezer_no.setText("");
-                        store_vendor_chiller_no.setText("");
-                        store_vendor_freezer_no.setText("");
-                        store_rodent_no.setText("");
-                        store_flycatcher_no.setText("");
-                        store_aircutter_no.setText("");
-                        store_thermo_no.setText("");
-                        store_manager_name.setText("");
-                        store_manager_email.setText("");
+//                        store_chiller_no.setText("");
+//                        store_freezer_no.setText("");
+//                        store_vendor_chiller_no.setText("");
+//                        store_vendor_freezer_no.setText("");
+//                        store_rodent_no.setText("");
+//                        store_flycatcher_no.setText("");
+//                        store_aircutter_no.setText("");
+//                        store_thermo_no.setText("");
+//                        store_manager_name.setText("");
+//                        store_manager_email.setText("");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -211,4 +216,47 @@ public class Store_DetailsFragment extends Fragment implements View.OnClickListe
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         MySingleton.getInstance(context).addToRequestQueue(str);
     }
+
+    private void saveStoreDetailsLocally()
+    {
+        DbManager.getInstance().deleteDetails(DBHelper.STORE_DETAILS_TBL_NAME,DBHelper.STORE_ID+"="+String.valueOf(store_id));
+
+        ContentValues cv = new ContentValues();
+        cv.put(DBHelper.STORE_ID, String.valueOf(store_id));
+        cv.put(DBHelper.AUDITOR_ID, AppPrefrences.getUserId(context));
+        cv.put(DBHelper.CHILLERS, store_chiller_no.getText().toString());
+        cv.put(DBHelper.FREZERS, store_freezer_no.getText().toString());
+        cv.put(DBHelper.VENDOR_CHILLERS, store_vendor_chiller_no.getText().toString());
+        cv.put(DBHelper.VENDOR_FREZEERS, store_vendor_freezer_no.getText().toString());
+        cv.put(DBHelper.BOXEX, store_rodent_no.getText().toString());
+        cv.put(DBHelper.FLY_CATCHERS, store_flycatcher_no.getText().toString());
+        cv.put(DBHelper.AIR_CUTTERS, store_aircutter_no.getText().toString());
+        cv.put(DBHelper.THERMOMETERS, store_thermo_no.getText().toString());
+        cv.put(DBHelper.MANAGER_NAME, store_manager_name.getText().toString());
+        cv.put(DBHelper.MANAGER_EMAIL, store_manager_email.getText().toString());
+        DbManager.getInstance().insertDetails(cv, DBHelper.STORE_DETAILS_TBL_NAME);
+    }
+
+    private void getStoreDetails()
+    {
+        String query = "SELECT * FROM " + DBHelper.STORE_DETAILS_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + store_id;
+        DbManager.getInstance().openDatabase();
+        Cursor cursor = DbManager.getInstance().getDetails(query);
+        Log.e("StoreDetails", cursor.getCount() + "   " + query);
+        if(cursor.getCount()>0)
+        {
+            cursor.moveToFirst();
+            store_chiller_no.setText(cursor.getString(cursor.getColumnIndex(DBHelper.CHILLERS)));
+            store_freezer_no.setText(cursor.getString(cursor.getColumnIndex(DBHelper.FREZERS)));
+            store_vendor_chiller_no.setText(cursor.getString(cursor.getColumnIndex(DBHelper.VENDOR_CHILLERS)));
+            store_vendor_freezer_no.setText(cursor.getString(cursor.getColumnIndex(DBHelper.VENDOR_FREZEERS)));
+            store_rodent_no.setText(cursor.getString(cursor.getColumnIndex(DBHelper.BOXEX)));
+            store_flycatcher_no.setText(cursor.getString(cursor.getColumnIndex(DBHelper.FLY_CATCHERS)));
+            store_aircutter_no.setText(cursor.getString(cursor.getColumnIndex(DBHelper.AIR_CUTTERS)));
+            store_thermo_no.setText(cursor.getString(cursor.getColumnIndex(DBHelper.THERMOMETERS)));
+            store_manager_name.setText(cursor.getString(cursor.getColumnIndex(DBHelper.MANAGER_NAME)));
+            store_manager_email.setText(cursor.getString(cursor.getColumnIndex(DBHelper.MANAGER_EMAIL)));
+        }
+    }
+
 }

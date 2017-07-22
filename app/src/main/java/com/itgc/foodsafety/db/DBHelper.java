@@ -258,6 +258,10 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(TABLE_STORE_SIGNATUTE_CREATE);
         db.execSQL(TABLE_CATEGORY_CREATE);
         db.execSQL(TABLE_QUESTION_CREATE);
+        db.execSQL(TABLE_QUESTION_ANSWER_CREATE);
+        db.execSQL(TABLE_QUESTION_ANSWER_IMAGE_CREATE);
+        db.execSQL(TABLE_SAMPLE_CREATE);
+        db.execSQL(TABLE_STORE_DETAILSE_CREATE);
         Log.d("Table created", "Table created");
     }
 
@@ -277,6 +281,10 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(TABLE_STORE_SIGNATURE_DROP);
         db.execSQL(TABLE_CATEGORY_DROP);
         db.execSQL(TABLE_QUESTION_DROP);
+        db.execSQL(TABLE_QUESTION_ANSWER_DROP);
+        db.execSQL(TABLE_QUESTION_ANSWER_IMAGE_DROP);
+        db.execSQL(TABLE_SAMPLE_DROP);
+        db.execSQL(TABLE_STORE_DETAILS_DROP);
         onCreate(db);
     }
 
@@ -293,10 +301,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
     // For Store Signature Information
     public static final String STORE_SIGNATURE_TBL_NAME = "storeSignature";
-    public static final String STORE_SIGNATURE_ID = "singatureId";
-    public static final String STORE_SIGNATURE_IMAGE = "signatureImage";
+    public static final String STORE_SIGNATURE_IMAGE = "storeSignatureImage";
+    public static final String AUDIOTR_SIGNATURE_IMAGE = "auditorSignatureImage";
+    public static final String EXPIRY_QUESTION = "expiry_question";
 
-    private final String TABLE_STORE_SIGNATUTE_CREATE = "CREATE TABLE " + STORE_SIGNATURE_TBL_NAME + " (" + STORE_SIGNATURE_ID + " INTEGER,"+ STORE_SIGNATURE_IMAGE + " TEXT" +")";
+    private final String TABLE_STORE_SIGNATUTE_CREATE = "CREATE TABLE " + STORE_SIGNATURE_TBL_NAME + " (" + STORE_ID + " INTEGER,"+ CATEGORY_ID + " INTEGER,"+ STORE_SIGNATURE_IMAGE + " TEXT,"+ AUDIOTR_SIGNATURE_IMAGE + " TEXT,"+ EXPIRY_QUESTION + " TEXT" +")";
     private final String TABLE_STORE_SIGNATURE_DROP = "DROP TABLE IF EXISTS " + STORE_SIGNATURE_TBL_NAME;
 
 
@@ -305,8 +314,13 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String CATEGORY_ID = "categoryId";
     public static final String CATEGORY_NAME = "categoryName";
     public static final String CATEGORY_TYPE = "categoryType";
+    public static final String CATEGORY_STATUS = "categoryStatus";
+    public static final String CATEGORY_START_DATE = "categoryStartDate";
+    public static final String CATEGORY_END_DATE = "categoryEndDate";
 
-    private final String TABLE_CATEGORY_CREATE = "CREATE TABLE " + CATEGORY_TBL_NAME + " (" + STORE_ID + " INTEGER,"+ CATEGORY_ID + " INTEGER,"+ CATEGORY_NAME + " TEXT,"+ CATEGORY_TYPE + " INTEGER" +")";
+
+    private final String TABLE_CATEGORY_CREATE = "CREATE TABLE " + CATEGORY_TBL_NAME + " (" + STORE_ID + " INTEGER,"+ CATEGORY_ID + " INTEGER,"+ CATEGORY_NAME + " TEXT,"+
+                                                                                              CATEGORY_TYPE + " INTEGER,"+ CATEGORY_STATUS + " TEXT,"+ CATEGORY_START_DATE + " TEXT,"+ CATEGORY_END_DATE + " TEXT" +")";
     private final String TABLE_CATEGORY_DROP = "DROP TABLE IF EXISTS " + CATEGORY_TBL_NAME;
 
 
@@ -319,8 +333,79 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String QUESTION_DESC="questionDesc";
     public static final String QUESTION_SAMPLES="numberOfSamples";
 
-    private final String TABLE_QUESTION_CREATE = "CREATE TABLE " + QUESTION_TBL_NAME + " (" + CATEGORY_ID + " INTEGER,"+ QUESTION_ID + " INTEGER,"+ QUESTION_SUB_CAT_ID + " INTEGER,"+
+    private final String TABLE_QUESTION_CREATE = "CREATE TABLE " + QUESTION_TBL_NAME + " (" + STORE_ID + " INTEGER," + CATEGORY_ID + " INTEGER,"+ QUESTION_ID + " INTEGER,"+ QUESTION_SUB_CAT_ID + " INTEGER,"+
                                                                     QUESTION_SUB_CAT_NAME + " TEXT,"+ QUESTION_TEXT + " TEXT,"+ QUESTION_DESC + " TEXT,"+ QUESTION_SAMPLES + " TEXT" +")";
     private final String TABLE_QUESTION_DROP = "DROP TABLE IF EXISTS " + QUESTION_TBL_NAME;
+
+
+    // For Category Question Answers
+    public static final String ANSWER_TBL_NAME="answerInfo";
+    public static final String ANSWER_COMMENT="comment";
+    public static final String ANSWER_REMARK="remark";
+    public static final String ANSWER_ACTION="actions";
+    public static final String ANSWER_DATETIME="answerDateTime";
+    public static final String ANSWER_TYPE="answer_type";
+    public static final String ANSWER_CAT_SKIP="cat_skip";
+    public static final String ANSWER_IS_SEEN="isSeen";
+    public static final String ANSWER_MAX_NO="max_no";
+    public static final String ANSWER_MAX_SAMPLE="max_sample";
+    public static final String ANSWER_NO_SAMPLE="no_sample";
+    public static final String ANSWER_QUES_SKIP="ques_skip";
+    public static final String ANSWER_SUBCAT_ID="subcat_id";
+    public static final String ANSWER_CAT_TYPE="type";
+
+    private final String TABLE_QUESTION_ANSWER_CREATE = "CREATE TABLE " + ANSWER_TBL_NAME + " (" +  STORE_ID + " INTEGER," + CATEGORY_ID + " INTEGER,"+
+                                                                                                    QUESTION_ID + " INTEGER,"+ ANSWER_SUBCAT_ID + " INTEGER,"+
+                                                                                                    ANSWER_COMMENT + " TEXT,"+ ANSWER_REMARK + " TEXT,"+ ANSWER_ACTION + " TEXT,"+
+                                                                                                    ANSWER_DATETIME + " TEXT,"+ ANSWER_TYPE + " INTEGER,"+ ANSWER_CAT_SKIP + " TEXT,"+
+                                                                                                    ANSWER_IS_SEEN + " TEXT,"+ ANSWER_MAX_NO + " INTEGER,"+ ANSWER_MAX_SAMPLE + " INTEGER,"+
+                                                                                                    ANSWER_NO_SAMPLE + " INTEGER,"+ ANSWER_QUES_SKIP + " TEXT,"+ ANSWER_CAT_TYPE + " INTEGER" +")";
+    private final String TABLE_QUESTION_ANSWER_DROP = "DROP TABLE IF EXISTS " + ANSWER_TBL_NAME;
+
+
+    // For Category Question Images
+    public static final String ANSWER_IMAGE_TBL_NAME="answerImage";
+    public static final String ANSWER_IMAGE="answerImage";
+
+    private final String TABLE_QUESTION_ANSWER_IMAGE_CREATE = "CREATE TABLE " + ANSWER_IMAGE_TBL_NAME + " ("+ STORE_ID + " INTEGER," + CATEGORY_ID + " INTEGER,"+ QUESTION_ID + " INTEGER,"+ ANSWER_IMAGE + " TEXT" +")";
+    private final String TABLE_QUESTION_ANSWER_IMAGE_DROP = "DROP TABLE IF EXISTS " + ANSWER_IMAGE_TBL_NAME;
+
+
+    // For Sample Audits
+    public static final String AUDIT_SAMPLE_TBL_NAME="sampleInfo";
+    public static final String SAMPLE_POS="samplePos";
+    public static final String SAMPLE_IS_CLICKED="isClicked";
+    public static final String SAMPLE_RATE_X="ratex";
+    public static final String SAMPLE_COUNT="sampleCount";
+    public static final String SAMPLE_CURRENT_RATE="sampleCurrentRate";
+
+    private final String TABLE_SAMPLE_CREATE = "CREATE TABLE " + AUDIT_SAMPLE_TBL_NAME + " ("+ STORE_ID + " INTEGER,"+ CATEGORY_ID + " INTEGER,"+ QUESTION_ID + " INTEGER,"+ SAMPLE_POS + " INTEGER,"+
+                                                                                                SAMPLE_IS_CLICKED + " TEXT,"+ SAMPLE_RATE_X + " TEXT,"+ SAMPLE_COUNT + " TEXT,"+ SAMPLE_CURRENT_RATE + " TEXT" +")";
+    private final String TABLE_SAMPLE_DROP = "DROP TABLE IF EXISTS " + AUDIT_SAMPLE_TBL_NAME;
+
+    // For Store Details
+    public static final String STORE_DETAILS_TBL_NAME="storeDetails";
+    public static final String AUDITOR_ID= "auditor_id";
+    public static final String CHILLERS="chillers";
+    public static final String FREZERS="freezers";
+    public static final String VENDOR_CHILLERS="chillers_from_vendors";
+    public static final String VENDOR_FREZEERS="freezers_from_vendors";
+    public static final String BOXEX="rodent_boxes";
+    public static final String FLY_CATCHERS="flyCatchers";
+    public static final String AIR_CUTTERS="airCutters";
+    public static final String THERMOMETERS="thermometers";
+    public static final String MANAGER_NAME="manager_name";
+    public static final String MANAGER_EMAIL="manager_email";
+
+    private final String TABLE_STORE_DETAILSE_CREATE = "CREATE TABLE " + STORE_DETAILS_TBL_NAME + " ("+
+            STORE_ID + " INTEGER,"+ AUDITOR_ID + " INTEGER,"+
+            CHILLERS + " TEXT,"+ FREZERS + " TEXT,"+
+            VENDOR_CHILLERS + " TEXT,"+VENDOR_FREZEERS + " TEXT,"+
+            BOXEX + " TEXT,"+FLY_CATCHERS + " TEXT,"+
+            AIR_CUTTERS + " TEXT,"+THERMOMETERS + " TEXT,"+
+            MANAGER_NAME + " TEXT,"+MANAGER_EMAIL + " TEXT"+")";
+    private final String TABLE_STORE_DETAILS_DROP = "DROP TABLE IF EXISTS " + STORE_DETAILS_TBL_NAME;
+
+
 
 }

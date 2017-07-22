@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -44,6 +45,7 @@ import com.itgc.foodsafety.utils.Vars;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -86,10 +88,15 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.login_fragment, container, false);
-
         setUpView(view);
+        //setData();
         return view;
+    }
 
+    private void setData()
+    {
+        edt_password.setText("admin");
+        edt_username.setText("test@gmail.com");
     }
 
     @Override
@@ -158,8 +165,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
             @Override
             public void onResponse(String response) {
                 Log.e("Login Response--", response);
-                if (pd != null && pd.isShowing())
-                    pd.dismiss();
                 if (response != null) {
                     try {
                         JSONObject jsonObject = new JSONObject(response);
@@ -186,24 +191,27 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
                                 JSONObject ob = jsonArray.getJSONObject(0);
                                 AppPrefrences.setMerchantId(ctx, ob.getString("merchantId"));
 
+                                // Locally Saving Start //
                                 for(int i=0;i<jsonArray.length();i++)
                                 {
-                                    DbManager.getInstance().saveStoreDetails(jsonArray.getJSONObject(i));
+                                    storeObject.add(jsonArray.getJSONObject(i));
                                 }
+                                new saveDatatoLocal().execute();
+                                // Locally Saving End //
                             }
 
-
-                            AppPrefrences.setIsLogin(ctx, true);
-                            Intent i = new Intent(ctx, MainActivity.class);
-                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(i);
                         } else {
                             Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
                             edt_username.setText("");
                             edt_password.setText("");
+                            if (pd != null && pd.isShowing())
+                                pd.dismiss();
                         }
 
                     } catch (Exception e) {
+
+                        if (pd != null && pd.isShowing())
+                            pd.dismiss();
                         e.printStackTrace();
                     }
 
@@ -212,6 +220,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError v) {
+                if (pd != null && pd.isShowing())
+                    pd.dismiss();
                 v.printStackTrace();
             }
         }) {
@@ -309,4 +319,38 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
 
         Log.d("LatLong", latitude + ", " + longitude);
     }
+
+    class saveDatatoLocal extends AsyncTask<String,Void,String>
+    {
+        @Override
+        protected String doInBackground(String... strings)
+        {
+            DbManager.getInstance().saveStoreDetails(storeObject.get(storePosition));
+            return storePosition+"";
+        }
+
+        @Override
+        protected void onPostExecute(String s)
+        {
+            storePosition=storePosition+1;
+            if(storePosition<storeObject.size())
+            {
+                new saveDatatoLocal().execute();
+            }else
+            {
+                if (pd != null && pd.isShowing())
+                    pd.dismiss();
+                Log.e("Data","Saved Locally");
+                storePosition=0;
+                AppPrefrences.setIsLogin(ctx, true);
+                Intent i = new Intent(ctx, MainActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(i);
+            }
+        }
+    }
+
+    int storePosition=0;
+    ArrayList<JSONObject> storeObject=new ArrayList<>();
+
 }

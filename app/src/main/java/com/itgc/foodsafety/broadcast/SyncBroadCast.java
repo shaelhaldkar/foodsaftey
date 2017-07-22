@@ -42,17 +42,17 @@ public class SyncBroadCast extends BroadcastReceiver
                 String query="SELECT * FROM answer where ans_status = 'Complete' OR ans_status = 'Incomplete'";
                 DbManager.getInstance().openDatabase();
                 Cursor cursor = DbManager.getInstance().getDetails(query);
-                Log.e("Item Count", cursor.getCount()+"");
-                if(cursor!=null)
-                {
-                    cursor.moveToFirst();
-                    do
-                    {
-                        answerId=cursor.getInt(cursor.getColumnIndex(DBHelper.ANSWER_id));
-                        answerCatType=cursor.getString(cursor.getColumnIndex(DBHelper.ANSWER_Cat));
-                        Log.e("Answer Details",answerId +"  " +answerCatType);
-                    }while (cursor.moveToNext());
-                }
+//                Log.e("Item Count", cursor.getCount()+"");
+//                if(cursor!=null)
+//                {
+//                    cursor.moveToFirst();
+//                    do
+//                    {
+//                        answerId=cursor.getInt(cursor.getColumnIndex(DBHelper.ANSWER_id));
+//                        answerCatType=cursor.getString(cursor.getColumnIndex(DBHelper.ANSWER_Cat));
+//                        Log.e("Answer Details",answerId +"  " +answerCatType);
+//                    }while (cursor.moveToNext());
+//                }
             }
         }
     }

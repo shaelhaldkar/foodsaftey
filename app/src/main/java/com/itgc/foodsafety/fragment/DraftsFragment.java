@@ -20,6 +20,7 @@ import com.itgc.foodsafety.MainActivity;
 import com.itgc.foodsafety.R;
 import com.itgc.foodsafety.adapter.DraftAdapter;
 import com.itgc.foodsafety.dao.Answers;
+import com.itgc.foodsafety.dao.DraftDetails;
 import com.itgc.foodsafety.dao.Drafts;
 import com.itgc.foodsafety.dao.StartAudit;
 import com.itgc.foodsafety.db.DBHelper;
@@ -42,6 +43,7 @@ public class DraftsFragment extends Fragment {
     private DraftAdapter adapter;
     private Context context;
     private ArrayList<Drafts> draftses;
+    private ArrayList<DraftDetails> draftDetailses=new ArrayList<>();
 
     @Override
     public void onAttach(Context context) {
@@ -63,51 +65,40 @@ public class DraftsFragment extends Fragment {
         setUpView(view);
         restoreToolbar();
         getData();
-
         return view;
     }
 
-    private void getData() {
-        Cursor curs = null;
-        String query = "";
+    private void getData()
+    {
+        draftDetailses.clear();
+        String query = "SELECT CI.categoryId,CI.categoryName,CI.categoryType,CI.storeId,CI.categoryStatus,CI.categoryStartDate,SI.storeName,SI.storeMarchantId,SI.storeRegion FROM categoryInfo AS CI " +
+                       "INNER JOIN storeInfo AS SI " +
+                        "ON CI.storeId=SI.storeId " +
+                        "WHERE CI.categoryStatus != 'NULL' ";
 
-        try {
-            query = "SELECT * FROM answer where ans_status = 'Complete' OR ans_status = 'Incomplete' ";
+        DbManager.getInstance().openDatabase();
+        Cursor draft = DbManager.getInstance().getDetails(query);
 
-            DbManager.getInstance().openDatabase();
-            curs = DbManager.getInstance().getDetails(query);
+        Log.e("Draft Size", query +" " + draftDetailses.size()+"");
 
-            draftses = new ArrayList<>();
-            while (curs != null && curs.moveToNext()) {
-                Drafts drafts = new Drafts();
-                drafts.setDraft_surveyid(curs.getInt(curs.getColumnIndex(DBHelper.ANSWER_id)));
-                drafts.setDraft_storename(curs.getString(curs.getColumnIndex(DBHelper.ANSWER_Store)));
-                drafts.setDraft_date(curs.getString(curs.getColumnIndex(DBHelper.ANSWER_DateTime)));
-                drafts.setDraft_storeid(curs.getInt(curs.getColumnIndex(DBHelper.ANSWER_Store_id)));
-                drafts.setDraft_storeregion(curs.getString(curs.getColumnIndex(DBHelper.ANSWER_Store_reg)));
-                drafts.setDraft_cat(curs.getString(curs.getColumnIndex(DBHelper.ANSWER_Cat)));
-                drafts.setDraft_catid(curs.getInt(curs.getColumnIndex(DBHelper.ANSWER_Cat_id)));
-                drafts.setAnswerses((ArrayList<Answers>) deserializeObject(curs.getBlob(curs.getColumnIndex(
-                        DBHelper.ANSWER_value))));
-                if (curs.getBlob(curs.getColumnIndex(
-                        DBHelper.ANSWER_Draft_value)) != null){
-                    drafts.setStartAudits((ArrayList<StartAudit>) deserializeObject(curs.getBlob(curs.getColumnIndex(
-                            DBHelper.ANSWER_Draft_value))));
-                }
-                else {
-                    drafts.setStartAudits((ArrayList<StartAudit>) deserializeObject(curs.getBlob(curs.getColumnIndex(
-                            DBHelper.ANSWER_value))));
-                }
-
-                drafts.setDraft_status(curs.getString(curs.getColumnIndex(DBHelper.ANSWER_Status)));
-                drafts.setType(curs.getInt(curs.getColumnIndex(DBHelper.ANSWER_Type)));
-                draftses.add(drafts);
-            }
-            setAdapter(draftses);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(draft.getCount()>0)
+        {
+            draft.moveToFirst();
+            do {
+                DraftDetails details=new DraftDetails();
+                details.setStoreId(draft.getString(draft.getColumnIndex(DBHelper.STORE_ID)));
+                details.setCategoryId(draft.getString(draft.getColumnIndex(DBHelper.CATEGORY_ID)));
+                details.setStoreName(draft.getString(draft.getColumnIndex(DBHelper.STORE_NAME)));
+                details.setCategoryName(draft.getString(draft.getColumnIndex(DBHelper.CATEGORY_NAME)));
+                details.setStoreLocation(draft.getString(draft.getColumnIndex(DBHelper.STORE_REGION)));
+                details.setCategoryType(draft.getInt(draft.getColumnIndex(DBHelper.CATEGORY_TYPE)));
+                details.setCategoryStatus(draft.getString(draft.getColumnIndex(DBHelper.CATEGORY_STATUS)));
+                details.setStatrDateTime(draft.getString(draft.getColumnIndex(DBHelper.CATEGORY_START_DATE)));
+                draftDetailses.add(details);
+            }while (draft.moveToNext());
         }
+        setAdapter(draftDetailses);
+        Log.e("Draft Size",draftDetailses.size()+"");
     }
 
     public static Object deserializeObject(byte[] b) {
@@ -129,28 +120,29 @@ public class DraftsFragment extends Fragment {
 
     }
 
-    private void setAdapter(final ArrayList<Drafts> draftses) {
-        adapter = new DraftAdapter(draftses, context);
+    private void setAdapter(final ArrayList<DraftDetails> draftses)
+    {
+        adapter = new DraftAdapter(draftDetailses, context);
         mRecyclerView.setAdapter(adapter);
-        adapter.setOnItemClickListener(new DraftAdapter.MyClickListener() {
+        adapter.setOnItemClickListener(new DraftAdapter.MyClickListener()
+        {
             @Override
-            public void onItemClick(int position, View v) {
-                if (!draftses.get(position).getDraft_status().equals("Complete")){
+            public void onItemClick(int position, View v)
+            {
+                if (!draftses.get(position).getCategoryStatus().equals("Complete"))
+                {
                     Fragment fragment = new AuditStartFragment();
                     Bundle bundle = new Bundle();
-                    bundle.putSerializable("DAO", draftses.get(position).getStartAudits());
-                    bundle.putSerializable("DAO_ANS", draftses.get(position).getAnswerses());
-                    bundle.putInt("Cat_id", draftses.get(position).getDraft_catid());
-                    bundle.putString("Cat_name", draftses.get(position).getDraft_cat());
-                    bundle.putInt("Store_id", draftses.get(position).getDraft_storeid());
-                    bundle.putString("Store_name", draftses.get(position).getDraft_storename());
-                    bundle.putString("Store_region", draftses.get(position).getDraft_storeregion());
-                    bundle.putInt("Type", draftses.get(position).getType());
+                    bundle.putInt("Cat_id", Integer.parseInt(draftDetailses.get(position).getCategoryId()));
+                    bundle.putString("Cat_name", draftDetailses.get(position).getCategoryName());
+                    bundle.putInt("Store_id", Integer.parseInt(draftDetailses.get(position).getStoreId()));
+                    bundle.putString("Store_name", draftDetailses.get(position).getStoreName());
+                    bundle.putString("Store_region", draftDetailses.get(position).getStoreLocation());
+                    bundle.putInt("Type", draftDetailses.get(position).getCategoryType());
                     fragment.setArguments(bundle);
-                    getFragmentManager().beginTransaction().replace(R.id.container_body,fragment)
-                            .addToBackStack("Audit").commit();
+                    getFragmentManager().beginTransaction().replace(R.id.container_body,fragment).addToBackStack("Audit").commit();
                 }
-                Toast.makeText(context, draftses.get(position).getDraft_status(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context, draftses.get(position).getCategoryStatus(), Toast.LENGTH_SHORT).show();
             }
         });
     }
