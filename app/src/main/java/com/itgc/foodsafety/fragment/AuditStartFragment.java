@@ -11,8 +11,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.location.Location;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -797,6 +799,10 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 try {
                     // Bitmap photo = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
                     Bitmap photo = BitmapHelper.decodeSampledBitmapFromResource(photoFile.getAbsolutePath(), 350, 400); //scall the bitmap into given size
+                    Matrix m=new Matrix();
+                    m.setRotate(rotationForImage(ctx,Uri.fromFile(photoFile)));
+
+                    photo=Bitmap.createBitmap(photo,0,0,photo.getWidth(),photo.getHeight(),m,true);
 
                     if (photo != null) {
                         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -820,6 +826,41 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         }
 
     }
+
+
+    public static float rotationForImage(Context context, Uri uri) {
+        if (uri.getScheme().equals("content")) {
+            String[] projection = { MediaStore.Images.ImageColumns.ORIENTATION };
+            Cursor c = context.getContentResolver().query(
+                    uri, projection, null, null, null);
+            if (c.moveToFirst()) {
+                return c.getInt(0);
+            }
+        } else if (uri.getScheme().equals("file")) {
+            try {
+                ExifInterface exif = new ExifInterface(uri.getPath());
+                int rotation = (int)exifOrientationToDegrees(
+                        exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                                ExifInterface.ORIENTATION_NORMAL));
+                return rotation;
+            } catch (IOException e) {
+                Log.e("Error..", "Error checking exif", e);
+            }
+        }
+        return 0f;
+    }
+
+    private static float exifOrientationToDegrees(int exifOrientation) {
+        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
+            return 90;
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
+            return 180;
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
+            return 270;
+        }
+        return 0;
+    }
+
 
     private void galleryAddPic() {
         Intent mediaScanIntent = new Intent(
