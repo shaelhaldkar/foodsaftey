@@ -27,6 +27,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.itgc.foodsafety.fragment.AuditStartFragment;
 import com.itgc.foodsafety.fragment.ContactUsFragment;
 import com.itgc.foodsafety.fragment.DraftsFragment;
 import com.itgc.foodsafety.fragment.FeedbackUsFragment;
@@ -280,11 +281,28 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
         if (requestCode == 1000) {
             Fragment frg = getSupportFragmentManager().findFragmentById(R.id.container_body);
             if (frg != null) {
                 frg.onActivityResult(requestCode, resultCode, data);
             }
         }
+
+
+        if (requestCode == AuditStartFragment.GALLERY_IMG) {
+            Fragment frg = getSupportFragmentManager().findFragmentById(R.id.container_body);
+            if (frg != null) {
+                frg.onActivityResult(requestCode, resultCode, data);
+            }
+        }
+
+        if (requestCode == AuditStartFragment.LOAD_CAMERA_RESULTS) {
+            Fragment frg = getSupportFragmentManager().findFragmentById(R.id.container_body);
+            if (frg != null) {
+                frg.onActivityResult(requestCode, resultCode, data);
+            }
+        }
+
     }
 }

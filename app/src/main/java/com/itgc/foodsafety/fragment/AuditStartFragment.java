@@ -90,9 +90,9 @@ import java.util.Map;
  */
 public class AuditStartFragment extends Fragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
-    private double latitude, longitude;
     private GoogleApiClient mGoogleApiClient;
     private ArrayList<ArrayList<Answers>> lists;
+    private double latitude, longitude;
     private Location mLastLocation;
     private Context ctx;
     private View view;
@@ -107,7 +107,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     private int count = 1;
     private AuditStartAdapter startAdapter;
     int TAKE_PHOTO_CODE = 0;
-    int GALLERY_IMG = 3;
+    public static int GALLERY_IMG = 3;
     private Spinner list_sampleno;
     private DBHelper dbHelper;
     private int Cat_id, Store_id, sample_selected = 1, type;
@@ -129,7 +129,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     private Uri fileUri;
     private String picturePath;
     private File photoFile;
-    private static int LOAD_CAMERA_RESULTS = 11;
+    public static int LOAD_CAMERA_RESULTS = 11;
     private ArrayList<String> imagesarray;
 
 
@@ -728,7 +728,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         if (photoFile != null) {
             if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-                startActivityForResult(takePictureIntent, LOAD_CAMERA_RESULTS);
+                getActivity().startActivityForResult(takePictureIntent, LOAD_CAMERA_RESULTS);
             }
         }
     }
@@ -779,7 +779,8 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+
+        Toast.makeText(ctx, requestCode+ "", Toast.LENGTH_SHORT).show();
 
         if (requestCode == TAKE_PHOTO_CODE && resultCode == Activity.RESULT_OK && data != null) {
             try {
@@ -883,7 +884,6 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         return 0;
     }
 
-
     private void galleryAddPic() {
         Intent mediaScanIntent = new Intent(
                 Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
@@ -963,7 +963,6 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
 
     public void checkPermission() {
 
-
         if ((ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
                 && (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
                 && (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
@@ -1014,7 +1013,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     void openGallery() {
         Intent galleryIntent = new Intent(Intent.ACTION_PICK,
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(Intent.createChooser(galleryIntent, "Select Photo"), GALLERY_IMG);
+       getActivity().startActivityForResult(Intent.createChooser(galleryIntent, "Select Photo"), GALLERY_IMG);
     }
 
 
@@ -1220,6 +1219,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     {
         String query="SELECT * FROM " + DBHelper.ANSWER_IMAGE_TBL_NAME +" WHERE " + DBHelper.STORE_ID +"=" + Store_id + " AND " + DBHelper.CATEGORY_ID +"=" + Cat_id + " AND " + DBHelper.QUESTION_ID +"=" + questionId;
         Cursor c=DbManager.getInstance().getDetails(query);
+        //Toast.makeText(ctx,"Image Count "+ c.getCount()+"", Toast.LENGTH_SHORT).show();
         return c.getCount();
     }
 
