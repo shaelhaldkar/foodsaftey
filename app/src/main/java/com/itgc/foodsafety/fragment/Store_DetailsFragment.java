@@ -113,41 +113,44 @@ public class Store_DetailsFragment extends Fragment implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_submit:
-                if (store_manager_name.getText().toString() != null && !store_manager_name.getText().toString().isEmpty()) {
-                    if (store_manager_email.getText().toString() != null && !store_manager_email.getText().toString().isEmpty()) {
-                        if (store_chiller_no.getText().toString() != null && !store_chiller_no.getText().toString().isEmpty()) {
-                            if (store_freezer_no.getText().toString() != null && !store_freezer_no.getText().toString().isEmpty()) {
-                                if (store_vendor_chiller_no.getText().toString() != null && !store_vendor_chiller_no.getText().toString().isEmpty()) {
-                                    if (store_vendor_freezer_no.getText().toString() != null && !store_vendor_freezer_no.getText().toString().isEmpty()) {
-                                        if (store_rodent_no.getText().toString() != null && !store_rodent_no.getText().toString().isEmpty()) {
-                                            if (store_flycatcher_no.getText().toString() != null && !store_flycatcher_no.getText().toString().isEmpty()) {
-                                                if (store_aircutter_no.getText().toString() != null && !store_aircutter_no.getText().toString().isEmpty()) {
-                                                    if (store_thermo_no.getText().toString() != null && !store_thermo_no.getText().toString().isEmpty()) {
-                                                        saveStoreDetailsLocally();
-                                                        sendStoreDetails();
-                                                    } else
-                                                        Toast.makeText(context, "Please enter No. of Thermometers", Toast.LENGTH_LONG).show();
-                                                } else
-                                                    Toast.makeText(context, "Please enter No. of Air Cutters", Toast.LENGTH_LONG).show();
-                                            } else
-                                                Toast.makeText(context, "Please enter No. of Flycatchers", Toast.LENGTH_LONG).show();
-                                        } else
-                                            Toast.makeText(context, "Please enter No. of Rodent Boxes", Toast.LENGTH_LONG).show();
-                                    } else
-                                        Toast.makeText(context, "Please enter No. of Freezers from Vendor", Toast.LENGTH_LONG).show();
-                                } else
-                                    Toast.makeText(context, "Please enter No. of Chillers from Vendor", Toast.LENGTH_LONG).show();
-                            } else
-                                Toast.makeText(context, "Please enter No. of Freezers", Toast.LENGTH_LONG).show();
-                        } else
-                            Toast.makeText(context, "Please enter No. of Chillers", Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(context, "Please enter Manager Email", Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Toast.makeText(context, "Please enter Manager Name", Toast.LENGTH_LONG).show();
-                }
+                saveStoreDetailsLocally();
+                sendStoreDetails();
                 break;
+
+//                if (store_manager_name.getText().toString() != null && !store_manager_name.getText().toString().isEmpty()) {
+//                    if (store_manager_email.getText().toString() != null && !store_manager_email.getText().toString().isEmpty()) {
+//                        if (store_chiller_no.getText().toString() != null && !store_chiller_no.getText().toString().isEmpty()) {
+//                            if (store_freezer_no.getText().toString() != null && !store_freezer_no.getText().toString().isEmpty()) {
+//                                if (store_vendor_chiller_no.getText().toString() != null && !store_vendor_chiller_no.getText().toString().isEmpty()) {
+//                                    if (store_vendor_freezer_no.getText().toString() != null && !store_vendor_freezer_no.getText().toString().isEmpty()) {
+//                                        if (store_rodent_no.getText().toString() != null && !store_rodent_no.getText().toString().isEmpty()) {
+//                                            if (store_flycatcher_no.getText().toString() != null && !store_flycatcher_no.getText().toString().isEmpty()) {
+//                                                if (store_aircutter_no.getText().toString() != null && !store_aircutter_no.getText().toString().isEmpty()) {
+//                                                    if (store_thermo_no.getText().toString() != null && !store_thermo_no.getText().toString().isEmpty()) {
+//                                                        saveStoreDetailsLocally();
+//                                                        sendStoreDetails();
+//                                                    } else
+//                                                        Toast.makeText(context, "Please enter No. of Thermometers", Toast.LENGTH_LONG).show();
+//                                                } else
+//                                                    Toast.makeText(context, "Please enter No. of Air Cutters", Toast.LENGTH_LONG).show();
+//                                            } else
+//                                                Toast.makeText(context, "Please enter No. of Flycatchers", Toast.LENGTH_LONG).show();
+//                                        } else
+//                                            Toast.makeText(context, "Please enter No. of Rodent Boxes", Toast.LENGTH_LONG).show();
+//                                    } else
+//                                        Toast.makeText(context, "Please enter No. of Freezers from Vendor", Toast.LENGTH_LONG).show();
+//                                } else
+//                                    Toast.makeText(context, "Please enter No. of Chillers from Vendor", Toast.LENGTH_LONG).show();
+//                            } else
+//                                Toast.makeText(context, "Please enter No. of Freezers", Toast.LENGTH_LONG).show();
+//                        } else
+//                            Toast.makeText(context, "Please enter No. of Chillers", Toast.LENGTH_LONG).show();
+//                    } else {
+//                        Toast.makeText(context, "Please enter Manager Email", Toast.LENGTH_LONG).show();
+//                    }
+//                } else {
+//                    Toast.makeText(context, "Please enter Manager Name", Toast.LENGTH_LONG).show();
+//                }
         }
     }
 
@@ -258,5 +261,7 @@ public class Store_DetailsFragment extends Fragment implements View.OnClickListe
             store_manager_email.setText(cursor.getString(cursor.getColumnIndex(DBHelper.MANAGER_EMAIL)));
         }
     }
+
+    //17100612062580N1
 
 }

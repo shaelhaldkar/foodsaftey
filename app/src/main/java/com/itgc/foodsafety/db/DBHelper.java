@@ -262,6 +262,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(TABLE_QUESTION_ANSWER_IMAGE_CREATE);
         db.execSQL(TABLE_SAMPLE_CREATE);
         db.execSQL(TABLE_STORE_DETAILSE_CREATE);
+        db.execSQL(TABLE_STORE_START_DATE_TIME_CREATE);
         Log.d("Table created", "Table created");
     }
 
@@ -285,6 +286,8 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(TABLE_QUESTION_ANSWER_IMAGE_DROP);
         db.execSQL(TABLE_SAMPLE_DROP);
         db.execSQL(TABLE_STORE_DETAILS_DROP);
+        db.execSQL(TABLE_STORE_START_DATE_TIME_DROP);
+
         onCreate(db);
     }
 
@@ -407,5 +410,12 @@ public class DBHelper extends SQLiteOpenHelper {
     private final String TABLE_STORE_DETAILS_DROP = "DROP TABLE IF EXISTS " + STORE_DETAILS_TBL_NAME;
 
 
+
+    // For Store Start & End Date Time
+    public static final String STORE_START_TIME_TABLE="startTimeTable";
+    public static final String DATE_TIME="startDateTime";
+
+    private final String TABLE_STORE_START_DATE_TIME_CREATE = "CREATE TABLE " + STORE_START_TIME_TABLE + " ("+ STORE_ID + " INTEGER," + DATE_TIME + " TEXT" +")";
+    private final String TABLE_STORE_START_DATE_TIME_DROP = "DROP TABLE IF EXISTS " + STORE_START_TIME_TABLE;
 
 }

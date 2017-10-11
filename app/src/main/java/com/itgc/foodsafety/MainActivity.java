@@ -1,6 +1,7 @@
 package com.itgc.foodsafety;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -77,6 +78,9 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             //Building the GoogleApi client
             buildGoogleApiClient();
         }
+
+        Log.e("Last Known Location",AppPrefrences.getLatitude(MainActivity.this)+"," +AppPrefrences.getLongitude(MainActivity.this));
+
     }
 
     @Override
@@ -248,10 +252,10 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
     private void displayLocation() {
 
-        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                    (MainActivity.this),
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions((MainActivity.this),new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSION_LOCATION_REQUEST_CODE);
             return;
         }
@@ -262,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             longitude = mLastLocation.getLongitude();
             AppPrefrences.setLatitude(MainActivity.this, latitude + "");
             AppPrefrences.setLongiTude(MainActivity.this, longitude + "");
-            Log.e("LOCATION UPDATE", latitude + "----" + longitude);
+            Log.e(TAG,"LOCATION UPDATE "+ latitude + "----" + longitude);
         } else if (!isGpsEnabled()) {
             // openLocationDialog(ctx, "Please Enable Location");
 
@@ -274,4 +278,13 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         return service.isProviderEnabled(LocationManager.GPS_PROVIDER) && service.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1000) {
+            Fragment frg = getSupportFragmentManager().findFragmentById(R.id.container_body);
+            if (frg != null) {
+                frg.onActivityResult(requestCode, resultCode, data);
+            }
+        }
+    }
 }

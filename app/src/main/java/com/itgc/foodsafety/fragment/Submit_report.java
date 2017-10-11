@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
@@ -29,6 +31,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.google.android.gms.maps.model.LatLng;
 import com.itgc.foodsafety.Capture;
 import com.itgc.foodsafety.MainActivity;
 import com.itgc.foodsafety.MySingleton;
@@ -38,6 +41,7 @@ import com.itgc.foodsafety.db.DBHelper;
 import com.itgc.foodsafety.db.DbManager;
 import com.itgc.foodsafety.utils.AppPrefrences;
 import com.itgc.foodsafety.utils.AppUtils;
+import com.itgc.foodsafety.utils.TrackGPS;
 import com.itgc.foodsafety.utils.Vars;
 
 import org.json.JSONArray;
@@ -54,15 +58,17 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import static android.content.Context.LOCATION_SERVICE;
+
 /**
  * Created by root on 4/11/15.
  */
-public class Submit_report extends Fragment implements View.OnClickListener {
+public class Submit_report extends Fragment implements View.OnClickListener  {
     public static final int SIGNATURE_ACTIVITY = 4;
     private Context ctx;
     private EditText auditerNameEditText, auditerContactNumberEditText;
     private Button signatureButton, submitReport, signatureButton1, expiry_btn,saveLocally;
-    private String auditerName, auditerId, auditerContactNumber, Store_name, audit_sign,data="",startTime,endTime;
+    private String auditerName, auditerId, auditerContactNumber, Store_name, audit_sign,data="",startTime,endTime,storeStartTime="";
     private ArrayList<Answers> answersArrayList;
     private Bundle b;
     private int Cat_id, Store_id;
@@ -116,6 +122,14 @@ public class Submit_report extends Fragment implements View.OnClickListener {
 //            e.printStackTrace();
 //        }
         getAllCompleteAudits();
+        getStoreStartTime();
+
+        if(isGpsEnabled()){
+            new GetCurrentLatLong().execute();
+        }else {
+            Log.e("GPS " ,"NOT ENABLE");
+        }
+
         return view;
     }
 
@@ -306,8 +320,8 @@ public class Submit_report extends Fragment implements View.OnClickListener {
                 params.put("auditor_id", AppPrefrences.getUserId(ctx));
                 params.put("lat", AppPrefrences.getLatitude(ctx));
                 params.put("long", AppPrefrences.getLongitude(ctx));
-                params.put("startdateTime", startTime);
-                params.put("enddatetime", endTime);
+                params.put("startdateTime", storeStartTime);
+                params.put("enddatetime", getDateTime());
                 params.put("store_id", storeId);
                 params.put("expiry_question", expiry);
                 Log.e("Final Post Data ",params.toString());
@@ -544,8 +558,8 @@ public class Submit_report extends Fragment implements View.OnClickListener {
                 params.put("auditor_id", AppPrefrences.getUserId(ctx));
                 params.put("lat", AppPrefrences.getLatitude(ctx));
                 params.put("long", AppPrefrences.getLongitude(ctx));
-                params.put("startdateTime", startTime);
-                params.put("enddatetime", endTime);
+                params.put("startdateTime", storeStartTime);
+                params.put("enddatetime", getDateTime());
                 params.put("store_id", storeId);
                 params.put("expiry_question", "0");
 
@@ -576,6 +590,9 @@ public class Submit_report extends Fragment implements View.OnClickListener {
 
         //Delete Data From Sample Audit Table
         DbManager.getInstance().deleteDetails(DBHelper.AUDIT_SAMPLE_TBL_NAME, DBHelper.STORE_ID + "=" + storeId);// + " AND " + DBHelper.CATEGORY_ID + "=" + categoryId);
+
+        //Delete Data From StartDateTime Table
+        DbManager.getInstance().deleteDetails(DBHelper.STORE_START_TIME_TABLE, DBHelper.STORE_ID + "=" + storeId);// + " AND " + DBHelper.CATEGORY_ID + "=" + categoryId);
 
         //Update Category Status
         ContentValues contentValues=new ContentValues();
@@ -717,6 +734,60 @@ public class Submit_report extends Fragment implements View.OnClickListener {
             //AuditJson.setObject(storeObject);
         }
         return storeObject;
+    }
+
+    private void getStoreStartTime(){
+        DbManager.getInstance().openDatabase();
+        String checkStartDateTime="SELECT " + DBHelper.DATE_TIME +" FROM " + DBHelper.STORE_START_TIME_TABLE + " WHERE " + DBHelper.STORE_ID +"=" + Store_id;
+        Cursor checkStartDate=DbManager.getInstance().getDetails(checkStartDateTime);
+        if(checkStartDate.getCount()>0)
+        {
+            checkStartDate.moveToFirst();
+            storeStartTime=checkStartDate.getString(checkStartDate.getColumnIndex(DBHelper.DATE_TIME));
+            Log.e("StoreStartTime",storeStartTime);
+        }
+    }
+
+    int totalLocFetchTryCount=0;
+    public class GetCurrentLatLong extends AsyncTask<Void,Void,LatLng>{
+
+        TrackGPS trackGPS;
+
+        @Override
+        protected void onPreExecute() {
+            trackGPS = new TrackGPS(ctx);
+        }
+
+        @Override
+        protected LatLng doInBackground(Void... voids) {
+            double lat = trackGPS.getLatitude();
+            double lang = trackGPS.getLongitude();
+            LatLng latLng = new LatLng(lat, lang);
+            if (latLng.latitude != 0 && latLng.longitude != 0) {
+                return latLng;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(LatLng latLng) {
+            if (latLng == null)
+            {
+                totalLocFetchTryCount = totalLocFetchTryCount +1;
+                new GetCurrentLatLong().execute();
+            } else
+            {
+                Log.e("Submit Report:> ","Location: "+latLng.toString());
+                AppPrefrences.setLatitude(ctx, latLng.latitude + "");
+                AppPrefrences.setLongiTude(ctx, latLng.longitude + "");
+            }
+        }
+    }
+
+
+    private boolean isGpsEnabled() {
+        LocationManager service = (LocationManager) ctx.getSystemService(LOCATION_SERVICE);
+        return service.isProviderEnabled(LocationManager.GPS_PROVIDER) && service.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
 
 }

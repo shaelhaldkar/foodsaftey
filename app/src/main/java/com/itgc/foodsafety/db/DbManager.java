@@ -94,13 +94,16 @@ public class DbManager {
 
     public void deleteStoreDetails()
     {
+
         mDb.execSQL("DELETE FROM " + DBHelper.STORE_INFO_TBL_NAME);
+        mDb.execSQL("DELETE FROM " + DBHelper.STORE_SIGNATURE_TBL_NAME);
         mDb.execSQL("DELETE FROM " + DBHelper.CATEGORY_TBL_NAME);
         mDb.execSQL("DELETE FROM " + DBHelper.QUESTION_TBL_NAME);
         mDb.execSQL("DELETE FROM " + DBHelper.ANSWER_TBL_NAME);
         mDb.execSQL("DELETE FROM " + DBHelper.ANSWER_IMAGE_TBL_NAME);
-        mDb.execSQL("DELETE FROM " + DBHelper.STORE_SIGNATURE_TBL_NAME);
         mDb.execSQL("DELETE FROM " + DBHelper.AUDIT_SAMPLE_TBL_NAME);
+        mDb.execSQL("DELETE FROM " + DBHelper.STORE_DETAILS_TBL_NAME);
+        mDb.execSQL("DELETE FROM " + DBHelper.STORE_START_TIME_TABLE);
         Log.e("Delete", "Data From StoreInfo,CategoryInfo & QuestionInfo Table");
     }
 

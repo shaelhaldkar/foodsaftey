@@ -182,7 +182,22 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         }
         getCategoryQuestion();
         restoreToolbar();
+        setStartTime();
+
         return view;
+    }
+
+    private void setStartTime(){
+        String checkStartDateTime="SELECT " + DBHelper.DATE_TIME +" FROM " + DBHelper.STORE_START_TIME_TABLE + " WHERE " + DBHelper.STORE_ID +"=" + Store_id;
+        Cursor checkStartDate=DbManager.getInstance().getDetails(checkStartDateTime);
+        Log.e("StoreDateTime",checkStartDate.getCount()+"");
+        if(checkStartDate.getCount()<=0)
+        {
+            ContentValues contentValues=new ContentValues();
+            contentValues.put(DBHelper.DATE_TIME,getDateTime());
+            contentValues.put(DBHelper.STORE_ID,Store_id);
+            DbManager.getInstance().insertDetails(contentValues,DBHelper.STORE_START_TIME_TABLE);
+        }
     }
 
 
@@ -288,6 +303,8 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         rg_partial.setOnCheckedChangeListener(this);
         txt_skip.setOnClickListener(this);
         read_more.setOnClickListener(this);
+
+        //TO DO for Remove
         AppPrefrences.setStartTime(ctx, getDateTime());
         btn_previous.setVisibility(View.INVISIBLE);
 
@@ -382,6 +399,8 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                     txt_title.setText("Question No." + (questionPos+1) + "/" + String.valueOf(categoryQuestionsArrayList.size()));
                     btn_previous.setVisibility(View.VISIBLE);
                     getQuestionDetails(categoryQuestionsArrayList.get(questionPos).getQuestionId());
+                    //txt_skip.setChecked(false);
+                    //skip="no";
                 }else
                 {
                     saveAnswer(Store_id,Cat_id,categoryQuestionsArrayList.get(questionPos).getQuestionId(),questionSubCatId,edt_comment.getText().toString(),edt_remark.getText().toString(),actions.getText().toString());
@@ -430,6 +449,8 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                     questionPos=questionPos-1;
                     txt_title.setText("Question No." + (questionPos+1) + "/" + String.valueOf(categoryQuestionsArrayList.size()));
                     getQuestionDetails(categoryQuestionsArrayList.get(questionPos).getQuestionId());
+                    //txt_skip.setChecked(false);
+                    //skip="no";
                 }
                 else
                 {
@@ -616,6 +637,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
 
     private String getDateTime() {
         String formattedDate = new SimpleDateFormat("dd MMM yyyy kk:mm").format(Calendar.getInstance().getTime());
+        //Toast.makeText(ctx, formattedDate, Toast.LENGTH_SHORT).show();
         return formattedDate;
     }
 
@@ -1063,6 +1085,15 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             edt_comment.setText(answer.getString(answer.getColumnIndex(DBHelper.ANSWER_COMMENT)));
             edt_remark.setText(answer.getString(answer.getColumnIndex(DBHelper.ANSWER_REMARK)));
             actions.setText(answer.getString(answer.getColumnIndex(DBHelper.ANSWER_ACTION)));
+            String skipInfo=answer.getString(answer.getColumnIndex(DBHelper.ANSWER_QUES_SKIP));
+            if(skipInfo.equalsIgnoreCase("no")){
+                skip="no";
+                txt_skip.setChecked(false);
+            }else {
+                skip="yes";
+                txt_skip.setChecked(true);
+            }
+
             int sample=answer.getInt(answer.getColumnIndex(DBHelper.ANSWER_NO_SAMPLE));
             if(answer.getInt(answer.getColumnIndex(DBHelper.ANSWER_TYPE))==3)
             {
@@ -1095,7 +1126,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                     d.setSampleCount(samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_COUNT)));
                     d.setSampleCurrentRate(samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_CURRENT_RATE)));
                     samples.add(d);
-                    Log.e("Samples Rates",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_RATE_X))+"");
+                    Log.e("Samples Rates",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_CURRENT_RATE))+"");
                 }while (samplesCursor.moveToNext());
                 sampleAuditAdapter.notifyDataSetChanged();
             }
@@ -1107,6 +1138,8 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             edt_remark.setText("");
             actions.setText("");
             rg_yes.setChecked(true);
+            skip="no";
+            txt_skip.setChecked(false);
         }
         answer.close();
     }

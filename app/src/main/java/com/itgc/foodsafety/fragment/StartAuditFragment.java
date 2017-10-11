@@ -4,6 +4,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -27,7 +29,15 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStates;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.itgc.foodsafety.MainActivity;
 import com.itgc.foodsafety.R;
 import com.itgc.foodsafety.adapter.AuditAdapter;
@@ -206,59 +216,7 @@ public class StartAuditFragment extends Fragment implements View.OnClickListener
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_submit:
-                String completeAudit="SELECT * FROM " + DBHelper.CATEGORY_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + store_id + " AND " + DBHelper.CATEGORY_STATUS + "='Complete'";
-                Cursor completed=DbManager.getInstance().getDetails(completeAudit);
-
-                if(completed.getCount()>0)
-                {
-                    Fragment fragment = new Submit_report();
-                    Bundle bundle = new Bundle();
-                    bundle.putInt("Store_id", store_id);
-                    bundle.putString("Store_name", store_name);
-                    fragment.setArguments(bundle);
-                    getFragmentManager().beginTransaction().replace(R.id.container_body, fragment)
-                            .addToBackStack("Submit Report")
-                            .commit();
-                } else
-                {
-                    Toast.makeText(ctx, "No Audit has been completed", Toast.LENGTH_LONG).show();
-                }
-                Log.d("Status", "CLicked");
-//                try {
-//                    Cursor curs = null;
-//                    String query = "";
-//
-//                    try {
-//                        query = "SELECT * FROM answer where ans_storeid = '" + store_id + "' AND ans_status = 'Skipped' OR " +
-//                                "ans_status = 'Complete' ";
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                    DbManager.getInstance().openDatabase();
-//                    curs = DbManager.getInstance().getDetails(query);
-//                    curs.getCount();
-//                    if (curs != null)
-//                    {
-//                        if (curs.moveToFirst())
-//                        {
-//                            Fragment fragment = new Submit_report();
-//                            Bundle bundle = new Bundle();
-//                            bundle.putInt("Store_id", store_id);
-//                            bundle.putString("Store_name", store_name);
-//                            fragment.setArguments(bundle);
-//                            getFragmentManager().beginTransaction().replace(R.id.container_body, fragment)
-//                                    .addToBackStack("Submit Report")
-//                                    .commit();
-//                        } else
-//                        {
-//                            Toast.makeText(ctx, "No Audit has been completed", Toast.LENGTH_LONG).show();
-//                        }
-//                    }
-//
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
+                    EnableGPSAutoMatically();
                 break;
         }
     }
@@ -508,6 +466,134 @@ public class StartAuditFragment extends Fragment implements View.OnClickListener
                     .addToBackStack("Submit Report")
                     .commit();
         }
+    }
+
+    private void EnableGPSAutoMatically() {
+        GoogleApiClient googleApiClient = null;
+        if (googleApiClient == null) {
+            googleApiClient = new GoogleApiClient.Builder(ctx)
+
+                    .addApi(LocationServices.API).addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this).build();
+            googleApiClient.connect();
+            LocationRequest locationRequest = LocationRequest.create();
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            locationRequest.setInterval(30 * 1000);
+            locationRequest.setFastestInterval(5 * 1000);
+            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                    .addLocationRequest(locationRequest);
+
+            // **************************
+            builder.setAlwaysShow(true); // this is the key ingredient
+            // **************************
+
+            PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi
+                    .checkLocationSettings(googleApiClient, builder.build());
+            result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+                @Override
+                public void onResult(LocationSettingsResult result) {
+                    final Status status = result.getStatus();
+                    final LocationSettingsStates state = result
+                            .getLocationSettingsStates();
+                    switch (status.getStatusCode()) {
+                        case LocationSettingsStatusCodes.SUCCESS:
+                            //toast("Success");
+                            gotoSubmitReport();
+                            // All location settings are satisfied. The client can
+                            // initialize location
+                            // requests here.
+                            break;
+                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                            //toast("GPS is not on");
+                            // Location settings are not satisfied. But could be
+                            // fixed by showing the user
+                            // a dialog.
+                            try {
+                                // Show the dialog by calling
+                                // startResolutionForResult(),
+                                // and check the result in onActivityResult().
+                                status.startResolutionForResult(((MainActivity)ctx),1000);
+
+                            } catch (IntentSender.SendIntentException e) {
+                                // Ignore the error.
+                            }
+                            break;
+                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                            //toast("Setting change not allowed");
+                            // Location settings are not satisfied. However, we have
+                            // no way to fix the
+                            // settings so we won't show the dialog.
+                            break;
+                    }
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            gotoSubmitReport();
+        }
+        if (resultCode == Activity.RESULT_CANCELED) {
+           gotoSubmitReport();
+        }
+    }
+
+    private void gotoSubmitReport(){
+        String completeAudit="SELECT * FROM " + DBHelper.CATEGORY_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + store_id + " AND " + DBHelper.CATEGORY_STATUS + "='Complete'";
+        Cursor completed=DbManager.getInstance().getDetails(completeAudit);
+
+        if(completed.getCount()>0)
+        {
+            Fragment fragment = new Submit_report();
+            Bundle bundle = new Bundle();
+            bundle.putInt("Store_id", store_id);
+            bundle.putString("Store_name", store_name);
+            fragment.setArguments(bundle);
+            getFragmentManager().beginTransaction().replace(R.id.container_body, fragment)
+                    .addToBackStack("Submit Report")
+                    .commit();
+        } else
+        {
+            Toast.makeText(ctx, "No Audit has been completed", Toast.LENGTH_LONG).show();
+        }
+        Log.d("Status", "CLicked");
+//                try {
+//                    Cursor curs = null;
+//                    String query = "";
+//
+//                    try {
+//                        query = "SELECT * FROM answer where ans_storeid = '" + store_id + "' AND ans_status = 'Skipped' OR " +
+//                                "ans_status = 'Complete' ";
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                    DbManager.getInstance().openDatabase();
+//                    curs = DbManager.getInstance().getDetails(query);
+//                    curs.getCount();
+//                    if (curs != null)
+//                    {
+//                        if (curs.moveToFirst())
+//                        {
+//                            Fragment fragment = new Submit_report();
+//                            Bundle bundle = new Bundle();
+//                            bundle.putInt("Store_id", store_id);
+//                            bundle.putString("Store_name", store_name);
+//                            fragment.setArguments(bundle);
+//                            getFragmentManager().beginTransaction().replace(R.id.container_body, fragment)
+//                                    .addToBackStack("Submit Report")
+//                                    .commit();
+//                        } else
+//                        {
+//                            Toast.makeText(ctx, "No Audit has been completed", Toast.LENGTH_LONG).show();
+//                        }
+//                    }
+//
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
     }
 
 }

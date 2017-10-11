@@ -41,7 +41,8 @@
                 android:maxLength="4"
                 android:padding="15dp"/>
 
-            <Button android:id="@+id/btn_rate"
+            <Button
+                android:id="@+id/btn_rate"
                 android:layout_width="@dimen/btn_ok_size"
                 android:layout_height="wrap_content"
                 android:text="Ok"
