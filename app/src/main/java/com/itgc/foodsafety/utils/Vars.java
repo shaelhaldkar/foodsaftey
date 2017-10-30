@@ -16,7 +16,9 @@ public class Vars {
     //public static final String BASE_URL_V4 = "http://35.154.96.253/api/"; //v4
 
     public static final String BASE_URL_V2 = "http://13.126.7.45/api/";
-    public static final String BASE_URL_V3 = "http://13.126.51.105/api/";
+    //public static final String BASE_URL_V3 = "http://13.126.51.105/api/";
+
+    public static final String BASE_URL_V3 = "http://13.126.249.150/api/";
 
     public static final String BASE_URL = BASE_URL_V3;
 
