@@ -19,8 +19,11 @@ public class Vars {
     //public static final String BASE_URL_V3 = "http://13.126.51.105/api/";
 
     public static final String BASE_URL_V3 = "http://13.126.249.150/api/";
+    public static final String STAGING = "http://13.126.179.210/api/";
 
-    public static final String BASE_URL = BASE_URL_V3;
+    //13.126.179.210
+
+    public static final String BASE_URL = STAGING;
 
     public static final String AUDIT = "Api/startAudit";
     public static final String REPORT = "Api/report";
