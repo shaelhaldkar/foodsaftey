@@ -8,6 +8,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import com.crashlytics.android.Crashlytics;
+import com.facebook.stetho.Stetho;
 import com.itgc.foodsafety.db.DBHelper;
 import com.itgc.foodsafety.db.DbManager;
 import com.itgc.foodsafety.utils.AppUtils;
@@ -26,6 +27,7 @@ public class MySingleton extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+		Stetho.initializeWithDefaults(this);
         Fabric.with(this, new Crashlytics());
 		File f = new File(AppUtils.FOOD_DIR);
 		f.mkdirs();
