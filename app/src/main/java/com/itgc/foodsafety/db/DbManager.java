@@ -115,18 +115,29 @@ public class DbManager {
 
     public void saveStoreDetails(JSONObject object)
     {
-        String storeID="",storeName="", marchantId="",storeRegion="";
+        String storeID="",storeName="", marchantId="",storeRegion="",auditdate="",auditcode="",latitude="",longitude="",merchantname="";
         try {
             storeID=object.getString("store_id");
             storeName=object.getString("storeName");
             marchantId=object.getString("merchantId");
             storeRegion=object.getString("region");
+
+            auditdate=object.getString("auditdate");
+            auditcode=object.getString("auditcode");
+            latitude=object.getString("lat");
+            longitude=object.getString("longs");
+            merchantname=object.getString("merchantName");
         }catch (Exception e){Log.e("Error","At saveStoreDetails()"+e.getMessage());}
 
         ContentValues c=new ContentValues();
         c.put(DBHelper.STORE_ID,storeID);
         c.put(DBHelper.STORE_NAME,storeName);
         c.put(DBHelper.STORE_MARCHANT_ID,marchantId);
+        c.put(DBHelper.AUDIT_CODE,auditcode);
+        c.put(DBHelper.AUDIT_DATE,auditdate);
+        c.put(DBHelper.LATITUDE,latitude);
+        c.put(DBHelper.LONGITUDE,longitude);
+        c.put(DBHelper.MERCHANT_NAME,merchantname);
         c.put(DBHelper.STORE_REGION,storeRegion);
         mDb.insert(DBHelper.STORE_INFO_TBL_NAME,null,c);
         //Log.e("Insert", "Into StoreInfo Table");
@@ -178,7 +189,10 @@ public class DbManager {
             c.put(DBHelper.QUESTION_SUB_CAT_NAME,object.getString("subCategoryName"));
             c.put(DBHelper.QUESTION_TEXT,object.getString("questionText"));
             c.put(DBHelper.QUESTION_DESC,object.getString("questionDesc"));
+            c.put(DBHelper.QUESTION_TYPE,object.getString("type"));
+            c.put(DBHelper.VERSION,object.getString("version"));
             c.put(DBHelper.QUESTION_SAMPLES,object.getString("numberOfSamples"));
+
             mDb.insert(DBHelper.QUESTION_TBL_NAME,null,c);
             Log.e("Insert", storeId + " " + categoryId + " " +object.getString("quesId"));
 

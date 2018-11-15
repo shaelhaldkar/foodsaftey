@@ -1,27 +1,53 @@
 package com.itgc.foodsafety;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.widget.Toast;
 
+import com.amazonaws.mobile.client.AWSMobileClient;
+import com.crashlytics.android.Crashlytics;
 import com.itgc.foodsafety.service.FoodService;
 import com.itgc.foodsafety.utils.AppPrefrences;
 import com.itgc.foodsafety.utils.AppUtils;
 import com.itgc.foodsafety.utils.Methods;
 
+import io.fabric.sdk.android.Fabric;
 
 
 public class SplashActivity extends Activity {
     private Runnable runnable;
     private Handler handler;
+    private static final int REQUEST= 112;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_splash);
-   //     Lookback.show(getApplicationContext(), "rakshit.choudhary@sirez.com");
+
+        AWSMobileClient.getInstance().initialize(this).execute();
+
         handler = new Handler();
+
+        String[] PERMISSIONS = {android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.CAMERA};
+
+        if (!hasPermissions(SplashActivity.this, PERMISSIONS)) {
+            ActivityCompat.requestPermissions((Activity) this, PERMISSIONS, REQUEST);
+        }
+        else {
+            showSplashScreen();
+        }
+   //     Lookback.show(getApplicationContext(), "rakshit.choudhary@sirez.com");
+
     }
 
     private void updateDB() {
@@ -43,7 +69,7 @@ public class SplashActivity extends Activity {
     protected void onResume() {
         super.onResume();
         //updateDB();
-        showSplashScreen();
+
     }
 
     private void showSplashScreen() {
@@ -65,5 +91,40 @@ public class SplashActivity extends Activity {
             }
         };
         handler.postDelayed(runnable, 3000);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUEST: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    showSplashScreen();
+                } else
+                {
+                    Toast.makeText(SplashActivity.this, "PERMISSIONS Denied", Toast.LENGTH_LONG).show();
+                    finish();
+                }
+            }
+        }
+
+    }
+
+    public static boolean hasPermissions(Context context, String... permissions)
+    {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null)
+        {
+            for (String permission : permissions)
+            {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED)
+                {
+                    return false;
+                }
+            }
+
+        }
+
+        return true;
     }
 }

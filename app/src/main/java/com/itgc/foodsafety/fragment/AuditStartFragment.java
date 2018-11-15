@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.location.Location;
@@ -18,10 +19,12 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
@@ -100,7 +103,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     private Bundle b;
     private String category, formattedDate, Store_name, skip = "no", store_loc;
     private TextView audit_date, question, max_num, txt_title, txt_subcat, discription_txt, read_more;
-    private RadioButton rg_yes, rg_no, rg_partial;
+    private RadioButton rg_yes, rg_no, rg_partial,rdt_isfail;
     private AutoCompleteTextView edt_remark, edt_comment;
     private LinearLayout btn_previous, btn_next;
     private ImageView btn_camera, img_back, img_info, img_info1;
@@ -121,7 +124,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     private com.itgc.foodsafety.ui.LinearLayoutManager mLayoutManager;
     private Boolean isImg = false;
     private int audit_id = 0;
-    private String Previous_data = "";
+    private String Previous_data = "",is_failed="0";
     private int Image_count = 0;
     private EditText actions;
     private AlertDialog d;
@@ -202,6 +205,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
 
 
     private void setUpView(View view) {
+        rdt_isfail=(RadioButton) view.findViewById(R.id.rdt_isfail);
         txt_skip = (CheckBox) view.findViewById(R.id.txt_skip);
         txt_title = (TextView) view.findViewById(R.id.txt_title);
         question = (TextView) view.findViewById(R.id.question);
@@ -233,13 +237,13 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         read_more.setPaintFlags(read_more.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
         rg1 = (RadioGroup) view.findViewById(R.id.rg1);
-        if (type == 0) {
-            rg1.setVisibility(View.GONE);
-            lin_audit.setVisibility(View.GONE);
-        } else if (type == 1) {
-            rg1.setVisibility(View.VISIBLE);
-            lin_audit.setVisibility(View.VISIBLE);
-        }
+//        if (type == 0) {
+//            rg1.setVisibility(View.GONE);
+//            lin_audit.setVisibility(View.GONE);
+//        } else if (type == 1) {
+//            rg1.setVisibility(View.VISIBLE);
+//            lin_audit.setVisibility(View.VISIBLE);
+//        }
 
         edt_comment = (AutoCompleteTextView) view.findViewById(R.id.edt_comment);
         edt_remark = (AutoCompleteTextView) view.findViewById(R.id.edt_remark);
@@ -303,6 +307,21 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         rg_partial.setOnCheckedChangeListener(this);
         txt_skip.setOnClickListener(this);
         read_more.setOnClickListener(this);
+        rdt_isfail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(is_failed.equalsIgnoreCase("0"))
+                {
+                    is_failed="1";
+                    rdt_isfail.setChecked(true);
+                }
+                else
+                {
+                    is_failed="0";
+                    rdt_isfail.setChecked(false);
+                }
+            }
+        });
 
         //TO DO for Remove
         AppPrefrences.setStartTime(ctx, getDateTime());
@@ -347,6 +366,16 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 d.setSampleCurrentRate(0);
                 d.setSamplePos((samples.size()+i+1));
                 d.setSampleRate(0);
+                d.setProduct_name("");
+                d.setMfdpkd("");
+                d.setMfd_date("");
+                d.setShellife_value(0);
+                d.setClicked(false);
+                d.setBrand_name("");
+                d.setNo_sample_product("");
+                d.setBb_exp("");
+                d.setBb_exp_date("");
+
                 samples.add(d);
             }
             sampleAuditAdapter.notifyDataSetChanged();
@@ -361,6 +390,15 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 d.setSampleCurrentRate(0);
                 d.setSamplePos((i));
                 d.setSampleRate(0);
+                d.setProduct_name("");
+                d.setMfdpkd("");
+                d.setMfd_date("");
+                d.setShellife_value(0);
+                d.setClicked(false);
+                d.setBrand_name("");
+                d.setNo_sample_product("");
+                d.setBb_exp("");
+                d.setBb_exp_date("");
                 samples.add(d);
             }
             sampleAuditAdapter.notifyDataSetChanged();
@@ -528,102 +566,102 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 .addApi(LocationServices.API).build();
     }
 
-    private void submitData(final String data1)
-    {
-        final ProgressDialog pd = new ProgressDialog(ctx);
-        pd.setMessage("Please Wait...");
-        pd.setCancelable(false);
-        pd.show();
-
-        StringRequest str = new StringRequest(Request.Method.POST,
-                Vars.BASE_URL + Vars.SUBMIT_REPORT, new Response.Listener<String>() {
-
-            @Override
-            public void onResponse(String response) {
-                Log.e("SUBMIT_RESPONCE---", response);
-
-                if (pd != null && pd.isShowing())
-                    pd.dismiss();
-                if (response != null) {
-                    try {
-                        JSONObject jsonObject = new JSONObject(response);
-                        JSONObject payload = jsonObject.getJSONObject("Payload");
-                        String msg = jsonObject.getString("Message");
-
-                        Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
-
-                        AppUtils.encodedimage = "";
-                        AppPrefrences.setAuditId(ctx, payload.getString("audit_id"));
-                        String Code = jsonObject.getString("Code");
-                        if (!Code.equalsIgnoreCase("ok")) {
-                            deleteData();
-                            Toast.makeText(ctx, "Error! Please ReSubmit", Toast.LENGTH_SHORT).show();
-                        }
-                        // deleteData();
-                        try {
-
-                            Intent intent = new Intent("DraftsCount");
-                            ctx.sendBroadcast(intent);
-
-                            Fragment fragment = new StartAuditFragment();
-                            Bundle bundle = new Bundle();
-                            bundle.putInt("Store_id", Store_id);
-                            bundle.putString("Store_name", Store_name);
-                            fragment.setArguments(bundle);
-                            getFragmentManager().beginTransaction().replace(R.id.container_body, fragment).addToBackStack("Store").commit();
-
-                        } catch (Exception e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError v) {
-                v.printStackTrace();
-                if (pd != null && pd.isShowing())
-                    pd.dismiss();
-                Toast.makeText(ctx, "Failed", Toast.LENGTH_LONG).show();
-            }
-        }) {
-
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("data", data1);
-//              params.put("audit_by", auditerName);
-                params.put("audit_id", AppPrefrences.getAuditId(ctx));
-//              params.put("audit_no", auditerContactNumber);
-                params.put("cat_id", Cat_id + "");
-                params.put("audit_sign", "");
-                params.put("final_submit", "false");
-                params.put("store_sign", "");
-                params.put("audit_contact", "");
-                params.put("auditor_id", AppPrefrences.getUserId(ctx));
-                params.put("lat", AppPrefrences.getLatitude(ctx));
-                params.put("long", AppPrefrences.getLongitude(ctx));
-                params.put("startdateTime", AppPrefrences.getStartTime(ctx));
-                params.put("enddatetime", getDateTime());
-                params.put("store_id", String.valueOf(Store_id));
-                params.put("expiry_question", "0");
-                JSONObject o = new JSONObject(params);
-                Log.e("Submit Params", o.toString());
-                return params;
-            }
-        };
-
-        str.setRetryPolicy(new DefaultRetryPolicy(
-                120000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        str.setShouldCache(false);
-        MySingleton.getInstance(ctx).addToRequestQueue(str);
-    }
+//    private void submitData(final String data1)
+//    {
+//        final ProgressDialog pd = new ProgressDialog(ctx);
+//        pd.setMessage("Please Wait...");
+//        pd.setCancelable(false);
+//        pd.show();
+//
+//        StringRequest str = new StringRequest(Request.Method.POST,
+//                Vars.BASE_URL + Vars.SUBMIT_REPORT, new Response.Listener<String>() {
+//
+//            @Override
+//            public void onResponse(String response) {
+//                Log.e("SUBMIT_RESPONCE---", response);
+//
+//                if (pd != null && pd.isShowing())
+//                    pd.dismiss();
+//                if (response != null) {
+//                    try {
+//                        JSONObject jsonObject = new JSONObject(response);
+//                        JSONObject payload = jsonObject.getJSONObject("Payload");
+//                        String msg = jsonObject.getString("Message");
+//
+//                        Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
+//
+//                        AppUtils.encodedimage = "";
+//                        AppPrefrences.setAuditId(ctx, payload.getString("audit_id"));
+//                        String Code = jsonObject.getString("Code");
+//                        if (!Code.equalsIgnoreCase("ok")) {
+//                            deleteData();
+//                            Toast.makeText(ctx, "Error! Please ReSubmit", Toast.LENGTH_SHORT).show();
+//                        }
+//                        // deleteData();
+//                        try {
+//
+//                            Intent intent = new Intent("DraftsCount");
+//                            ctx.sendBroadcast(intent);
+//
+//                            Fragment fragment = new StartAuditFragment();
+//                            Bundle bundle = new Bundle();
+//                            bundle.putInt("Store_id", Store_id);
+//                            bundle.putString("Store_name", Store_name);
+//                            fragment.setArguments(bundle);
+//                            getFragmentManager().beginTransaction().replace(R.id.container_body, fragment).addToBackStack("Store").commit();
+//
+//                        } catch (Exception e) {
+//                            // TODO Auto-generated catch block
+//                            e.printStackTrace();
+//                        }
+//
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError v) {
+//                v.printStackTrace();
+//                if (pd != null && pd.isShowing())
+//                    pd.dismiss();
+//                Toast.makeText(ctx, "Failed", Toast.LENGTH_LONG).show();
+//            }
+//        }) {
+//
+//            @Override
+//            protected Map<String, String> getParams() {
+//                Map<String, String> params = new HashMap<String, String>();
+//                params.put("data", data1);
+////              params.put("audit_by", auditerName);
+//                params.put("audit_id", AppPrefrences.getAuditId(ctx));
+////              params.put("audit_no", auditerContactNumber);
+//                params.put("cat_id", Cat_id + "");
+//                params.put("audit_sign", "");
+//                params.put("final_submit", "false");
+//                params.put("store_sign", "");
+//                params.put("audit_contact", "");
+//                params.put("auditor_id", AppPrefrences.getUserId(ctx));
+//                params.put("lat", AppPrefrences.getLatitude(ctx));
+//                params.put("long", AppPrefrences.getLongitude(ctx));
+//                params.put("startdateTime", AppPrefrences.getStartTime(ctx));
+//                params.put("enddatetime", getDateTime());
+//                params.put("store_id", String.valueOf(Store_id));
+//                params.put("expiry_question", "0");
+//                JSONObject o = new JSONObject(params);
+//                Log.e("Submit Params", o.toString());
+//                return params;
+//            }
+//        };
+//
+//        str.setRetryPolicy(new DefaultRetryPolicy(
+//                120000,
+//                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+//                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+//        str.setShouldCache(false);
+//        MySingleton.getInstance(ctx).addToRequestQueue(str);
+//    }
 
     private void deleteData() {
         DbManager.getInstance().deleteDetails(DBHelper.ANSWER_Tbl_NAME, DBHelper.ANSWER_Store_id + "='" + Store_id + "' and " +
@@ -637,6 +675,12 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
 
     private String getDateTime() {
         String formattedDate = new SimpleDateFormat("dd MMM yyyy kk:mm").format(Calendar.getInstance().getTime());
+        //Toast.makeText(ctx, formattedDate, Toast.LENGTH_SHORT).show();
+        return formattedDate;
+    }
+
+    private String getDateTime1() {
+        String formattedDate = new SimpleDateFormat("ddMMyyyykkmmss").format(Calendar.getInstance().getTime());
         //Toast.makeText(ctx, formattedDate, Toast.LENGTH_SHORT).show();
         return formattedDate;
     }
@@ -705,14 +749,15 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     private int checkRadio() {
         int checked = 0;
         if (rg_yes.isChecked()) {
-            checked = 1;
+            checked = 0;
         } else if (rg_no.isChecked()) {
-            checked = 2;
+            checked = 1;
         } else {
-            checked = 3;
+            checked = 2;
         }
         return checked;
     }
+
 
     private void doTakePhotoAction() {
         try {
@@ -721,14 +766,23 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             ex.printStackTrace();
         }
 
-        fileUri = Uri.fromFile(photoFile);
+        fileUri = FileProvider.getUriForFile(ctx,
+                "com.itgc.foodsafety.provider", //(use your app signature + ".provider" )
+                photoFile);
+
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
+
         Intent takePictureIntent = new Intent(
                 MediaStore.ACTION_IMAGE_CAPTURE);
+
+       // Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+      //  getActivity().startActivityForResult(cameraIntent, LOAD_CAMERA_RESULTS);
 
         if (photoFile != null) {
             if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-                getActivity().startActivityForResult(takePictureIntent, LOAD_CAMERA_RESULTS);
+               getActivity().startActivityForResult(takePictureIntent, LOAD_CAMERA_RESULTS);
             }
         }
     }
@@ -780,16 +834,17 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        Toast.makeText(ctx, requestCode+ "", Toast.LENGTH_SHORT).show();
+       // Toast.makeText(ctx, requestCode+ "", Toast.LENGTH_SHORT).show();
 
         if (requestCode == TAKE_PHOTO_CODE && resultCode == Activity.RESULT_OK && data != null) {
             try {
                 Bitmap photo = (Bitmap) data.getExtras().get("data");
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                photo.compress(Bitmap.CompressFormat.JPEG, 70, bos);
+                photo.compress(Bitmap.CompressFormat.JPEG, 40, bos);
                 byte[] dataOfImage = bos.toByteArray();
                 encodedImage = Base64.encodeToString(dataOfImage, Base64.DEFAULT);
                 saveanswerImages(encodedImage);
+              //  saveimagepath();
                 encodedImage = "";
                 int imsize = getAnswerImageCount(questionID);
                 Toast.makeText(getContext(), imsize + "/4 Images Added", Toast.LENGTH_SHORT).show();
@@ -801,12 +856,16 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 Uri uri = data.getData();
 
                 String imageUrl = FilePathUtils.getPath(getActivity(), uri);
-                Bitmap scalledBitmap = BitmapHelper.decodeSampledBitmapFromResource(imageUrl, 400, 400); //scall the bitmap into given size
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                scalledBitmap.compress(Bitmap.CompressFormat.JPEG, 70, bos);
-                byte[] dataOfImage = bos.toByteArray();
-                encodedImage = Base64.encodeToString(dataOfImage, Base64.DEFAULT);
-                saveanswerImages(encodedImage);
+                saveimagepath(imageUrl);
+
+                String name= getDateTime1()+"_"+AppPrefrences.getMerchatId(ctx)+"_"+AppPrefrences.getAuditCODE(ctx)+
+                        "_"+Store_id+"_"+Cat_id+"_"+questionSubCatId+ ".jpg";
+//                Bitmap scalledBitmap = BitmapHelper.decodeSampledBitmapFromResource(imageUrl, 300, 300); //scall the bitmap into given size
+//                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//                scalledBitmap.compress(Bitmap.CompressFormat.JPEG, 40, bos);
+//                byte[] dataOfImage = bos.toByteArray();
+//                encodedImage = Base64.encodeToString(dataOfImage, Base64.DEFAULT);
+                saveanswerImages(name);
                 encodedImage = "";
                 int imsize = getAnswerImageCount(questionID);
                 Toast.makeText(getContext(), imsize + "/4 Images Added", Toast.LENGTH_SHORT).show();
@@ -820,16 +879,16 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             if (photoFile != null) {
                 Log.d("", "imagefilepath notcrop " + photoFile.getAbsolutePath());
                 try {
-                    // Bitmap photo = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-                    Bitmap photo = BitmapHelper.decodeSampledBitmapFromResource(photoFile.getAbsolutePath(), 350, 400); //scall the bitmap into given size
+                  //  Bitmap photo1 = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+                    Bitmap photo = BitmapHelper.decodeSampledBitmapFromResource(photoFile.getAbsolutePath(), 300, 300); //scall the bitmap into given size
                     Matrix m=new Matrix();
                     m.setRotate(rotationForImage(ctx,Uri.fromFile(photoFile)));
 
                     photo=Bitmap.createBitmap(photo,0,0,photo.getWidth(),photo.getHeight(),m,true);
-
+                   // Bitmap image = (Bitmap) data.getExtras().get("data");
                     if (photo != null) {
                         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                        photo.compress(Bitmap.CompressFormat.JPEG, 60, bos);
+                        photo.compress(Bitmap.CompressFormat.JPEG, 40, bos);
                         byte[] dataOfImage = bos.toByteArray();
                         encodedImage = Base64.encodeToString(dataOfImage, Base64.DEFAULT);
                         saveanswerImages(encodedImage);
@@ -920,7 +979,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 break;
             case R.id.rdt_no:
                 if (isChecked)
-                    mRecyclerView.setVisibility(View.GONE);
+                    mRecyclerView.setVisibility(View.VISIBLE);
                 break;
             case R.id.rdt_partial:
                 if (isChecked)
@@ -1060,6 +1119,14 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 maxSample=sampleCount;
             } while (c.moveToNext());
 
+            if (type == 1) {
+                rg1.setVisibility(View.GONE);
+                //       lin_audit.setVisibility(View.GONE);
+            } else if (type ==  2|| type==3) {
+                rg1.setVisibility(View.VISIBLE);
+                //      lin_audit.setVisibility(View.VISIBLE);
+            }
+
             setSampleSpinnerData(sampleCount);
             getQuestionAnswer(strId,catId,qId);
         }
@@ -1120,10 +1187,20 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 {
                     SampleDetails d=new SampleDetails();
                     d.setClicked(Boolean.parseBoolean(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.SAMPLE_IS_CLICKED))));
-                    d.setSampleRate(samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_RATE_X)));
+                    d.setIs_sample_failed(samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.IS_SAMPLE_CLICKED)));
                     d.setSamplePos(samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_POS)));
                     d.setSampleCount(samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_COUNT)));
+                    d.setNo_sample_product(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.NO_SAMPLE_PRODUCT)));
+                    d.setProduct_name(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.PRODUCCT_NAME)));
+                    d.setBrand_name(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.BRAND_NAME)));
+                    d.setMfdpkd(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.MFDPKD)));
+                    d.setMfd_date(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.MFDDATA)));
+                    d.setBb_exp(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.BB_EXP)));
+                    d.setBb_exp_date(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.BBEXPDATA)));
+                    d.setShellife_value(samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SELFLIFE)));
+                    d.setTemperature(samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.TEMPERATURE)));
                     d.setSampleCurrentRate(samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_CURRENT_RATE)));
+//                    d.setIs_sample_failed(Integer.parseInt(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.is_sample_failed))));
                     samples.add(d);
                     Log.e("Samples Rates",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_CURRENT_RATE))+"");
                 }while (samplesCursor.moveToNext());
@@ -1165,6 +1242,8 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             c.put(DBHelper.ANSWER_NO_SAMPLE, sample_selected);
             c.put(DBHelper.ANSWER_QUES_SKIP, skip);
             c.put(DBHelper.ANSWER_SUBCAT_ID,subCatId);
+            c.put(DBHelper.SEC_EXISTS,"1");
+            c.put(DBHelper.QUESTION_FAIL,is_failed);
             c.put(DBHelper.ANSWER_CAT_TYPE, type);
 
             DbManager.getInstance().updateDetails(c,DBHelper.ANSWER_TBL_NAME,DBHelper.STORE_ID +"=" + storeId + " AND " + DBHelper.CATEGORY_ID +"=" + categoryId+ " AND " + DBHelper.QUESTION_ID + "=" +questionId );
@@ -1187,6 +1266,8 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             c.put(DBHelper.ANSWER_MAX_SAMPLE, maxSample);
             c.put(DBHelper.ANSWER_NO_SAMPLE, sample_selected);
             c.put(DBHelper.ANSWER_QUES_SKIP, skip);
+            c.put(DBHelper.SEC_EXISTS,"1");
+            c.put(DBHelper.QUESTION_FAIL,is_failed);
             c.put(DBHelper.ANSWER_CAT_TYPE, type);
             DbManager.getInstance().insertDetails(c, DBHelper.ANSWER_TBL_NAME);
         }
@@ -1196,7 +1277,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     private void saveSampleAudits(int storeId,int categoryId,int questionId)
     {
         DbManager.getInstance().deleteDetails(DBHelper.AUDIT_SAMPLE_TBL_NAME,DBHelper.STORE_ID +"=" + storeId + " AND " + DBHelper.CATEGORY_ID +"=" + categoryId + " AND " + DBHelper.QUESTION_ID +"=" + questionId);
-        if(checkRadio()>2)
+        if(checkRadio()>0)
         {
             Log.e("Partial","Checked");
             for (int i = 0; i < samples.size(); i++)
@@ -1207,7 +1288,16 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 c.put(DBHelper.QUESTION_ID, questionId);
                 c.put(DBHelper.SAMPLE_IS_CLICKED, "true");
                 c.put(DBHelper.SAMPLE_POS, samples.get(i).getSamplePos());
-                c.put(DBHelper.SAMPLE_RATE_X, samples.get(i).getSampleRate());
+                c.put(DBHelper.NO_SAMPLE_PRODUCT,samples.get(i).getNo_sample_product());
+                c.put(DBHelper.PRODUCCT_NAME,samples.get(i).getProduct_name());
+                c.put(DBHelper.BRAND_NAME,samples.get(i).getBrand_name());
+                c.put(DBHelper.MFDPKD,samples.get(i).getMfdpkd());
+                c.put(DBHelper.MFDDATA,samples.get(i).getMfd_date());
+                c.put(DBHelper.BB_EXP,samples.get(i).getBb_exp());
+                c.put(DBHelper.BBEXPDATA,samples.get(i).getBb_exp_date());
+                c.put(DBHelper.SELFLIFE,samples.get(i).getShellife_value());
+                c.put(DBHelper.TEMPERATURE,samples.get(i).getTemperature());
+                c.put(DBHelper.IS_SAMPLE_CLICKED, samples.get(i).getIs_sample_failed());
                 c.put(DBHelper.SAMPLE_COUNT, samples.get(i).getSampleCount());
                 c.put(DBHelper.SAMPLE_CURRENT_RATE, samples.get(i).getSampleCurrentRate());
                 DbManager.getInstance().insertDetails(c, DBHelper.AUDIT_SAMPLE_TBL_NAME);
@@ -1233,9 +1323,30 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         DbManager.getInstance().insertDetails(c,DBHelper.ANSWER_IMAGE_TBL_NAME);
     }
 
-    public void updateSamples(int pos,int value)
+    private void saveimagepath(String path)
+    {
+        ContentValues c=new ContentValues();
+        c.put(DBHelper.STORE_ID,Store_id);
+        c.put(DBHelper.CATEGORY_ID,Cat_id);
+        c.put(DBHelper.QUESTION_ID,questionID);
+        c.put(DBHelper.ANSWER_PATH,path);
+        DbManager.getInstance().insertDetails(c,DBHelper.ANSWER_IMAGE_TBL_PATH);
+    }
+
+    public void updateSamples(int pos,int value,String no_sample_product,String product_name,String brand_name,
+                              String mfdpkd,String mfd_date,String bb_exp,String bb_expdate,int Selflife_value,int temperature,int sample_value_fail)
     {
         samples.get(pos).setSampleCurrentRate(value);
+        samples.get(pos).setNo_sample_product(no_sample_product);
+        samples.get(pos).setProduct_name(product_name);
+        samples.get(pos).setBrand_name(brand_name);
+        samples.get(pos).setMfdpkd(mfdpkd);
+        samples.get(pos).setMfd_date(mfd_date);
+        samples.get(pos).setBb_exp(bb_exp);
+        samples.get(pos).setBb_exp_date(bb_expdate);
+        samples.get(pos).setShellife_value(Selflife_value);
+        samples.get(pos).setTemperature(temperature);
+        samples.get(pos).getIs_sample_failed();
         for(int i=0;i<samples.size();i++)
         {
             Log.e("Sample Rate",samples.get(i).getSampleCurrentRate()+"");

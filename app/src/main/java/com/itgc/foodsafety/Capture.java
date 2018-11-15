@@ -211,9 +211,9 @@ public class Capture extends Activity {
                 FileOutputStream mFileOutStream = new FileOutputStream(mypath);
 
                 v.draw(canvas);
-                mBitmap.compress(Bitmap.CompressFormat.PNG, 90, mFileOutStream);
+                mBitmap.compress(Bitmap.CompressFormat.PNG, 50, mFileOutStream);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
+                mBitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos); //bm is the bitmap object
                 byte[] b = baos.toByteArray();
                 if (type.equals("auditor"))
                     AppUtils.encodedimage = Base64.encodeToString(b, Base64.DEFAULT);

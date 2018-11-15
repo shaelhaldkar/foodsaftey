@@ -26,6 +26,43 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:singleLine="true"
+                    android:text="Account Name"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@android:color/black" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.1"
+                    android:singleLine="true"
+                    android:text="@string/store_colon"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@android:color/black" />
+
+                <EditText
+                    android:id="@+id/account_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:editable="false"
+                    android:maxLength="50"
+                    android:singleLine="true"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:inputType="text"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:singleLine="true"
                     android:text="@string/store_manager_name"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="@android:color/black" />
@@ -382,6 +419,41 @@
                     android:singleLine="true"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:inputType="number"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/fssai_lic_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:singleLine="true"
+                    android:text="FSSAI Lic. Valid UPTo"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@android:color/black" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.1"
+                    android:singleLine="true"
+                    android:text="@string/store_colon"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@android:color/black" />
+
+                <TextView
+                    android:id="@+id/fssai_lic"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:singleLine="true"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
 
             </LinearLayout>
 

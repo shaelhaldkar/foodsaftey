@@ -16,12 +16,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.itgc.foodsafety.MainActivity;
 import com.itgc.foodsafety.MySingleton;
@@ -31,25 +35,30 @@ import com.itgc.foodsafety.db.DbManager;
 import com.itgc.foodsafety.utils.AppPrefrences;
 import com.itgc.foodsafety.utils.AppUtils;
 import com.itgc.foodsafety.utils.Vars;
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by root on 11/12/15.
  */
-public class Store_DetailsFragment extends Fragment implements View.OnClickListener {
+public class Store_DetailsFragment extends Fragment implements View.OnClickListener,DatePickerDialog.OnDateSetListener {
 
     private Context context;
-    private EditText store_chiller_no, store_freezer_no, store_vendor_chiller_no, store_vendor_freezer_no, store_rodent_no,
+    private EditText account_name,store_chiller_no, store_freezer_no, store_vendor_chiller_no, store_vendor_freezer_no, store_rodent_no,
             store_flycatcher_no, store_aircutter_no, store_thermo_no, store_manager_name, store_manager_email;
     private Button btn_submit;
-    private String store_name;
+    private String store_name,submit_date;
     private int store_id;
     private Bundle b;
     private ProgressDialog pd;
+    private TextView fssai_lic;
+    LinearLayout select_date;
 
     @Override
     public void onAttach(Context context) {
@@ -79,6 +88,7 @@ public class Store_DetailsFragment extends Fragment implements View.OnClickListe
     }
 
     private void setUpView(View view) {
+        account_name=(EditText)view.findViewById(R.id.account_name);
         store_chiller_no = (EditText) view.findViewById(R.id.store_chiller_no);
         store_freezer_no = (EditText) view.findViewById(R.id.store_freezer_no);
         store_vendor_chiller_no = (EditText) view.findViewById(R.id.store_vendor_chiller_no);
@@ -89,6 +99,26 @@ public class Store_DetailsFragment extends Fragment implements View.OnClickListe
         store_thermo_no = (EditText) view.findViewById(R.id.store_thermo_no);
         store_manager_name = (EditText) view.findViewById(R.id.store_manager_name);
         store_manager_email = (EditText) view.findViewById(R.id.store_manager_email);
+
+        select_date=(LinearLayout)view.findViewById(R.id.fssai_lic_ll);
+        fssai_lic=(TextView) view.findViewById(R.id.fssai_lic);
+
+        btn_submit = (Button) view.findViewById(R.id.btn_submit);
+        btn_submit.setOnClickListener(this);
+
+        select_date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Calendar c=Calendar.getInstance();
+                int year=c.get(Calendar.YEAR);
+                int month=c.get(Calendar.MONTH);
+                int day=c.get(Calendar.DAY_OF_MONTH);
+
+                DatePickerDialog datePickerDialog=DatePickerDialog.newInstance(Store_DetailsFragment.this,year,month,day);
+                datePickerDialog.setMinDate(c);
+                datePickerDialog.show(getActivity().getFragmentManager(),"show");
+            }
+        });
 
         btn_submit = (Button) view.findViewById(R.id.btn_submit);
         btn_submit.setOnClickListener(this);
@@ -160,64 +190,114 @@ public class Store_DetailsFragment extends Fragment implements View.OnClickListe
         pd.setCancelable(false);
         pd.show();
 
-        StringRequest str = new StringRequest(Request.Method.POST,
-                Vars.BASE_URL + Vars.STORE_INFO, new Response.Listener<String>() {
+        JSONObject params=new JSONObject();
+        try {
 
+
+            params.put("auditor_id", AppPrefrences.getUserId(context));
+            params.put("storeId", String.valueOf(store_id));
+            params.put("chillers", store_chiller_no.getText().toString());
+            params.put("freezers", store_freezer_no.getText().toString());
+            params.put("chillers_from_vendors", store_vendor_chiller_no.getText().toString());
+            params.put("freezers_from_vendors", store_vendor_freezer_no.getText().toString());
+            params.put("rodent_boxes", store_rodent_no.getText().toString());
+            params.put("flyCatchers", store_flycatcher_no.getText().toString());
+            params.put("airCutters", store_aircutter_no.getText().toString());
+            params.put("thermometers", store_thermo_no.getText().toString());
+            params.put("manager_name", store_manager_name.getText().toString());
+            params.put("manager_email", store_manager_email.getText().toString());
+            params.put("accountName", account_name.getText().toString());
+            params.put("fssaiLicence_date", submit_date);
+        }catch (Exception e){}
+
+        String URL=Vars.BASE_URL+Vars.STORE_INFO;
+        JsonObjectRequest req = new JsonObjectRequest(1,URL, params,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response)
+                    {
+                        if (pd != null && pd.isShowing())
+                            pd.dismiss();
+                        try {
+                            JSONArray jsonArray=new JSONArray( response.getString("store_informationResult"));
+                            JSONObject jsonObject=jsonArray.getJSONObject(0);
+                            String message=jsonObject.getString("Message");
+                            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
             @Override
-            public void onResponse(String response) {
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.e("Error: ", error.getMessage());
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
-                if (response != null) {
-                    try {
-                        JSONObject jsonObject = new JSONObject(response);
-                        String msg = jsonObject.getString("Message");
-                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
-//                        store_chiller_no.setText("");
-//                        store_freezer_no.setText("");
-//                        store_vendor_chiller_no.setText("");
-//                        store_vendor_freezer_no.setText("");
-//                        store_rodent_no.setText("");
-//                        store_flycatcher_no.setText("");
-//                        store_aircutter_no.setText("");
-//                        store_thermo_no.setText("");
-//                        store_manager_name.setText("");
-//                        store_manager_email.setText("");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError v) {
-                v.printStackTrace();
+                error.printStackTrace();
                 Toast.makeText(context, "Failed", Toast.LENGTH_LONG).show();
             }
-        }) {
+        });
 
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("auditor_id", AppPrefrences.getUserId(context));
-                params.put("storeId", String.valueOf(store_id));
-                params.put("chillers", store_chiller_no.getText().toString());
-                params.put("freezers", store_freezer_no.getText().toString());
-                params.put("chillers_from_vendors", store_vendor_chiller_no.getText().toString());
-                params.put("freezers_from_vendors", store_vendor_freezer_no.getText().toString());
-                params.put("rodent_boxes", store_rodent_no.getText().toString());
-                params.put("flyCatchers", store_flycatcher_no.getText().toString());
-                params.put("airCutters", store_aircutter_no.getText().toString());
-                params.put("thermometers", store_thermo_no.getText().toString());
-                params.put("manager_name", store_manager_name.getText().toString());
-                params.put("manager_email", store_manager_email.getText().toString());
-                return params;
-            }
-        };
-        str.setRetryPolicy(new DefaultRetryPolicy(
+
+//        StringRequest str = new StringRequest(Request.Method.POST,
+//                Vars.BASE_URL + Vars.STORE_INFO, new Response.Listener<String>() {
+//
+//            @Override
+//            public void onResponse(String response) {
+//                if (pd != null && pd.isShowing())
+//                    pd.dismiss();
+//                if (response != null) {
+//                    try {
+//                        JSONObject jsonObject = new JSONObject(response);
+//                        String msg = jsonObject.getString("Message");
+//                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+////                        store_chiller_no.setText("");
+////                        store_freezer_no.setText("");
+////                        store_vendor_chiller_no.setText("");
+////                        store_vendor_freezer_no.setText("");
+////                        store_rodent_no.setText("");
+////                        store_flycatcher_no.setText("");
+////                        store_aircutter_no.setText("");
+////                        store_thermo_no.setText("");
+////                        store_manager_name.setText("");
+////                        store_manager_email.setText("");
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError v) {
+//                v.printStackTrace();
+//                Toast.makeText(context, "Failed", Toast.LENGTH_LONG).show();
+//            }
+//        }) {
+//
+//            @Override
+//            protected Map<String, String> getParams() {
+//                Map<String, String> params = new HashMap<String, String>();
+//                params.put("auditor_id", AppPrefrences.getUserId(context));
+//                params.put("storeId", String.valueOf(store_id));
+//                params.put("chillers", store_chiller_no.getText().toString());
+//                params.put("freezers", store_freezer_no.getText().toString());
+//                params.put("chillers_from_vendors", store_vendor_chiller_no.getText().toString());
+//                params.put("freezers_from_vendors", store_vendor_freezer_no.getText().toString());
+//                params.put("rodent_boxes", store_rodent_no.getText().toString());
+//                params.put("flyCatchers", store_flycatcher_no.getText().toString());
+//                params.put("airCutters", store_aircutter_no.getText().toString());
+//                params.put("thermometers", store_thermo_no.getText().toString());
+//                params.put("manager_name", store_manager_name.getText().toString());
+//                params.put("manager_email", store_manager_email.getText().toString());
+//                return params;
+//            }
+//        };
+        req.setRetryPolicy(new DefaultRetryPolicy(
                 5000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        MySingleton.getInstance(context).addToRequestQueue(str);
+        MySingleton.getInstance(context).addToRequestQueue(req);
     }
 
     private void saveStoreDetailsLocally()
@@ -260,6 +340,27 @@ public class Store_DetailsFragment extends Fragment implements View.OnClickListe
             store_manager_name.setText(cursor.getString(cursor.getColumnIndex(DBHelper.MANAGER_NAME)));
             store_manager_email.setText(cursor.getString(cursor.getColumnIndex(DBHelper.MANAGER_EMAIL)));
         }
+    }
+
+    @Override
+    public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth)
+    {
+        String day= String.valueOf(dayOfMonth); String month=String.valueOf(monthOfYear);
+        if(dayOfMonth<10)
+        {
+            day="0"+dayOfMonth;
+        }
+        if (monthOfYear<9)
+        {
+            month="0"+ (monthOfYear+1);
+        }
+        else {
+            month=String.valueOf(monthOfYear+1);
+        }
+
+        submit_date=month+"-"+day+"-"+year;
+        fssai_lic.setText(month+"-"+day+"-"+year);
+
     }
 
     //17100612062580N1

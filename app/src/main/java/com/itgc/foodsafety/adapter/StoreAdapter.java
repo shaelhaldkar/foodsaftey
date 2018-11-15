@@ -64,8 +64,11 @@ public class StoreAdapter extends BaseAdapter {
             ft = ((FragmentActivity) context).getSupportFragmentManager().beginTransaction();
 
             convertView = mInflater.inflate(R.layout.store_view, null);
-            holder.txt_store = (TextView) convertView.findViewById(R.id.txt_store);
-            holder.txt_store_loc = (TextView) convertView.findViewById(R.id.txt_store_loc);
+            holder.txt_mercahnt_name=convertView.findViewById(R.id.txt_mercahnt_name);
+            holder.txt_store_name = (TextView) convertView.findViewById(R.id.txt_store_name);
+            holder.txt_address=(TextView)convertView.findViewById(R.id.txt_address);
+            holder.txt_store_region = (TextView) convertView.findViewById(R.id.txt_store_region);
+            holder.txt_audit_date=convertView.findViewById(R.id.txt_audit_date);
             holder.txt_details = (TextView) convertView.findViewById(R.id.txt_details);
             holder.lin_store = (LinearLayout) convertView.findViewById(R.id.lin_store);
 
@@ -105,8 +108,16 @@ public class StoreAdapter extends BaseAdapter {
             }
         });
 
-        holder.txt_store.setText(stores.get(position).getStore_name());
-        holder.txt_store_loc.setText(stores.get(position).getStore_loc());
+        String complete_store_with_address=stores.get(position).getStore_name();
+        String[] parts = complete_store_with_address.split("Address");
+
+        String store_name=parts[0];
+        String Address=parts[1];
+        holder.txt_store_name.setText(store_name);
+        holder.txt_address.setText(Address);
+        holder.txt_store_region.setText(stores.get(position).getStore_loc());
+        holder.txt_mercahnt_name.setText(stores.get(position).getMerchant_name());
+        holder.txt_audit_date.setText("Audit date: "+stores.get(position).getAudit_date());
 
         return convertView;
     }
@@ -117,7 +128,7 @@ public class StoreAdapter extends BaseAdapter {
     }
 
     public static class ViewHolder {
-        TextView txt_store, txt_store_loc, txt_details;
+        TextView txt_mercahnt_name,txt_store_name,txt_address, txt_store_region,txt_audit_date, txt_details;
         LinearLayout lin_store;
 
     }

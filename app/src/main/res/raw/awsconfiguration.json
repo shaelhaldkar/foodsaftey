@@ -1,0 +1,23 @@
+{
+  "Version": "1.0",
+  "CredentialsProvider": {
+    "CognitoIdentity": {
+      "Default": {
+
+        "PoolId": "ap-south-1:a699f6d2-c20a-444d-9c20-2c4633645111",
+        "Region": "Asia Pacific (Mumbai)"
+      }
+    }
+  },
+  "IdentityManager" : {
+    "Default" : {
+
+    }
+  },
+  "S3TransferUtility": {
+    "Default": {
+      "Bucket": "foodsaftys",
+      "Region": "Asia Pacific (Mumbai)"
+    }
+  }
+}

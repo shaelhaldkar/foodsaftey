@@ -19,7 +19,7 @@
             android:layout_centerInParent="true"
             android:gravity="center">
 
-            <TextView android:id="@+id/txt_store"
+            <TextView android:id="@+id/txt_mercahnt_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Meat"
@@ -27,12 +27,36 @@
                 android:layout_gravity="left"
                 android:textColor="@android:color/black"/>
 
-            <TextView android:id="@+id/txt_store_loc"
+            <TextView android:id="@+id/txt_store_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Meat"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:layout_gravity="left"
+                android:textColor="@android:color/black"/>
+
+            <TextView android:id="@+id/txt_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Meat"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:layout_gravity="left"
+                android:textColor="@android:color/black"/>
+
+            <TextView android:id="@+id/txt_store_region"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:textAppearanceSmall"
                 android:layout_gravity="left"/>
 
+
+            <TextView android:id="@+id/txt_audit_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Meat"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:layout_gravity="left"
+                android:textColor="@android:color/black"/>
         </LinearLayout>
 
         <TextView android:id="@+id/txt_details"

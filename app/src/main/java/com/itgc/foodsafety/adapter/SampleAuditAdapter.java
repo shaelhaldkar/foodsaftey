@@ -1,5 +1,7 @@
 package com.itgc.foodsafety.adapter;
 
+import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -11,10 +13,13 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,8 +28,11 @@ import com.itgc.foodsafety.dao.SampleDetails;
 import com.itgc.foodsafety.db.DBHelper;
 import com.itgc.foodsafety.db.DbManager;
 import com.itgc.foodsafety.fragment.AuditStartFragment;
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 /**
  * Created by Farhan on 5/29/17.
@@ -38,6 +46,9 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
     int progressChanged = 0;
     float trueprogress = 0;
     int storeId,categoryId,questionId;
+    String mfdpkd, mfd_date,bb_exp,bb_expdate;
+    String no_samples_product="",product_name="",brand_name="";
+    int Selflife_value=0,temperature=0,sample_fail_value=0;
 
     public SampleAuditAdapter(ArrayList<SampleDetails> samples, Context c, int storeId, int categoryId, int questionId, AuditStartFragment auditStartFragment) {
         this.samples = samples;
@@ -56,23 +67,81 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
     }
 
     @Override
-    public void onBindViewHolder(Samples holder, int position)
+    public void onBindViewHolder(final Samples holder, int position)
     {
         holder.txt_sample.setText("Sample " + (position+1));
-//        String query="SELECT * FROM " + DBHelper.AUDIT_SAMPLE_TBL_NAME +" WHERE " + DBHelper.STORE_ID +"=" + storeId + " AND " + DBHelper.CATEGORY_ID +"=" + categoryId + " AND " + DBHelper.QUESTION_ID +"=" + questionId + " AND " + DBHelper.SAMPLE_POS +"=" + position;
-//        Cursor c=DbManager.getInstance().getDetails(query);
-//        Log.e("Sample Audit ",query + " Result " +c.getCount());
-//        if(c.getCount()>0)
-//        {
-//            //holder.edt_rate.setText(c.getString(c.getColumnIndex(DBHelper.STORE_ID)));
-//            holder.progressBar.setProgress(0);
-//        }else
-//        {
-//            holder.edt_rate.setText("0.0");
-//            holder.progressBar.setProgress(0);
-//        }
+
         holder.edt_rate.setText(samples.get(position).getSampleCurrentRate()+"");
         holder.progressBar.setProgress(samples.get(position).getSampleCurrentRate()*2);
+
+        holder.txt_datemfd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentManager manager = ((Activity) c).getFragmentManager();
+                Calendar calendar=Calendar.getInstance();
+                int year=calendar.get(Calendar.YEAR);
+                int month=calendar.get(Calendar.MONTH);
+                int day=calendar.get(Calendar.DAY_OF_MONTH);
+                calendar.setTimeZone(TimeZone.getTimeZone("IST"));
+
+                DatePickerDialog datePickerDialog=DatePickerDialog.newInstance(new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+                        String day= String.valueOf(dayOfMonth); String month=String.valueOf(monthOfYear);
+                        if(dayOfMonth<10)
+                        {
+                            day="0"+dayOfMonth;
+                        }
+                        if (monthOfYear<9)
+                        {
+                            month="0"+ (monthOfYear+1);
+                        }
+                        else {
+                            month=String.valueOf(monthOfYear+1);
+                        }
+
+                        holder.txt_datemfd.setText(day+"-"+month+"-"+year);
+                        mfd_date=year+"-"+month+"-"+day;
+                    }
+                }, year, month, day);
+                datePickerDialog.show(manager,"show");
+            }
+        });
+
+        holder.txt_dateexp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                FragmentManager manager = ((Activity) c).getFragmentManager();
+                Calendar calendar=Calendar.getInstance();
+                int year=calendar.get(Calendar.YEAR);
+                int month=calendar.get(Calendar.MONTH);
+                int day=calendar.get(Calendar.DAY_OF_MONTH);
+
+                calendar.setTimeZone(TimeZone.getTimeZone("IST"));
+
+                DatePickerDialog datePickerDialog=DatePickerDialog.newInstance(new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+                        String day= String.valueOf(dayOfMonth); String month=String.valueOf(monthOfYear);
+                        if(dayOfMonth<10)
+                        {
+                            day="0"+dayOfMonth;
+                        }
+                        if (monthOfYear<9)
+                        {
+                            month="0"+ (monthOfYear+1);
+                        }
+                        else {
+                            month=String.valueOf(monthOfYear+1);
+                        }
+                        holder.txt_dateexp.setText(day+"-"+month+"-"+year);
+                        bb_expdate=year+"-"+month+"-"+day;
+                    }
+                }, year, month, day);
+                datePickerDialog.show(manager,"show");
+            }
+        });
 
     }
 
@@ -83,24 +152,97 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
 
     public class Samples extends RecyclerView.ViewHolder
     {
-        TextView txt_sample;
-        EditText edt_rate;
+
+        TextView txt_sample,txt_datemfd,txt_dateexp;
+        EditText recycle_view_sample,edit_product_name,edit_brand_name,edt_rate;
         SeekBar progressBar;
+        RadioButton my_recycler_view_sample_fail,rdt_none,rdt_upto30,rdt_1month6mont,rdt_more6month;
         Button btn_rate;
+        Spinner mfd_spinner,bb_spinner;
         public Samples(View itemView)
         {
             super(itemView);
+            recycle_view_sample=(EditText)itemView.findViewById(R.id.my_recycler_view_sample);
+            edit_product_name=(EditText)itemView.findViewById(R.id.edt_product_name);
+            edit_brand_name=(EditText)itemView.findViewById(R.id.edt_brand_name);
+            my_recycler_view_sample_fail=(RadioButton)itemView.findViewById(R.id.my_recycler_view_sample_fail);
+            rdt_none=(RadioButton)itemView.findViewById(R.id.rdt_none);
+            rdt_upto30=(RadioButton)itemView.findViewById(R.id.rdt_upto30);
+            rdt_1month6mont=(RadioButton)itemView.findViewById(R.id.rdt_1monthto6month);
+            rdt_more6month=(RadioButton)itemView.findViewById(R.id.rdt_more6months);
+
+
             edt_rate=(EditText)itemView.findViewById(R.id.edt_rate);
             txt_sample=(TextView)itemView.findViewById(R.id.txt_sample);
             progressBar=(SeekBar)itemView.findViewById(R.id.seek_bar);
             btn_rate=(Button)itemView.findViewById(R.id.btn_rate);
+
+            mfd_spinner=(Spinner)itemView.findViewById(R.id.list_samplemfd);
+            bb_spinner=(Spinner)itemView.findViewById(R.id.list_sampleexp);
+
+            txt_datemfd=(TextView)itemView.findViewById(R.id.txt_datemfd);
+            txt_dateexp=(TextView)itemView.findViewById(R.id.txt_dateexp);
+
+            mfd_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    mfdpkd= adapterView.getItemAtPosition(i).toString();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+
+                }
+            });
+
+            bb_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    bb_exp=adapterView.getItemAtPosition(i).toString();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+
+                }
+            });
+
             btn_rate.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     int rate=Double.valueOf(edt_rate.getText().toString()).intValue();
                     if(rate<=10){
                         progressBar.setProgress(rate*2);
-                        fragment.updateSamples(getAdapterPosition(),rate);
+                        if (rdt_none.isChecked())
+                        {
+                            Selflife_value=0;
+                        }
+                        else if(rdt_upto30.isChecked())
+                        {
+                            Selflife_value=1;
+                        }
+                        else if(rdt_1month6mont.isChecked())
+                        {
+                            Selflife_value=2;
+                        }
+                        else
+                        {
+                            Selflife_value=3;
+                        }
+
+                        if(my_recycler_view_sample_fail.isChecked())
+                        {
+                            sample_fail_value=1;
+                        }
+                        else
+                        {
+                            sample_fail_value=0;
+                        }
+                        no_samples_product=recycle_view_sample.getText().toString();
+                        brand_name=edit_brand_name.getText().toString();
+                        product_name=edit_product_name.getText().toString();
+                        fragment.updateSamples(getAdapterPosition(),rate,no_samples_product,product_name,brand_name,
+                                mfdpkd,mfd_date,bb_exp,bb_expdate,Selflife_value,temperature,sample_fail_value);
                     }else {
                         Toast.makeText(c, "Value should not more than 10", Toast.LENGTH_SHORT).show();
                     }
@@ -127,8 +269,38 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
 
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
+                    if (rdt_none.isChecked())
+                    {
+                        Selflife_value=0;
+                    }
+                    else if(rdt_upto30.isChecked())
+                    {
+                        Selflife_value=1;
+                    }
+                    else if(rdt_1month6mont.isChecked())
+                    {
+                        Selflife_value=2;
+                    }
+                    else
+                    {
+                        Selflife_value=3;
+                    }
+
+                    if(my_recycler_view_sample_fail.isChecked())
+                    {
+                        sample_fail_value=1;
+                    }
+                    else
+                    {
+                        sample_fail_value=0;
+                    }
+
+                    no_samples_product=recycle_view_sample.getText().toString();
+                    brand_name=edit_brand_name.getText().toString();
+                    product_name=edit_product_name.getText().toString();
                     edt_rate.setText(trueprogress+"");
-                    fragment.updateSamples(getAdapterPosition(),(int)trueprogress);
+                    fragment.updateSamples(getAdapterPosition(),(int)trueprogress,no_samples_product,product_name,brand_name,
+                            mfdpkd,mfd_date,bb_exp,bb_expdate,Selflife_value,temperature,sample_fail_value);
                 }
             });
 
@@ -162,5 +334,35 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
 //            });
 
         }
+    }
+
+    public  void showpicker()
+    {
+        FragmentManager manager = ((Activity) c).getFragmentManager();
+        Calendar calendar=Calendar.getInstance();
+        int day=calendar.get(Calendar.YEAR);
+        int month=calendar.get(Calendar.MONTH);
+        int year=calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog=DatePickerDialog.newInstance(new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+                String day= String.valueOf(dayOfMonth); String month=String.valueOf(monthOfYear);
+                if(dayOfMonth<10)
+                {
+                    day="0"+dayOfMonth;
+                }
+                if (monthOfYear<9)
+                {
+                    month="0"+ (monthOfYear+1);
+                }
+                else {
+                    month=String.valueOf(monthOfYear+1);
+                }
+
+            }
+        }, year, month, day);
+        datePickerDialog.setMinDate(calendar);
+        datePickerDialog.show(manager,"show");
     }
 }

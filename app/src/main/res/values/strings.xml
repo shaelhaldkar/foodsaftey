@@ -97,4 +97,16 @@
     <string name="password_new">Enter New Password</string>
     <string name="password_confirm">Confirm New Password</string>
     <string name="expiry">Expiry Found</string>
+
+    <string-array name="array_mfd">
+        <item>MFD</item>
+        <item>PKD</item>
+        <item>RECD</item>
+    </string-array>
+
+    <string-array name="array_bb">
+        <item>EXP</item>
+        <item>BB</item>
+        <item>UBD</item>
+    </string-array>
 </resources>

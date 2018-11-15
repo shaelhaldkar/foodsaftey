@@ -19,6 +19,7 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.itgc.foodsafety.MainActivity;
 import com.itgc.foodsafety.MySingleton;
@@ -27,6 +28,7 @@ import com.itgc.foodsafety.utils.AppPrefrences;
 import com.itgc.foodsafety.utils.AppUtils;
 import com.itgc.foodsafety.utils.Vars;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -98,47 +100,60 @@ public class Change_password extends Fragment implements View.OnClickListener {
         pd.setCancelable(false);
         pd.show();
 
-        StringRequest str = new StringRequest(Request.Method.POST,
-                Vars.BASE_URL + Vars.CHANGE_PASSWORD, new Response.Listener<String>() {
+        String URL=Vars.BASE_URL+Vars.CHANGE_PASSWORD;
 
+        JSONObject jsonObject=new JSONObject();
+
+        try{
+            jsonObject.put("auditor_id", AppPrefrences.getUserId(context));
+            jsonObject.put("password", edt_password.getText().toString());
+        }catch(Exception e){}
+
+        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST, URL, jsonObject,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        if (pd != null && pd.isShowing())
+                            pd.dismiss();
+                        try {
+                            JSONArray jsonArray1 = response.getJSONArray("PasswordchangeResult");
+                            JSONObject jsonObject1 = jsonArray1.getJSONObject(0);
+
+                            boolean Status = jsonObject1.getBoolean("Status");
+
+                            if(Status) {
+                                String msg = jsonObject1.getString("Message");
+                                Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                            }
+
+                            else
+                            {
+                                Toast.makeText(context, "Request Failed!!", Toast.LENGTH_LONG).show();
+                            }
+
+
+                        }catch (Exception e)
+                        {
+
+                        }
+                    }
+                }, new Response.ErrorListener() {
             @Override
-            public void onResponse(String response) {
+            public void onErrorResponse(VolleyError error)
+            {
+                error.printStackTrace();
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
-                if (response != null) {
-                    try {
-                        JSONObject jsonObject = new JSONObject(response);
-
-                        boolean Status = jsonObject.getBoolean("Status");
-                        String msg = jsonObject.getString("Message");
-
-                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                }
+                Toast.makeText(context, "Request Failed!!", Toast.LENGTH_LONG).show();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError v) {
-                v.printStackTrace();
-            }
-        }) {
+        });
 
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("auditor_id", AppPrefrences.getUserId(context));
-                params.put("password", edt_password.getText().toString());
-                return params;
-            }
-        };
-        str.setRetryPolicy(new DefaultRetryPolicy(
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
                 5000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        MySingleton.getInstance(context).addToRequestQueue(str);
+        MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
     private void restoreToolbar() {

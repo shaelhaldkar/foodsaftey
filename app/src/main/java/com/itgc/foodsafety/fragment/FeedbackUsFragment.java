@@ -20,6 +20,7 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.itgc.foodsafety.MainActivity;
 import com.itgc.foodsafety.MySingleton;
@@ -28,6 +29,7 @@ import com.itgc.foodsafety.utils.AppPrefrences;
 import com.itgc.foodsafety.utils.AppUtils;
 import com.itgc.foodsafety.utils.Vars;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -91,49 +93,92 @@ public class FeedbackUsFragment extends Fragment implements View.OnClickListener
         pd.setCancelable(false);
         pd.show();
 
-        StringRequest str = new StringRequest(Request.Method.POST,
-                Vars.BASE_URL + Vars.FEEDBACK, new Response.Listener<String>() {
+        String URL=Vars.BASE_URL+Vars.FEEDBACK;
 
-            @Override
-            public void onResponse(String response) {
-                if (pd != null && pd.isShowing())
-                    pd.dismiss();
-                if (response != null) {
-                    try {
-                        JSONObject jsonObject = new JSONObject(response);
+        JSONObject jsonObject=new JSONObject();
 
-                        String msg = jsonObject.getString("Message");
+        try{
+            jsonObject.put("auditor_id", AppPrefrences.getUserId(ctx));
+            jsonObject.put("contact_msg", txt_contact.getText().toString());
+            jsonObject.put("Type","F");
+        }catch(Exception e){}
 
-                        Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
+        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST, URL, jsonObject,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        if (pd != null && pd.isShowing())
+                            pd.dismiss();
+
+                        try {
+                            JSONArray jsonArray1 = response.getJSONArray("contactResult");
+                            JSONObject jsonObject1 = jsonArray1.getJSONObject(0);
+
+                            boolean Status = jsonObject1.getBoolean("Status");
+                            String msg = jsonObject1.getString("Message");
+
+                            Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
+                        }catch (Exception e)
+                        {
+
+                        }
+
                     }
-
-                }
-            }
-        }, new Response.ErrorListener() {
+                }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError v) {
+            public void onErrorResponse(VolleyError error)
+            {
+                error.printStackTrace();
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
                 Toast.makeText(ctx, "Failed", Toast.LENGTH_LONG).show();
             }
-        }) {
+        });
 
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("auditor_id", AppPrefrences.getUserId(ctx));
-                params.put("feedback_msg", txt_contact.getText().toString());
-                return params;
-            }
-        };
-        str.setRetryPolicy(new DefaultRetryPolicy(
+//        StringRequest str = new StringRequest(Request.Method.POST,
+//                Vars.BASE_URL + Vars.FEEDBACK, new Response.Listener<String>() {
+//
+//            @Override
+//            public void onResponse(String response) {
+//                if (pd != null && pd.isShowing())
+//                    pd.dismiss();
+//                if (response != null) {
+//                    try {
+//                        JSONObject jsonObject = new JSONObject(response);
+//
+//                        String msg = jsonObject.getString("Message");
+//
+//                        Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
+//
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                }
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError v) {
+//                if (pd != null && pd.isShowing())
+//                    pd.dismiss();
+//                Toast.makeText(ctx, "Failed", Toast.LENGTH_LONG).show();
+//            }
+//        }) {
+//
+//            @Override
+//            protected Map<String, String> getParams() {
+//                Map<String, String> params = new HashMap<String, String>();
+//                params.put("auditor_id", AppPrefrences.getUserId(ctx));
+//                params.put("feedback_msg", txt_contact.getText().toString());
+//                return params;
+//            }
+//        };
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
                 5000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        MySingleton.getInstance(ctx).addToRequestQueue(str);
+        MySingleton.getInstance(ctx).addToRequestQueue(jsonObjectRequest);
     }
 
     private void restoreToolbar() {

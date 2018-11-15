@@ -41,6 +41,14 @@ public class AppPrefrences {
         return PreferenceManager.getDefaultSharedPreferences(ctx).getString("Auditid", "0");
     }
 
+    public static void setAuditCODE(Context ctx, String auditcode) {
+        PreferenceManager.getDefaultSharedPreferences(ctx).edit().putString("Auditcode", auditcode).commit();
+    }
+
+    public static String getAuditCODE(Context ctx) {
+        return PreferenceManager.getDefaultSharedPreferences(ctx).getString("Auditcode", "0");
+    }
+
     public static void setMerchantId(Context ctx, String UserId) {
         PreferenceManager.getDefaultSharedPreferences(ctx).edit().putString("merchant", UserId).commit();
     }

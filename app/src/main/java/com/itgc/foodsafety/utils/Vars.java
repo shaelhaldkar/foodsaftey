@@ -21,30 +21,32 @@ public class Vars {
 
 
     public static final String  STAGING= "http://13.126.249.150/api/";
-    public static final String  LIVE= "http://13.126.179.210/api/";
+    public static final String  LIVE= "http://52.66.121.97:83/RestServiceImpl.svc/";
 
     //13.126.179.210
 
-    public static final String BASE_URL = STAGING;
+    public static final String BASE_URL = LIVE;
 
     public static final String AUDIT = "Api/startAudit";
     public static final String REPORT = "Api/report";
     public static final String LOGIN = "Api/login";
-    public static final String FORGOT_PASSWORD = "Api/forgotPassword";
-    public static final String SUBMIT_REPORT = "Api/submitAudit";
-    public static final String FEEDBACK = "Api/feedbackUs";
-    public static final String CONTACT = "Api/contactUs";
-    public static final String STORE_INFO = "Api/store_information";
+    public static final String FORGOT_PASSWORD = "forgotPassword";
+    public static final String SUBMIT_REPORT = "submit_report";
+    public static final String SUBMIT_REPORT_TEST="submit_reportTest";
+    public static final String FEEDBACK = "contact";
+    public static final String CONTACT = "contact";
+    public static final String STORE_INFO = "store_information";
     public static final String UPDATE_PROFILE = "Api/updateProfile";
-    public static final String CHANGE_PASSWORD = "Api/changePassword";
-    public static final String OFFLINELOGIN = "Api/offlinelogin";
+    public static final String CHANGE_PASSWORD = "Passwordchange";
+    public static final String OFFLINELOGIN = "login";
 
 
 
 
 
 
-   public static final String[] remarks = new String[]{"No Exceptions Found.", "Not Applicable.",
+
+    public static final String[] remarks = new String[]{"No Exceptions Found.", "Not Applicable.",
             "FSSAI License was not displayed at the prominent place; it was displayed in the back room.",
             "No pallets being used and the food stock was touching the walls in the Grocery & Back Room sections.",
             "There was Flaking/Peeling of walls observed.", "The sliding window panel of the display chiller was dirty.",

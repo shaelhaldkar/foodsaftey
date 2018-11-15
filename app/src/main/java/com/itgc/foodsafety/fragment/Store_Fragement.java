@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.itgc.foodsafety.MainActivity;
 import com.itgc.foodsafety.R;
@@ -73,7 +74,7 @@ public class Store_Fragement extends Fragment
         Cursor c= DbManager.getInstance().getDetails("SELECT * FROM "+ DBHelper.STORE_INFO_TBL_NAME);
         Log.e("Store Count",c.getCount()+"");
 
-        if(c!=null)
+        if(c.getCount()>0)
         {
             c.moveToFirst();
             do {
@@ -81,10 +82,19 @@ public class Store_Fragement extends Fragment
                 Stores stores = new Stores();
                 stores.setStore_id(c.getInt(0));
                 stores.setStore_name(c.getString(1));
-                stores.setStore_loc(c.getString(3));
+                stores.setStore_loc(c.getString(8));
                 stores.setMerchant_id(c.getString(2));
+                stores.setAudit_code(c.getString(c.getColumnIndex(DBHelper.AUDIT_CODE)));
+                stores.setAudit_date(c.getString(c.getColumnIndex(DBHelper.AUDIT_DATE)));
+                stores.setLatitude(c.getString(c.getColumnIndex(DBHelper.LATITUDE)));
+                stores.setLongitude(c.getString(c.getColumnIndex(DBHelper.LONGITUDE)));
+                stores.setMerchant_name(c.getString(c.getColumnIndex(DBHelper.MERCHANT_NAME)));
                 stores_list.add(stores);
             }while (c.moveToNext());
+        }
+        else
+        {
+            Toast.makeText(context, "Please Logout and Login Again", Toast.LENGTH_LONG).show();
         }
     }
 

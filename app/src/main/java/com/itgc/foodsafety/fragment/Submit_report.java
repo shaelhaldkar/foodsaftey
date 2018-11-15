@@ -15,6 +15,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Base64;
 import android.util.Log;
@@ -26,11 +27,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.itgc.foodsafety.Capture;
 import com.itgc.foodsafety.MainActivity;
@@ -41,6 +45,7 @@ import com.itgc.foodsafety.db.DBHelper;
 import com.itgc.foodsafety.db.DbManager;
 import com.itgc.foodsafety.utils.AppPrefrences;
 import com.itgc.foodsafety.utils.AppUtils;
+import com.itgc.foodsafety.utils.S3FileUploadHelper;
 import com.itgc.foodsafety.utils.TrackGPS;
 import com.itgc.foodsafety.utils.Vars;
 
@@ -75,13 +80,20 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
     private ArrayList<ArrayList<Answers>> lists;
     private ProgressDialog pd;
     private ImageView img_back;
-    private String expiry = "";
+    private String expiry = null;
+    private ArrayList<String> imagepath;
+    private ArrayList<String> imagename;//=new ArrayList<>();
 
     private String auditId="";
+    String auditor_filename="",storefilename="";
     private String categoryId="";
     private String storeId="";
     private ArrayList<String> categoryIsList=new ArrayList<>();
     private int idPosition=0;
+    JSONObject o;
+
+    int a=0;
+    int bb=0;
 
     @Override
     public void onAttach(Context context) {
@@ -244,11 +256,20 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
 
     private void submitReport() {
         //getSignature();
-        if (expiry.equalsIgnoreCase("")) {
+        if (expiry!=null) {
             Toast.makeText(ctx, "Please Add Expiry Status", Toast.LENGTH_LONG).show();
         } else
             saveSignature(2);
+        o=getLocalSavedData(storeId,categoryIsList.get(idPosition));
+
+        if(imagename.size()>0) {
+
+            uploadWithTransferUtility();
+        }
+        else
+        {
             submitFirstStep();
+        }
     }
 
     private void submitData(final String data1)
@@ -258,28 +279,50 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         pd.setMessage("Please Wait...");
         pd.setCancelable(false);
         pd.show();
-        StringRequest str = new StringRequest(Request.Method.POST,Vars.BASE_URL + Vars.SUBMIT_REPORT, new Response.Listener<String>()
-        {
+
+        JSONObject jsonObject = new JSONObject();
+
+        try {
+            JSONArray jsonArray=new JSONArray();
+            jsonObject.put("marchent_id", AppPrefrences.getMerchatId(ctx));
+            jsonObject.put("store_id",storeId);
+            jsonObject.put("audit_code",AppPrefrences.getAuditCODE(ctx));
+            jsonObject.put("startdateTime",storeStartTime);
+            jsonObject.put("store_sign",storefilename);
+            jsonObject.put("audit_sign",auditor_filename);
+            jsonObject.put("cat_id",0);
+            jsonObject.put("auditor_id",AppPrefrences.getUserId(ctx));
+            jsonObject.put("lat",AppPrefrences.getLatitude(ctx));
+            jsonObject.put("longs",AppPrefrences.getLongitude(ctx));
+            jsonObject.put("final_submit","true");
+            jsonObject.put("enddatetime",getDateTime());
+            jsonObject.put("data",jsonArray.toString());
+
+
+        }catch (Exception e){}
+
+        String URL=Vars.BASE_URL+Vars.SUBMIT_REPORT_TEST;
+
+        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST, URL, jsonObject, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(String response)
-            {
-                Log.e("Final Submit Response ", response);
+            public void onResponse(JSONObject response) {
+
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
-                if (response != null)
-                {
-                    try
-                    {
-                        JSONObject jsonObject = new JSONObject(response);
-                        String msg = jsonObject.getString("Message");
-                        if(msg.contains("success"))
-                        {
-                            AppUtils.encodedimage = "";
-                            AppUtils.encodedstoreimage="";
-                            deleteSubmittedData(String.valueOf(Store_id),String.valueOf(Cat_id));
 
-                        }
-                        Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
+                try {
+                    JSONArray jsonArray=response.getJSONArray("submit_reportResult");
+                    JSONObject jsonObject=jsonArray.getJSONObject(0);
+
+                    boolean status=jsonObject.getBoolean("Status");
+
+                    if(status) {
+                        String msg = jsonObject.getString("Message");
+                        Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show();
+                        AppUtils.encodedimage = "";
+                        AppUtils.encodedstoreimage="";
+                        deleteSubmittedData(String.valueOf(Store_id),String.valueOf(Cat_id));
+
                         try
                         {
                             Intent intent = new Intent("DraftsCount");
@@ -287,49 +330,102 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                             getFragmentManager().beginTransaction().replace(R.id.container_body, new Store_Fragement()).addToBackStack("Store").commit();
                         } catch (Exception e) {}
 
-                    } catch (Exception e)
-                    {
-                        if (pd != null && pd.isShowing())
-                            pd.dismiss();
                     }
+                    else {
+                        Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
+                    }
+
+
+                }catch (Exception e)
+                {
+
                 }
+
             }
         }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError v)
+            public void onErrorResponse(VolleyError error)
             {
-                v.printStackTrace();
+                error.printStackTrace();
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
-                Toast.makeText(ctx, "Failed", Toast.LENGTH_LONG).show();
+                Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
             }
-        })
+        });
 
-        {
-            @Override
-            protected Map<String, String> getParams()
-            {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("data", "");
-                params.put("audit_id", auditId);
-                params.put("final_submit", "true");
-                params.put("audit_sign",AppUtils.encodedimage);
-                params.put("store_sign",AppUtils.encodedstoreimage);
-                params.put("cat_id", "0");//categoryId);
-                params.put("audit_contact", auditerContactNumberEditText.getText().toString());
-                params.put("auditor_id", AppPrefrences.getUserId(ctx));
-                params.put("lat", AppPrefrences.getLatitude(ctx));
-                params.put("long", AppPrefrences.getLongitude(ctx));
-                params.put("startdateTime", storeStartTime);
-                params.put("enddatetime", getDateTime());
-                params.put("store_id", storeId);
-                params.put("expiry_question", expiry);
-                Log.e("Final Post Data ",params.toString());
-                return params;
-            }
-        };
-        str.setRetryPolicy(new DefaultRetryPolicy(120000,DefaultRetryPolicy.DEFAULT_MAX_RETRIES,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        MySingleton.getInstance(ctx).addToRequestQueue(str);
+
+//        StringRequest str = new StringRequest(Request.Method.POST,Vars.BASE_URL + Vars.SUBMIT_REPORT, new Response.Listener<String>()
+//        {
+//            @Override
+//            public void onResponse(String response)
+//            {
+//                Log.e("Final Submit Response ", response);
+//                if (pd != null && pd.isShowing())
+//                    pd.dismiss();
+//                if (response != null)
+//                {
+//                    try
+//                    {
+//                        JSONObject jsonObject = new JSONObject(response);
+//                        String msg = jsonObject.getString("Message");
+//                        if(msg.contains("success"))
+//                        {
+//                            AppUtils.encodedimage = "";
+//                            AppUtils.encodedstoreimage="";
+//                            deleteSubmittedData(String.valueOf(Store_id),String.valueOf(Cat_id));
+//
+//                        }
+//                        Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
+//                        try
+//                        {
+//                            Intent intent = new Intent("DraftsCount");
+//                            ctx.sendBroadcast(intent);
+//                            getFragmentManager().beginTransaction().replace(R.id.container_body, new Store_Fragement()).addToBackStack("Store").commit();
+//                        } catch (Exception e) {}
+//
+//                    } catch (Exception e)
+//                    {
+//                        if (pd != null && pd.isShowing())
+//                            pd.dismiss();
+//                    }
+//                }
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError v)
+//            {
+//                v.printStackTrace();
+//                if (pd != null && pd.isShowing())
+//                    pd.dismiss();
+//                Toast.makeText(ctx, "Failed", Toast.LENGTH_LONG).show();
+//            }
+//        })
+//
+//        {
+//            @Override
+//            protected Map<String, String> getParams()
+//            {
+//                Map<String, String> params = new HashMap<String, String>();
+//                params.put("data", "");
+//                params.put("audit_id", auditId);
+//                params.put("final_submit", "true");
+//                params.put("audit_sign",AppUtils.encodedimage);
+//                params.put("store_sign",AppUtils.encodedstoreimage);
+//                params.put("cat_id", "0");//categoryId);
+//                params.put("audit_contact", auditerContactNumberEditText.getText().toString());
+//                params.put("auditor_id", AppPrefrences.getUserId(ctx));
+//                params.put("lat", AppPrefrences.getLatitude(ctx));
+//                params.put("long", AppPrefrences.getLongitude(ctx));
+//                params.put("startdateTime", storeStartTime);
+//                params.put("enddatetime", getDateTime());
+//                params.put("store_id", storeId);
+//                params.put("expiry_question", expiry);
+//                Log.e("Final Post Data ",params.toString());
+//                return params;
+//            }
+//        };
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(120000,DefaultRetryPolicy.DEFAULT_MAX_RETRIES,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        MySingleton.getInstance(ctx).addToRequestQueue(jsonObjectRequest);
     }
 
     private String getDateTime() {
@@ -464,8 +560,88 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         pd.setCancelable(false);
         pd.show();
 
+
+        JSONObject jsonObject = new JSONObject();
+
+        try {
+
+
+              data=o.getJSONArray("data").toString();
+            categoryId= String.valueOf(Integer.parseInt(o.getString("cat_id")));
+            startTime= o.getString("startdateTime");
+            endTime= o.getString("enddatetime");
+
+
+
+            jsonObject.put("marchent_id", AppPrefrences.getMerchatId(ctx));
+            jsonObject.put("store_id",storeId);
+            jsonObject.put("audit_code",AppPrefrences.getAuditCODE(ctx));
+            jsonObject.put("startdateTime",storeStartTime);
+            jsonObject.put("store_sign","");
+            jsonObject.put("audit_sign","");
+            jsonObject.put("cat_id",categoryId);
+            jsonObject.put("auditor_id",AppPrefrences.getUserId(ctx));
+            jsonObject.put("lat",AppPrefrences.getLatitude(ctx));
+            jsonObject.put("longs",AppPrefrences.getLongitude(ctx));
+            jsonObject.put("final_submit","false");
+            jsonObject.put("enddatetime",getDateTime());
+            jsonObject.put("data",o.getJSONArray("data").toString());
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        String URL=Vars.BASE_URL+Vars.SUBMIT_REPORT;
+
+//        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST, URL, jsonObject, new Response.Listener<JSONObject>() {
+//            @Override
+//            public void onResponse(JSONObject response) {
+//
+//                if (pd != null && pd.isShowing())
+//                    pd.dismiss();
+//
+//                try {
+//                    JSONArray jsonArray=response.getJSONArray("submit_reportResult");
+//                    JSONObject jsonObject=jsonArray.getJSONObject(0);
+//
+//                    boolean status=jsonObject.getBoolean("Status");
+//
+//                    if(status) {
+//                        String msg = jsonObject.getString("Message");
+//                        idPosition = idPosition + 1;
+//                        if (idPosition < categoryIsList.size()) {
+//                            submitFirstStep();
+//                        }
+//
+//                        if (idPosition == categoryIsList.size()) {
+//                            submitsignature();
+//                        }
+//                    }
+//                    else {
+//                        Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
+//                    }
+//
+//
+//                }catch (Exception e)
+//                {
+//
+//                }
+//
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error)
+//            {
+//                error.printStackTrace();
+//                if (pd != null && pd.isShowing())
+//                    pd.dismiss();
+//                Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
+//            }
+//        });
+
         StringRequest str = new StringRequest(Request.Method.POST,
-                Vars.BASE_URL + Vars.SUBMIT_REPORT, new Response.Listener<String>() {
+                URL , new Response.Listener<String>() {
 
             @Override
             public void onResponse(String response)
@@ -549,20 +725,19 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                 }
 
                 params.put("data", data);
-                params.put("audit_id", auditId);
-                params.put("cat_id", categoryId);
-                params.put("audit_sign", "");
-                params.put("final_submit", "false");
-                params.put("store_sign", "");
-                params.put("audit_contact", "");
-                params.put("auditor_id", AppPrefrences.getUserId(ctx));
-                params.put("lat", AppPrefrences.getLatitude(ctx));
-                params.put("long", AppPrefrences.getLongitude(ctx));
-                params.put("startdateTime", storeStartTime);
-                params.put("enddatetime", getDateTime());
+                params.put("marchent_id",AppPrefrences.getMerchatId(ctx));
                 params.put("store_id", storeId);
-                params.put("expiry_question", "0");
+                params.put("audit_code", AppPrefrences.getAuditCODE(ctx));
+                params.put("startdateTime", storeStartTime);
+                params.put("store_sign", "");
+                params.put("audit_sign", "");
+                params.put("cat_id", categoryId);
 
+                params.put("auditor_id",AppPrefrences.getUserId(ctx));
+                params.put("lat",AppPrefrences.getLatitude(ctx));
+                params.put("longs",AppPrefrences.getLongitude(ctx));
+                params.put("final_submit","false");
+                params.put("enddatetime",getDateTime());
                 Log.e("First Post Data", params.toString());
 
                 return params;
@@ -628,6 +803,8 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         //Log.e("Category Count", c.getCount() + "");
         JSONObject storeObject=new JSONObject();
         JSONArray array=new JSONArray();
+        imagepath=new ArrayList<>();
+        imagename=new ArrayList<>();
         JSONObject o;
         if (c.getCount()>0)
         {
@@ -646,6 +823,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                     int strId=c.getInt(c.getColumnIndex(DBHelper.QUESTION_ID));
 
                     // For Audit Images
+                    ArrayList<StringBuilder> stringBuilders=new ArrayList<>();
                     JSONArray imageArray=new JSONArray();
                     Cursor imageCursor = DbManager.getInstance().getDetails("SELECT answerImage FROM " + DBHelper.ANSWER_IMAGE_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + storeId + " AND " +
                             DBHelper.CATEGORY_ID +"=" + categoryId + " AND " +
@@ -655,14 +833,35 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                     {
                         imageCursor.moveToFirst();
                         do {
-                            imageArray.put(imageCursor.getString(imageCursor.getColumnIndex(DBHelper.ANSWER_IMAGE)));
+                            JSONObject jsonObject=new JSONObject();
+
+                            String iamge=(imageCursor.getString(imageCursor.getColumnIndex(DBHelper.ANSWER_IMAGE)));
+                            imagename.add(iamge);
+
+                            jsonObject.put("image",iamge);
+                            imageArray.put(jsonObject);
                         }while (imageCursor.moveToNext());
-                        imageCursor.close();
+
                     }
+                    imageCursor.close();
                     o.put("image",imageArray);
 
-                    // For Sample Audits
-                    JSONArray auditSamples=new JSONArray();
+                    Cursor pathCursor = DbManager.getInstance().getDetails("SELECT answerpath FROM " + DBHelper.ANSWER_IMAGE_TBL_PATH + " WHERE " + DBHelper.STORE_ID + "=" + storeId + " AND " +
+                            DBHelper.CATEGORY_ID +"=" + categoryId + " AND " +
+                            DBHelper.QUESTION_ID +"=" + quesId);
+                    //Log.e("Image Count", imageCursor.getCount() + "");
+                    if(pathCursor.getCount()>0)
+                    {
+                        pathCursor.moveToFirst();
+                        do {
+
+                            String iamge=(pathCursor.getString(pathCursor.getColumnIndex(DBHelper.ANSWER_PATH)));
+                            imagepath.add(iamge);
+                        }while (imageCursor.moveToNext());
+
+                    }
+                    pathCursor.close();
+
                     String sampleQuery="SELECT * FROM " + DBHelper.AUDIT_SAMPLE_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + storeId + " AND " +
                             DBHelper.CATEGORY_ID + "=" + categoryId + " AND " +
                             DBHelper.QUESTION_ID + "=" +quesId;
@@ -673,28 +872,69 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                         samplesCursor.moveToFirst();
                         do
                         {
-                            JSONObject auditObject=new JSONObject();
-                            auditObject.put("isclicked",Boolean.parseBoolean(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.SAMPLE_IS_CLICKED))));
-                            auditObject.put("rate_x",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_RATE_X)));
-                            auditObject.put("sample_count",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_COUNT)));
-                            auditObject.put("sample_current_rate",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_CURRENT_RATE)));
-                            auditObject.put("sample_pos",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_POS)));
-                            auditSamples.put(auditObject);
+                            StringBuilder sb=new StringBuilder();
+                            sb.append(samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.IS_SAMPLE_CLICKED))).append(",")  ;//1
+                            sb.append(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.TEMPERATURE))).append(",");  //2
+                            sb.append(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.NO_SAMPLE_PRODUCT))).append(",");//3
+                            sb.append(samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_CURRENT_RATE))).append(",");  //4
+                            sb.append(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.PRODUCCT_NAME))).append(",");  //5
+                            sb.append(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.BRAND_NAME))).append(",");  //6
+                            sb.append(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.SELFLIFE))).append(",");  //7
+                            sb.append(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.MFDPKD))).append(",");    //8
+                            sb.append(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.MFDDATA))).append(",");  ///9
+                            sb.append(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.BB_EXP))).append(",");  //10
+                            sb.append(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.BBEXPDATA))); //11
+
+                            stringBuilders.add(sb);
+//                            JSONObject auditObject=new JSONObject();
+//                            auditObject.put("isclicked",Boolean.parseBoolean(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.SAMPLE_IS_CLICKED))));
+//                           // auditObject.put("rate_x",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_RATE_X)));
+//                            auditObject.put("sample_count",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_COUNT)));
+//                            auditObject.put("sample_current_rate",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_CURRENT_RATE)));
+//                            auditObject.put("sample_pos",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_POS)));
+//                            auditSamples.put(auditObject);
                         }while (samplesCursor.moveToNext());
-                        samplesCursor.close();
+
                     }
-                    o.put("sampleAudits",auditSamples);
+                    samplesCursor.close();
+                    StringBuilder str;
+                    JSONArray jsonArray=new JSONArray();
+
+                    if(stringBuilders.size()>0) {
+                        for (int q = 0; q < stringBuilders.size(); q++)
+                        {
+                            str =new StringBuilder();
+                            str.append(stringBuilders.get(q).toString());
+                            jsonArray.put(q,str.toString());
+
+                        }
+                        o.put("sampleAudits", jsonArray);
+                    }
+                    else
+                    {
+                        o.put("sampleAudits",jsonArray);
+                    }
 
                     o.put("comment",c.getString(c.getColumnIndex(DBHelper.ANSWER_COMMENT)));
                     o.put("remark",c.getString(c.getColumnIndex(DBHelper.ANSWER_REMARK)));
                     o.put("actions",c.getString(c.getColumnIndex(DBHelper.ANSWER_ACTION)));
                     o.put("answer_type",c.getInt(c.getColumnIndex(DBHelper.ANSWER_TYPE)));
                     o.put("cat_skip",c.getString(c.getColumnIndex(DBHelper.ANSWER_CAT_SKIP)));
-                    o.put("isSeen",Boolean.parseBoolean(c.getString(c.getColumnIndex(DBHelper.ANSWER_IS_SEEN))));
+                    o.put("sec_exst",c.getString(c.getColumnIndex(DBHelper.SEC_EXISTS)));
+                    o.put("question_fail",c.getString(c.getColumnIndex(DBHelper.QUESTION_FAIL)));
+                 //   o.put("isSeen",Boolean.parseBoolean(c.getString(c.getColumnIndex(DBHelper.ANSWER_IS_SEEN))));
                     o.put("max_no",c.getInt(c.getColumnIndex(DBHelper.ANSWER_MAX_NO)));
                     o.put("max_sample",c.getInt(c.getColumnIndex(DBHelper.ANSWER_MAX_SAMPLE)));
                     o.put("no_sample",c.getInt(c.getColumnIndex(DBHelper.ANSWER_NO_SAMPLE)));
-                    o.put("ques_skip",c.getString(c.getColumnIndex(DBHelper.ANSWER_QUES_SKIP)));
+                   // o.put("ques_skip",c.getString(c.getColumnIndex(DBHelper.ANSWER_QUES_SKIP)));
+                    if(c.getString(c.getColumnIndex(DBHelper.ANSWER_QUES_SKIP)).equalsIgnoreCase("no"))
+                    {
+                        o.put("ques_skip","0");
+                    }
+                    else
+                    {
+                        o.put("ques_skip","1");
+                    }
                     o.put("type",c.getInt(c.getColumnIndex(DBHelper.ANSWER_CAT_TYPE)));
                     o.put("answerDateTime",c.getString(c.getColumnIndex(DBHelper.ANSWER_DATETIME)));
                     array.put(o);
@@ -707,32 +947,37 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                         catCursor.moveToFirst();
                         startDateTime=catCursor.getString(catCursor.getColumnIndex(DBHelper.CATEGORY_START_DATE));
                         endDateTime=catCursor.getString(catCursor.getColumnIndex(DBHelper.CATEGORY_END_DATE));
-                    }
 
+                    }
+                    catCursor.close();
+
+                    storeObject.put("marchent_id",AppPrefrences.getMerchatId(ctx));
                     storeObject.put("store_id",storeId);
                     storeObject.put("cat_id",categoryId);
-                    storeObject.put("audit_id",auditId);
-                    storeObject.put("expiry_question","0");
+                    //       storeObject.put("audit_id",auditId);
+                    //   storeObject.put("expiry_question","0");
                     storeObject.put("startdateTime",startDateTime);
                     storeObject.put("enddatetime",endDateTime);
                     storeObject.put("data",array);
                     storeObject.put("store_sign","");
                     storeObject.put("audit_sign","");
-                    storeObject.put("audit_contact","");
+                    //    storeObject.put("audit_contact","");
                     storeObject.put("final_submit","false");
                     storeObject.put("auditor_id",AppPrefrences.getUserId(ctx));
                     storeObject.put("lat",AppPrefrences.getLatitude(ctx));
                     storeObject.put("long",AppPrefrences.getLongitude(ctx));
+
 
                 } catch (JSONException e)
                 {
                     Log.e("Data Binding Error ",e.getMessage());
                 }
             } while (c.moveToNext());
-            c.close();
+
             //Log.e("Json Data",storeObject.toString());
             //AuditJson.setObject(storeObject);
         }
+        c.close();
         return storeObject;
     }
 
@@ -789,5 +1034,151 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         LocationManager service = (LocationManager) ctx.getSystemService(LOCATION_SERVICE);
         return service.isProviderEnabled(LocationManager.GPS_PROVIDER) && service.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
+
+    public void submitsignature()
+    {
+
+        pd = new ProgressDialog(ctx);
+        pd.setMessage("Please Wait...");
+        pd.setCancelable(false);
+        pd.show();
+
+        JSONObject jsonObject = new JSONObject();
+
+        try {
+            JSONArray jsonArray=new JSONArray();
+            jsonObject.put("marchent_id", AppPrefrences.getMerchatId(ctx));
+            jsonObject.put("store_id",storeId);
+            jsonObject.put("audit_code",AppPrefrences.getAuditCODE(ctx));
+            if(a==0)
+            {
+            jsonObject.put("FileString",AppUtils.encodedimage);
+            }
+            else
+            {
+                jsonObject.put("FileString",AppUtils.encodedstoreimage);
+            }
+
+
+        }
+        catch (Exception e){}
+
+        String URL=Vars.BASE_URL+"upladfile";
+
+        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST, URL, jsonObject, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+                if (pd != null && pd.isShowing())
+                    pd.dismiss();
+
+                try {
+                    JSONArray jsonArray=response.getJSONArray("upladfileResult");
+                    JSONObject jsonObject=jsonArray.getJSONObject(0);
+
+                    boolean status=jsonObject.getBoolean("Status");
+
+                    if(status) {
+
+                        JSONArray jsonArray1=jsonObject.getJSONArray("Payload");
+                        JSONObject jsonObject1=jsonArray1.getJSONObject(0);
+
+                        if (a==0)
+                        {
+                            auditor_filename=jsonObject1.getString("FileName");
+                            a=1;
+                            submitsignature();
+                        }
+                        else {
+                            storefilename=jsonObject1.getString("FileName");
+                            submitData("");
+                        }
+
+
+                    }
+                    else {
+                        Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
+                    }
+
+
+                }catch (Exception e)
+                {
+
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error)
+            {
+                error.printStackTrace();
+                if (pd != null && pd.isShowing())
+                    pd.dismiss();
+                Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                120000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        jsonObjectRequest.setShouldCache(false);
+        MySingleton.getInstance(ctx).addToRequestQueue(jsonObjectRequest);
+
+    }
+
+    private void uploadWithTransferUtility()
+    {
+        final ProgressDialog pd = new ProgressDialog(ctx);
+        pd.setMessage("Please Wait...");
+        pd.setCancelable(false);
+        pd.show();
+
+        S3FileUploadHelper transferHelper = new S3FileUploadHelper(ctx);
+        transferHelper.upload(imagepath.get(bb), imagename.get(bb));
+
+        transferHelper.setFileTransferListener(new S3FileUploadHelper.FileTransferListener() {
+            @Override
+            public void onSuccess(int id, TransferState state, String fileName)
+            {
+                if (pd != null && pd.isShowing())
+                    pd.dismiss();
+                if(imagename.size()-1==bb)
+                {
+                    submitFirstStep();
+                }
+                else
+                {
+                    bb=bb+1;
+                    uploadWithTransferUtility();
+                }
+               // AppLogger.d("S3FileUpload", String.format("%s uploaded successfully!", fileName));
+               // profileImage = fileName;
+            }
+
+            @Override
+            public void onProgressChanged(int id, long bytesCurrent, long bytesTotal)
+            {
+                float percentDonef = ((float) bytesCurrent / (float) bytesTotal) * 100;
+                int percentDone = (int) percentDonef;
+
+                Log.d("S3FileUpload", "ID:" + id + " bytesCurrent: " + bytesCurrent
+                        + " bytesTotal: " + bytesTotal + " " + percentDone + "%");
+            }
+
+            @Override
+            public void onError(int id, Exception ex)
+            {
+                if (pd != null && pd.isShowing())
+                    pd.dismiss();
+
+                Toast.makeText(ctx,"Please try after some time",Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+
+    }
+
 
 }

@@ -29,6 +29,8 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -140,11 +142,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
             case R.id.btn_signin:
                 if (edt_username.getText().toString() != null && !edt_username.getText().toString().isEmpty()) {
                     if (edt_password.getText().toString() != null && !edt_password.getText().toString().isEmpty()) {
-                        if (emailValidator(edt_username.getText().toString())) {
-                            displayLocation();
-                            checkLogin(edt_password.getText().toString(), edt_username.getText().toString());
-                        } else
-                            Toast.makeText(ctx, "Please enter correct Email.", Toast.LENGTH_LONG).show();
+
+                        checkLogin(edt_password.getText().toString(), edt_username.getText().toString());
+//                        if (emailValidator(edt_username.getText().toString())) {
+//                            displayLocation();
+//                            checkLogin(edt_password.getText().toString(), edt_username.getText().toString());
+//                        } else
+//                            Toast.makeText(ctx, "Please enter correct Email.", Toast.LENGTH_LONG).show();
                     } else
                         Toast.makeText(ctx, "Please enter Password.", Toast.LENGTH_LONG).show();
                 } else
@@ -159,89 +163,171 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
         pd.setCancelable(false);
         pd.show();
 
-        StringRequest str = new StringRequest(Request.Method.POST,
-                Vars.BASE_URL + Vars.OFFLINELOGIN, new Response.Listener<String>() {
+        JSONObject jsonObject = new JSONObject();
+        try {
 
-            @Override
-            public void onResponse(String response) {
-                Log.e("Login Response--", response);
-                if (response != null) {
-                    try {
-                        JSONObject jsonObject = new JSONObject(response);
 
-                        boolean Status = jsonObject.getBoolean("Status");
-                        String msg = jsonObject.getString("Message");
+            jsonObject.put("email", username);
+            jsonObject.put("password",password);
+            jsonObject.put("deviceType", "a");
+            jsonObject.put("deviceId", DeviceId);
+        }catch (Exception e){}
 
-                        JSONObject payload = jsonObject.getJSONObject("Payload");
+        String URL=Vars.BASE_URL + Vars.OFFLINELOGIN;
 
-                        if (Status)
-                        {
-                            AppPrefrences.setUserId(ctx, payload.getString("UserId"));
-                            AppPrefrences.setEmail(ctx, payload.getString("email"));
-                            AppPrefrences.setUserName(ctx, payload.getString("userName"));
-                            AppPrefrences.setMobileNo(ctx, payload.getString("mobileNumber"));
+        JsonObjectRequest req = new JsonObjectRequest(1,URL, jsonObject,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONArray jsonArray1=response.getJSONArray("loginResult");
+                            JSONObject jsonObject1=jsonArray1.getJSONObject(0);
 
-                            JSONArray jsonArray = payload.getJSONArray("store");
-                            AppPrefrences.setStoreJson(ctx, jsonArray.toString());
+                            boolean Status = jsonObject1.getBoolean("Status");
+                            String msg = jsonObject1.getString("Message");
 
-                            if (jsonArray.length() > 0)
+
+                            if (Status)
                             {
-                                DbManager.getInstance().openDatabase();
-                                DbManager.getInstance().deleteStoreDetails();
-                                JSONObject ob = jsonArray.getJSONObject(0);
-                                AppPrefrences.setMerchantId(ctx, ob.getString("merchantId"));
+                                JSONArray jsonArray_payload = new JSONArray(jsonObject1.getString("Payload"));
+                                JSONObject payload =jsonArray_payload.getJSONObject(0);
 
-                                // Locally Saving Start //
-                                for(int i=0;i<jsonArray.length();i++)
+                                AppPrefrences.setUserId(ctx, payload.getString("UserID"));
+                                AppPrefrences.setEmail(ctx, payload.getString("email"));
+                                AppPrefrences.setUserName(ctx, payload.getString("username"));
+                                AppPrefrences.setMobileNo(ctx, payload.getString("mobileNumber"));
+
+
+                                JSONArray jsonArray = payload.getJSONArray("Store");
+                                AppPrefrences.setStoreJson(ctx, jsonArray.toString());
+
+                                if (jsonArray.length() > 0)
                                 {
-                                    storeObject.add(jsonArray.getJSONObject(i));
-                                }
-                                new saveDatatoLocal().execute();
-                                // Locally Saving End //
-                            }
+                                    DbManager.getInstance().openDatabase();
+                                    DbManager.getInstance().deleteStoreDetails();
+                                    JSONObject ob = jsonArray.getJSONObject(0);
+                                    AppPrefrences.setMerchantId(ctx, ob.getString("merchantId"));
+                                    AppPrefrences.setAuditCODE(ctx,ob.getString("auditcode"));
 
-                        } else {
-                            Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
-                            edt_username.setText("");
-                            edt_password.setText("");
+                                    // Locally Saving Start //
+                                    for(int i=0;i<jsonArray.length();i++)
+                                    {
+                                        storeObject.add(jsonArray.getJSONObject(i));
+                                    }
+                                    new saveDatatoLocal().execute();
+                                    // Locally Saving End //
+                                }
+
+                            } else {
+                                Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
+                                edt_username.setText("");
+                                edt_password.setText("");
+                                if (pd != null && pd.isShowing())
+                                    pd.dismiss();
+                            }
                             if (pd != null && pd.isShowing())
                                 pd.dismiss();
+                            VolleyLog.v("Response:%n %s", response.toString(4));
+
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-
-                    } catch (Exception e) {
-
-                        if (pd != null && pd.isShowing())
-                            pd.dismiss();
-                        e.printStackTrace();
                     }
-
-                }
-            }
-        }, new Response.ErrorListener() {
+                }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError v) {
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.e("Error: ", error.getMessage());
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
-                v.printStackTrace();
+                error.printStackTrace();
+                Toast.makeText(ctx, "Failed", Toast.LENGTH_SHORT).show();
             }
-        }) {
+        });
 
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("email", username);
-                params.put("password", password);
-                params.put("deviceType", "a");
-                params.put("deviceId", DeviceId);
-                Log.e("Login Params",new JSONObject(params).toString());
-                return params;
-            }
-        };
-        str.setRetryPolicy(new DefaultRetryPolicy(
+//        StringRequest str = new StringRequest(Request.Method.POST,
+//                Vars.BASE_URL + Vars.OFFLINELOGIN, new Response.Listener<String>() {
+//
+//            @Override
+//            public void onResponse(String response) {
+//                Log.e("Login Response--", response);
+//                if (response != null) {
+//                    try {
+//                        JSONObject jsonObject = new JSONObject(response);
+//
+//                        boolean Status = jsonObject.getBoolean("Status");
+//                        String msg = jsonObject.getString("Message");
+//
+//                        JSONObject payload = jsonObject.getJSONObject("Payload");
+//
+//                        if (Status)
+//                        {
+//                            AppPrefrences.setUserId(ctx, payload.getString("UserId"));
+//                            AppPrefrences.setEmail(ctx, payload.getString("email"));
+//                            AppPrefrences.setUserName(ctx, payload.getString("userName"));
+//                            AppPrefrences.setMobileNo(ctx, payload.getString("mobileNumber"));
+//
+//                            JSONArray jsonArray = payload.getJSONArray("store");
+//                            AppPrefrences.setStoreJson(ctx, jsonArray.toString());
+//
+//                            if (jsonArray.length() > 0)
+//                            {
+//                                DbManager.getInstance().openDatabase();
+//                                DbManager.getInstance().deleteStoreDetails();
+//                                JSONObject ob = jsonArray.getJSONObject(0);
+//                                AppPrefrences.setMerchantId(ctx, ob.getString("merchantId"));
+//
+//                                // Locally Saving Start //
+//                                for(int i=0;i<jsonArray.length();i++)
+//                                {
+//                                    storeObject.add(jsonArray.getJSONObject(i));
+//                                }
+//                                new saveDatatoLocal().execute();
+//                                // Locally Saving End //
+//                            }
+//
+//                        } else {
+//                            Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
+//                            edt_username.setText("");
+//                            edt_password.setText("");
+//                            if (pd != null && pd.isShowing())
+//                                pd.dismiss();
+//                        }
+//
+//                    } catch (Exception e) {
+//
+//                        if (pd != null && pd.isShowing())
+//                            pd.dismiss();
+//                        e.printStackTrace();
+//                    }
+//
+//                }
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError v) {
+//                if (pd != null && pd.isShowing())
+//                    pd.dismiss();
+//                v.printStackTrace();
+//            }
+//        }) {
+//
+//            @Override
+//            protected Map<String, String> getParams() {
+//                Map<String, String> params = new HashMap<String, String>();
+//                params.put("email", username);
+//                params.put("password", password);
+//                params.put("deviceType", "a");
+//                params.put("deviceId", DeviceId);
+//                Log.e("Login Params",new JSONObject(params).toString());
+//                return params;
+//            }
+//        };
+        req.setRetryPolicy(new DefaultRetryPolicy(
                 5000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        MySingleton.getInstance(ctx).addToRequestQueue(str);
+        MySingleton.getInstance(ctx).addToRequestQueue(req);
     }
 
     public boolean emailValidator(String email) {

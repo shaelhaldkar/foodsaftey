@@ -20,11 +20,13 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.itgc.foodsafety.MySingleton;
 import com.itgc.foodsafety.R;
 import com.itgc.foodsafety.utils.Vars;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -113,53 +115,62 @@ public class ForgetPassword extends Fragment implements View.OnClickListener {
         pd.setCancelable(false);
         pd.show();
 
-        StringRequest str = new StringRequest(Request.Method.POST,
-                Vars.BASE_URL + Vars.FORGOT_PASSWORD, new Response.Listener<String>() {
+        String URL=Vars.BASE_URL+Vars.FORGOT_PASSWORD;
 
-            @Override
-            public void onResponse(String response) {
-                if (pd != null && pd.isShowing())
-                    pd.dismiss();
-                if (response != null) {
-                    try{
-                        JSONObject jsonObject = new JSONObject(response);
+        JSONObject jsonObject=new JSONObject();
 
-                        String msg = jsonObject.getString("Message");
+        try{
+            jsonObject.put("email", email);
+        }catch(Exception e){}
 
-                        Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
+        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST, URL, jsonObject,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
 
-                        fgtpassEt.setText("");
+                        if (pd != null && pd.isShowing())
+                            pd.dismiss();
+
+                        try {
+                            JSONArray jsonArray1 = response.getJSONArray("forgotPasswordResult");
+                            JSONObject jsonObject1 = jsonArray1.getJSONObject(0);
+
+                            boolean Status = jsonObject1.getBoolean("Status");
+                            if(Status) {
+
+                                JSONArray payload=jsonObject1.getJSONArray("Payload");
+                                JSONObject message = payload.getJSONObject(0);
+                                String msg = message.getString("Message");
+                                Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
+                            }
+                            else
+                            {
+                                Toast.makeText(ctx, "Request Failed!!", Toast.LENGTH_LONG).show();
+                            }
+
+
+                        }catch (Exception e)
+                        {
+                            Toast.makeText(ctx, "Request Failed!!", Toast.LENGTH_LONG).show();
+                        }
 
                     }
-                    catch (Exception e){
-                        e.printStackTrace();
-                    }
-
-                }
-            }
-        }, new Response.ErrorListener() {
+                }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError v) {
+            public void onErrorResponse(VolleyError error)
+            {
+                error.printStackTrace();
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
-                Toast.makeText(ctx,"falied",Toast.LENGTH_LONG).show();
-                v.printStackTrace();
+                Toast.makeText(ctx, "Request Failed", Toast.LENGTH_LONG).show();
             }
-        }){
+        });
 
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("email", email);
-                return params;
-            }
-        };
-
-        str.setRetryPolicy(new DefaultRetryPolicy(
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
                 5000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        MySingleton.getInstance(ctx).addToRequestQueue(str);
+        MySingleton.getInstance(ctx).addToRequestQueue(jsonObjectRequest);
     }
 
     public static boolean isEmailValid(String email) {

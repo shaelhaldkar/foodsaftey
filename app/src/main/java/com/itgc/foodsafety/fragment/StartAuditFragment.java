@@ -157,20 +157,20 @@ public class StartAuditFragment extends Fragment implements View.OnClickListener
         else
             {
 
-            if (type == 0)
-            {
-                fragment = new AuditStartFragment();
-                Bundle bundle = new Bundle();
-                bundle.putInt("Cat_id", Integer.parseInt(categoriesArrayList.get(position).getCategoryId()));
-                bundle.putString("Cat_name", categoriesArrayList.get(position).getCategoryName());
-                bundle.putInt("Type", Integer.parseInt(categoriesArrayList.get(position).getCategoryType()));
-                bundle.putInt("Store_id", store_id);
-                bundle.putString("Store_name", store_name);
-                bundle.putString("Store_region", store_loc);
-                fragment.setArguments(bundle);
-                getFragmentManager().beginTransaction().replace(R.id.container_body, fragment).addToBackStack("Audit").commit();
-            }
-            else
+//            if (type == 0)
+//            {
+//                fragment = new AuditStartFragment();
+//                Bundle bundle = new Bundle();
+//                bundle.putInt("Cat_id", Integer.parseInt(categoriesArrayList.get(position).getCategoryId()));
+//                bundle.putString("Cat_name", categoriesArrayList.get(position).getCategoryName());
+//                bundle.putInt("Type", Integer.parseInt(categoriesArrayList.get(position).getCategoryType()));
+//                bundle.putInt("Store_id", store_id);
+//                bundle.putString("Store_name", store_name);
+//                bundle.putString("Store_region", store_loc);
+//                fragment.setArguments(bundle);
+//                getFragmentManager().beginTransaction().replace(R.id.container_body, fragment).addToBackStack("Audit").commit();
+//            }
+//            else
             {
                 fragment = new CheckAuditStatus();
                 Bundle bundle = new Bundle();
@@ -368,7 +368,7 @@ public class StartAuditFragment extends Fragment implements View.OnClickListener
                         {
                             JSONObject auditObject=new JSONObject();
                             auditObject.put("isclicked",Boolean.parseBoolean(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.SAMPLE_IS_CLICKED))));
-                            auditObject.put("rate_x",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_RATE_X)));
+                           // auditObject.put("rate_x",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_RATE_X)));
                             auditObject.put("sample_count",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_COUNT)));
                             auditObject.put("sample_current_rate",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_CURRENT_RATE)));
                             auditObject.put("sample_pos",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_POS)));
@@ -439,7 +439,7 @@ public class StartAuditFragment extends Fragment implements View.OnClickListener
     }
 
     class loadLocalData extends AsyncTask<Void,Void,Void>
-    {
+        {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();

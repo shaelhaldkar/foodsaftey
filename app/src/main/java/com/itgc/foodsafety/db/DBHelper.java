@@ -260,6 +260,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(TABLE_QUESTION_CREATE);
         db.execSQL(TABLE_QUESTION_ANSWER_CREATE);
         db.execSQL(TABLE_QUESTION_ANSWER_IMAGE_CREATE);
+        db.execSQL(TABLE_QUESTION_ANSWER_PATH_CREATE);
         db.execSQL(TABLE_SAMPLE_CREATE);
         db.execSQL(TABLE_STORE_DETAILSE_CREATE);
         db.execSQL(TABLE_STORE_START_DATE_TIME_CREATE);
@@ -284,6 +285,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(TABLE_QUESTION_DROP);
         db.execSQL(TABLE_QUESTION_ANSWER_DROP);
         db.execSQL(TABLE_QUESTION_ANSWER_IMAGE_DROP);
+        db.execSQL(TABLE_QUESTION_ANSWER_PATh_DROP);
         db.execSQL(TABLE_SAMPLE_DROP);
         db.execSQL(TABLE_STORE_DETAILS_DROP);
         db.execSQL(TABLE_STORE_START_DATE_TIME_DROP);
@@ -297,8 +299,13 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String STORE_NAME = "storeName";
     public static final String STORE_MARCHANT_ID = "storeMarchantId";
     public static final String STORE_REGION = "storeRegion";
+    public static final String AUDIT_CODE="auditcode";
+    public static final String AUDIT_DATE="auditdate";
+    public static final String LATITUDE="lat";
+    public static final String LONGITUDE="long";
+    public static final String MERCHANT_NAME="merchantname";
 
-    private final String TABLE_STORE_INFO_CREATE = "CREATE TABLE " + STORE_INFO_TBL_NAME + " (" + STORE_ID + " INTEGER,"+ STORE_NAME + " TEXT," + STORE_MARCHANT_ID +" INTEGER," + STORE_REGION + " TEXT)";
+    private final String TABLE_STORE_INFO_CREATE = "CREATE TABLE " + STORE_INFO_TBL_NAME + " (" + STORE_ID + " INTEGER,"+ STORE_NAME + " TEXT," + STORE_MARCHANT_ID +" INTEGER," + AUDIT_CODE + " TEXT," + AUDIT_DATE +" TEXT," + LATITUDE + " TEXT," + LONGITUDE + " TEXT," + MERCHANT_NAME + " TEXT," + STORE_REGION + " TEXT)";
     private final String TABLE_STORE_INFO_DROP = "DROP TABLE IF EXISTS " + STORE_INFO_TBL_NAME;
 
 
@@ -335,9 +342,11 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String QUESTION_TEXT="questionText";
     public static final String QUESTION_DESC="questionDesc";
     public static final String QUESTION_SAMPLES="numberOfSamples";
+    public static final String QUESTION_TYPE="questiontype";
+    public static final String VERSION="version";
 
     private final String TABLE_QUESTION_CREATE = "CREATE TABLE " + QUESTION_TBL_NAME + " (" + STORE_ID + " INTEGER," + CATEGORY_ID + " INTEGER,"+ QUESTION_ID + " INTEGER,"+ QUESTION_SUB_CAT_ID + " INTEGER,"+
-                                                                    QUESTION_SUB_CAT_NAME + " TEXT,"+ QUESTION_TEXT + " TEXT,"+ QUESTION_DESC + " TEXT,"+ QUESTION_SAMPLES + " TEXT" +")";
+                                                                    QUESTION_SUB_CAT_NAME + " TEXT,"+ QUESTION_TEXT + " TEXT,"+ QUESTION_DESC + " TEXT,"+ QUESTION_TYPE + " TEXT,"+ VERSION +" TEXT,"+ QUESTION_SAMPLES + " TEXT" +")";
     private final String TABLE_QUESTION_DROP = "DROP TABLE IF EXISTS " + QUESTION_TBL_NAME;
 
 
@@ -356,13 +365,15 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String ANSWER_QUES_SKIP="ques_skip";
     public static final String ANSWER_SUBCAT_ID="subcat_id";
     public static final String ANSWER_CAT_TYPE="type";
+    public static final String SEC_EXISTS="secexists";
+    public static final String QUESTION_FAIL="questionfail";
 
     private final String TABLE_QUESTION_ANSWER_CREATE = "CREATE TABLE " + ANSWER_TBL_NAME + " (" +  STORE_ID + " INTEGER," + CATEGORY_ID + " INTEGER,"+
                                                                                                     QUESTION_ID + " INTEGER,"+ ANSWER_SUBCAT_ID + " INTEGER,"+
                                                                                                     ANSWER_COMMENT + " TEXT,"+ ANSWER_REMARK + " TEXT,"+ ANSWER_ACTION + " TEXT,"+
                                                                                                     ANSWER_DATETIME + " TEXT,"+ ANSWER_TYPE + " INTEGER,"+ ANSWER_CAT_SKIP + " TEXT,"+
                                                                                                     ANSWER_IS_SEEN + " TEXT,"+ ANSWER_MAX_NO + " INTEGER,"+ ANSWER_MAX_SAMPLE + " INTEGER,"+
-                                                                                                    ANSWER_NO_SAMPLE + " INTEGER,"+ ANSWER_QUES_SKIP + " TEXT,"+ ANSWER_CAT_TYPE + " INTEGER" +")";
+                                                                                                    ANSWER_NO_SAMPLE + " INTEGER,"+ ANSWER_QUES_SKIP + " TEXT,"+ SEC_EXISTS + " TEXT,"+ QUESTION_FAIL + " TEXT,"+ ANSWER_CAT_TYPE + " INTEGER" +")";
     private final String TABLE_QUESTION_ANSWER_DROP = "DROP TABLE IF EXISTS " + ANSWER_TBL_NAME;
 
 
@@ -373,17 +384,31 @@ public class DBHelper extends SQLiteOpenHelper {
     private final String TABLE_QUESTION_ANSWER_IMAGE_CREATE = "CREATE TABLE " + ANSWER_IMAGE_TBL_NAME + " ("+ STORE_ID + " INTEGER," + CATEGORY_ID + " INTEGER,"+ QUESTION_ID + " INTEGER,"+ ANSWER_IMAGE + " TEXT" +")";
     private final String TABLE_QUESTION_ANSWER_IMAGE_DROP = "DROP TABLE IF EXISTS " + ANSWER_IMAGE_TBL_NAME;
 
+    public static final String ANSWER_IMAGE_TBL_PATH="answerpath";
+    public static final String ANSWER_PATH="answerpath";
+
+    private final String TABLE_QUESTION_ANSWER_PATH_CREATE = "CREATE TABLE " + ANSWER_IMAGE_TBL_PATH + " ("+ STORE_ID + " INTEGER," + CATEGORY_ID + " INTEGER,"+ QUESTION_ID + " INTEGER,"+ ANSWER_PATH + " TEXT" +")";
+    private final String TABLE_QUESTION_ANSWER_PATh_DROP = "DROP TABLE IF EXISTS " + ANSWER_IMAGE_TBL_PATH;
+
 
     // For Sample Audits
     public static final String AUDIT_SAMPLE_TBL_NAME="sampleInfo";
     public static final String SAMPLE_POS="samplePos";
     public static final String SAMPLE_IS_CLICKED="isClicked";
-    public static final String SAMPLE_RATE_X="ratex";
+    public static final String IS_SAMPLE_CLICKED="ratex";
     public static final String SAMPLE_COUNT="sampleCount";
     public static final String SAMPLE_CURRENT_RATE="sampleCurrentRate";
+    public static final String NO_SAMPLE_PRODUCT="nosampleproduct";
+    public static final String PRODUCCT_NAME="productname";
+    public static final String BRAND_NAME="brandname";
+    public static final String MFDPKD="mfdpkd";
+    public static final String MFDDATA="mfddate";
+    public static final String BB_EXP="bbexp";
+    public static final String BBEXPDATA="bbexpdata";
+    public static final String SELFLIFE="selflife";
+    public static final String TEMPERATURE="temperature";
 
-    private final String TABLE_SAMPLE_CREATE = "CREATE TABLE " + AUDIT_SAMPLE_TBL_NAME + " ("+ STORE_ID + " INTEGER,"+ CATEGORY_ID + " INTEGER,"+ QUESTION_ID + " INTEGER,"+ SAMPLE_POS + " INTEGER,"+
-                                                                                                SAMPLE_IS_CLICKED + " TEXT,"+ SAMPLE_RATE_X + " TEXT,"+ SAMPLE_COUNT + " TEXT,"+ SAMPLE_CURRENT_RATE + " TEXT" +")";
+    private final String TABLE_SAMPLE_CREATE = "CREATE TABLE " + AUDIT_SAMPLE_TBL_NAME + " ("+ STORE_ID + " INTEGER,"+ CATEGORY_ID + " INTEGER,"+ QUESTION_ID + " INTEGER,"+ SAMPLE_POS + " INTEGER,"+ NO_SAMPLE_PRODUCT + " TEXT,"+ PRODUCCT_NAME + " TEXT,"+ BRAND_NAME + " TEXT,"+ MFDPKD + " TEXT,"+ MFDDATA + " TEXT,"+ BB_EXP + " TEXT,"+ BBEXPDATA + " TEXT,"+ SELFLIFE + " TEXT,"+ TEMPERATURE +" TEXT,"+ SAMPLE_IS_CLICKED + " TEXT,"+ IS_SAMPLE_CLICKED + " TEXT,"+ SAMPLE_COUNT + " TEXT,"+ SAMPLE_CURRENT_RATE + " TEXT" +")";
     private final String TABLE_SAMPLE_DROP = "DROP TABLE IF EXISTS " + AUDIT_SAMPLE_TBL_NAME;
 
     // For Store Details
