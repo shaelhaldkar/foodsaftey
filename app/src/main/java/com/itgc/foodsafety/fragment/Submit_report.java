@@ -301,7 +301,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
 
         }catch (Exception e){}
 
-        String URL=Vars.BASE_URL+Vars.SUBMIT_REPORT_TEST;
+        String URL=Vars.BASE_URL+Vars.SUBMIT_REPORT;
 
         JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST, URL, jsonObject, new Response.Listener<JSONObject>() {
             @Override
@@ -594,162 +594,162 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
 
         String URL=Vars.BASE_URL+Vars.SUBMIT_REPORT;
 
-//        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST, URL, jsonObject, new Response.Listener<JSONObject>() {
-//            @Override
-//            public void onResponse(JSONObject response) {
-//
-//                if (pd != null && pd.isShowing())
-//                    pd.dismiss();
-//
-//                try {
-//                    JSONArray jsonArray=response.getJSONArray("submit_reportResult");
-//                    JSONObject jsonObject=jsonArray.getJSONObject(0);
-//
-//                    boolean status=jsonObject.getBoolean("Status");
-//
-//                    if(status) {
-//                        String msg = jsonObject.getString("Message");
-//                        idPosition = idPosition + 1;
-//                        if (idPosition < categoryIsList.size()) {
-//                            submitFirstStep();
-//                        }
-//
-//                        if (idPosition == categoryIsList.size()) {
-//                            submitsignature();
-//                        }
-//                    }
-//                    else {
-//                        Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
-//                    }
-//
-//
-//                }catch (Exception e)
-//                {
-//
-//                }
-//
-//            }
-//        }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error)
-//            {
-//                error.printStackTrace();
-//                if (pd != null && pd.isShowing())
-//                    pd.dismiss();
-//                Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
-//            }
-//        });
-
-        StringRequest str = new StringRequest(Request.Method.POST,
-                URL , new Response.Listener<String>() {
-
+        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST, URL, jsonObject, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(String response)
-            {
+            public void onResponse(JSONObject response) {
+
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
-                Log.e("First Submit Response", response);
-                if (response != null)
-                {
-                    try
-                    {
-                        JSONObject jsonObject = new JSONObject(response);
-                        JSONObject payload = jsonObject.getJSONObject("Payload");
+
+                try {
+                    JSONArray jsonArray=response.getJSONArray("submit_reportResult");
+                    JSONObject jsonObject=jsonArray.getJSONObject(0);
+
+                    boolean status=jsonObject.getBoolean("Status");
+
+                    if(status) {
                         String msg = jsonObject.getString("Message");
-                        //Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
-                        //AppUtils.encodedimage = "";
-
-                        String Code = jsonObject.getString("Code");
-                        if (Code.equalsIgnoreCase("ok"))
-                        {
-                            AppPrefrences.setAuditId(ctx, payload.getString("audit_id"));
-                            auditId=payload.getString("audit_id");
-                            idPosition=idPosition+1;
-                            if(idPosition<categoryIsList.size())
-                            {
-                                submitFirstStep();
-                            }
-
-                            if(idPosition==categoryIsList.size())
-                            {
-                                submitData("");
-                            }
+                        idPosition = idPosition + 1;
+                        if (idPosition < categoryIsList.size()) {
+                            submitFirstStep();
                         }
 
-//                        idPosition=idPosition+1;
-//                        if(idPosition<categoryIsList.size())
-//                        {
-//                            submitFirstStep();
-//                        }
-//                        // deleteData();
-//                        try {
-//
-//                            Intent intent = new Intent("DraftsCount");
-//                            ctx.sendBroadcast(intent);
-//
-//                            Fragment fragment = new StartAuditFragment();
-//                            Bundle bundle = new Bundle();
-//                            bundle.putInt("Store_id", Store_id);
-//                            bundle.putString("Store_name", Store_name);
-//                            fragment.setArguments(bundle);
-//                            getFragmentManager().beginTransaction().replace(R.id.container_body, fragment).addToBackStack("Store").commit();
-
-                        } catch (Exception e) {
-
+                        if (idPosition == categoryIsList.size()) {
+                            submitsignature();
                         }
+                    }
+                    else {
+                        Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
+                    }
+
+
+                }catch (Exception e)
+                {
+
                 }
+
             }
         }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError v)
+            public void onErrorResponse(VolleyError error)
             {
-                v.printStackTrace();
+                error.printStackTrace();
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
-                Toast.makeText(ctx, "Failed", Toast.LENGTH_LONG).show();
+                Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
             }
-        }) {
+        });
 
-            @Override
-            protected Map<String, String> getParams()
-            {
-                Map<String, String> params = new HashMap<String, String>();
-                JSONObject o=getLocalSavedData(storeId,categoryIsList.get(idPosition));
-                try {
-                    data=o.getJSONArray("data").toString();
-                    categoryId= String.valueOf(Integer.parseInt(o.getString("cat_id")));
-                    startTime= o.getString("startdateTime");
-                    endTime= o.getString("enddatetime");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+//        StringRequest str = new StringRequest(Request.Method.POST,
+//                URL , new Response.Listener<String>() {
+//
+//            @Override
+//            public void onResponse(String response)
+//            {
+//                if (pd != null && pd.isShowing())
+//                    pd.dismiss();
+//                Log.e("First Submit Response", response);
+//                if (response != null)
+//                {
+//                    try
+//                    {
+//                        JSONObject jsonObject = new JSONObject(response);
+//                        JSONObject payload = jsonObject.getJSONObject("Payload");
+//                        String msg = jsonObject.getString("Message");
+//                        //Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
+//                        //AppUtils.encodedimage = "";
+//
+//                        String Code = jsonObject.getString("Code");
+//                        if (Code.equalsIgnoreCase("ok"))
+//                        {
+//                            AppPrefrences.setAuditId(ctx, payload.getString("audit_id"));
+//                            auditId=payload.getString("audit_id");
+//                            idPosition=idPosition+1;
+//                            if(idPosition<categoryIsList.size())
+//                            {
+//                                submitFirstStep();
+//                            }
+//
+//                            if(idPosition==categoryIsList.size())
+//                            {
+//                                submitData("");
+//                            }
+//                        }
+//
+////                        idPosition=idPosition+1;
+////                        if(idPosition<categoryIsList.size())
+////                        {
+////                            submitFirstStep();
+////                        }
+////                        // deleteData();
+////                        try {
+////
+////                            Intent intent = new Intent("DraftsCount");
+////                            ctx.sendBroadcast(intent);
+////
+////                            Fragment fragment = new StartAuditFragment();
+////                            Bundle bundle = new Bundle();
+////                            bundle.putInt("Store_id", Store_id);
+////                            bundle.putString("Store_name", Store_name);
+////                            fragment.setArguments(bundle);
+////                            getFragmentManager().beginTransaction().replace(R.id.container_body, fragment).addToBackStack("Store").commit();
+//
+//                        } catch (Exception e) {
+//
+//                        }
+//                }
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError v)
+//            {
+//                v.printStackTrace();
+//                if (pd != null && pd.isShowing())
+//                    pd.dismiss();
+//                Toast.makeText(ctx, "Failed", Toast.LENGTH_LONG).show();
+//            }
+//        }) {
+//
+//            @Override
+//            protected Map<String, String> getParams()
+//            {
+//                Map<String, String> params = new HashMap<String, String>();
+//                JSONObject o=getLocalSavedData(storeId,categoryIsList.get(idPosition));
+//                try {
+//                    data=o.getJSONArray("data").toString();
+//                    categoryId= String.valueOf(Integer.parseInt(o.getString("cat_id")));
+//                    startTime= o.getString("startdateTime");
+//                    endTime= o.getString("enddatetime");
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                params.put("data", data);
+//                params.put("marchent_id",AppPrefrences.getMerchatId(ctx));
+//                params.put("store_id", storeId);
+//                params.put("audit_code", AppPrefrences.getAuditCODE(ctx));
+//                params.put("startdateTime", storeStartTime);
+//                params.put("store_sign", "");
+//                params.put("audit_sign", "");
+//                params.put("cat_id", categoryId);
+//
+//                params.put("auditor_id",AppPrefrences.getUserId(ctx));
+//                params.put("lat",AppPrefrences.getLatitude(ctx));
+//                params.put("longs",AppPrefrences.getLongitude(ctx));
+//                params.put("final_submit","false");
+//                params.put("enddatetime",getDateTime());
+//                Log.e("First Post Data", params.toString());
+//
+//                return params;
+//            }
+//        };
 
-                params.put("data", data);
-                params.put("marchent_id",AppPrefrences.getMerchatId(ctx));
-                params.put("store_id", storeId);
-                params.put("audit_code", AppPrefrences.getAuditCODE(ctx));
-                params.put("startdateTime", storeStartTime);
-                params.put("store_sign", "");
-                params.put("audit_sign", "");
-                params.put("cat_id", categoryId);
-
-                params.put("auditor_id",AppPrefrences.getUserId(ctx));
-                params.put("lat",AppPrefrences.getLatitude(ctx));
-                params.put("longs",AppPrefrences.getLongitude(ctx));
-                params.put("final_submit","false");
-                params.put("enddatetime",getDateTime());
-                Log.e("First Post Data", params.toString());
-
-                return params;
-            }
-        };
-
-        str.setRetryPolicy(new DefaultRetryPolicy(
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
                 120000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        str.setShouldCache(false);
-        MySingleton.getInstance(ctx).addToRequestQueue(str);
+        jsonObjectRequest.setShouldCache(false);
+        MySingleton.getInstance(ctx).addToRequestQueue(jsonObjectRequest);
     }
 
     private void deleteSubmittedData(String storeId,String categoryId)
@@ -833,13 +833,10 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                     {
                         imageCursor.moveToFirst();
                         do {
-                            JSONObject jsonObject=new JSONObject();
 
                             String iamge=(imageCursor.getString(imageCursor.getColumnIndex(DBHelper.ANSWER_IMAGE)));
                             imagename.add(iamge);
-
-                            jsonObject.put("image",iamge);
-                            imageArray.put(jsonObject);
+                            imageArray.put(iamge);
                         }while (imageCursor.moveToNext());
 
                     }
@@ -1135,7 +1132,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         pd.show();
 
         S3FileUploadHelper transferHelper = new S3FileUploadHelper(ctx);
-        transferHelper.upload(imagepath.get(bb), imagename.get(bb));
+        transferHelper.upload(imagepath.get(bb), imagename.get(bb));///
 
         transferHelper.setFileTransferListener(new S3FileUploadHelper.FileTransferListener() {
             @Override
@@ -1172,7 +1169,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
 
-                Toast.makeText(ctx,"Please try after some time",Toast.LENGTH_SHORT).show();
+                Toast.makeText(ctx,"Error in uploading image",Toast.LENGTH_SHORT).show();
 
             }
         });

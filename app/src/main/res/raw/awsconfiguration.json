@@ -4,8 +4,8 @@
     "CognitoIdentity": {
       "Default": {
 
-        "PoolId": "ap-south-1:a699f6d2-c20a-444d-9c20-2c4633645111",
-        "Region": "Asia Pacific (Mumbai)"
+        "PoolId": "us-east-1:65679f01-f7c0-41ac-a039-7dd38b56865d",
+        "Region": "us-east-1"
       }
     }
   },
@@ -16,8 +16,8 @@
   },
   "S3TransferUtility": {
     "Default": {
-      "Bucket": "foodsaftys",
-      "Region": "Asia Pacific (Mumbai)"
+      "Bucket": "foodsaftyauditimage",
+      "Region": "us-east-1"
     }
   }
 }

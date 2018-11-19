@@ -793,6 +793,8 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         File dir = new File(Environment.getExternalStorageDirectory(), "FoodSafety");
         if (!dir.exists())
             dir.mkdir();
+        String name= getDateTime1()+"_"+AppPrefrences.getMerchatId(ctx)+"_"+AppPrefrences.getAuditCODE(ctx)+
+                "_"+Store_id+"_"+Cat_id+"_"+questionSubCatId+ ".jpg";
         File pictureFile = new File(dir, "foodsafety_" + System.currentTimeMillis() + ".jpg");
 
 
@@ -838,13 +840,20 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
 
         if (requestCode == TAKE_PHOTO_CODE && resultCode == Activity.RESULT_OK && data != null) {
             try {
-                Bitmap photo = (Bitmap) data.getExtras().get("data");
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                photo.compress(Bitmap.CompressFormat.JPEG, 40, bos);
-                byte[] dataOfImage = bos.toByteArray();
-                encodedImage = Base64.encodeToString(dataOfImage, Base64.DEFAULT);
-                saveanswerImages(encodedImage);
-              //  saveimagepath();
+                Uri uri=data.getData();
+                String imageUrl = FilePathUtils.getPath(getActivity(), uri);
+                saveimagepath(imageUrl);
+
+                String name= getDateTime1()+"_"+AppPrefrences.getMerchatId(ctx)+"_"+AppPrefrences.getAuditCODE(ctx)+
+                        "_"+Store_id+"_"+questionID+"_"+Cat_id+"_"+questionSubCatId+ ".jpg";
+                saveanswerImages(name);
+//                Bitmap photo = (Bitmap) data.getExtras().get("data");
+//                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//                photo.compress(Bitmap.CompressFormat.JPEG, 40, bos);
+//                byte[] dataOfImage = bos.toByteArray();
+//                encodedImage = Base64.encodeToString(dataOfImage, Base64.DEFAULT);
+//                saveanswerImages(encodedImage);
+//              //  saveimagepath();
                 encodedImage = "";
                 int imsize = getAnswerImageCount(questionID);
                 Toast.makeText(getContext(), imsize + "/4 Images Added", Toast.LENGTH_SHORT).show();
@@ -859,14 +868,14 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 saveimagepath(imageUrl);
 
                 String name= getDateTime1()+"_"+AppPrefrences.getMerchatId(ctx)+"_"+AppPrefrences.getAuditCODE(ctx)+
-                        "_"+Store_id+"_"+Cat_id+"_"+questionSubCatId+ ".jpg";
+                        "_"+Store_id+"_"+questionID+"_"+Cat_id+"_"+questionSubCatId+ ".jpg";
 //                Bitmap scalledBitmap = BitmapHelper.decodeSampledBitmapFromResource(imageUrl, 300, 300); //scall the bitmap into given size
 //                ByteArrayOutputStream bos = new ByteArrayOutputStream();
 //                scalledBitmap.compress(Bitmap.CompressFormat.JPEG, 40, bos);
 //                byte[] dataOfImage = bos.toByteArray();
 //                encodedImage = Base64.encodeToString(dataOfImage, Base64.DEFAULT);
                 saveanswerImages(name);
-                encodedImage = "";
+    //            encodedImage = "";
                 int imsize = getAnswerImageCount(questionID);
                 Toast.makeText(getContext(), imsize + "/4 Images Added", Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
@@ -878,30 +887,41 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             galleryAddPic();
             if (photoFile != null) {
                 Log.d("", "imagefilepath notcrop " + photoFile.getAbsolutePath());
-                try {
-                  //  Bitmap photo1 = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-                    Bitmap photo = BitmapHelper.decodeSampledBitmapFromResource(photoFile.getAbsolutePath(), 300, 300); //scall the bitmap into given size
-                    Matrix m=new Matrix();
-                    m.setRotate(rotationForImage(ctx,Uri.fromFile(photoFile)));
 
-                    photo=Bitmap.createBitmap(photo,0,0,photo.getWidth(),photo.getHeight(),m,true);
-                   // Bitmap image = (Bitmap) data.getExtras().get("data");
-                    if (photo != null) {
-                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                        photo.compress(Bitmap.CompressFormat.JPEG, 40, bos);
-                        byte[] dataOfImage = bos.toByteArray();
-                        encodedImage = Base64.encodeToString(dataOfImage, Base64.DEFAULT);
-                        saveanswerImages(encodedImage);
-                        encodedImage = "";
+
+                try {
+                    saveimagepath(photoFile.getAbsolutePath());
+                    String name= getDateTime1()+"_"+AppPrefrences.getMerchatId(ctx)+"_"+AppPrefrences.getAuditCODE(ctx)+
+                            "_"+Store_id+"_"+questionID+"_"+Cat_id+"_"+questionSubCatId+ ".jpg";
+                    saveanswerImages(name);
+                  //  Bitmap photo1 = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+         //           Bitmap photo = BitmapHelper.decodeSampledBitmapFromResource(photoFile.getAbsolutePath(), 300, 300); //scall the bitmap into given size
+      //              Matrix m=new Matrix();
+   //                 m.setRotate(rotationForImage(ctx,Uri.fromFile(photoFile)));
+
+//                    photo=Bitmap.createBitmap(photo,0,0,photo.getWidth(),photo.getHeight(),m,true);
+//                   // Bitmap image = (Bitmap) data.getExtras().get("data");
+//                    if (photo != null) {
+//                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//                        photo.compress(Bitmap.CompressFormat.JPEG, 40, bos);
+//                        byte[] dataOfImage = bos.toByteArray();
+//                        encodedImage = Base64.encodeToString(dataOfImage, Base64.DEFAULT);
+//                        saveanswerImages(encodedImage);
+//                        encodedImage = "";
                         int imsize = getAnswerImageCount(questionID);
                         Toast.makeText(getContext(), imsize + "/4 Images Added", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getContext(), "Unable to save", Toast.LENGTH_SHORT).show();
+                   // }
+                    //else {
 
-                    }
+
+                    //}
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }
+            else
+            {
+                Toast.makeText(getContext(), "Unable to save", Toast.LENGTH_SHORT).show();
             }
 
 

@@ -3,6 +3,7 @@ package com.itgc.foodsafety.adapter;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
@@ -46,7 +47,7 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
     int progressChanged = 0;
     float trueprogress = 0;
     int storeId,categoryId,questionId;
-    String mfdpkd, mfd_date,bb_exp,bb_expdate;
+    String mfdpkd, mfd_date=null,bb_exp,bb_expdate=null;
     String no_samples_product="",product_name="",brand_name="";
     int Selflife_value=0,temperature=0,sample_fail_value=0;
 
@@ -105,6 +106,14 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
                     }
                 }, year, month, day);
                 datePickerDialog.show(manager,"show");
+
+                datePickerDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialogInterface) {
+                        holder.txt_datemfd.setText("");
+                        mfd_date=null;
+                    }
+                });
             }
         });
 
@@ -138,10 +147,21 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
                         holder.txt_dateexp.setText(day+"-"+month+"-"+year);
                         bb_expdate=year+"-"+month+"-"+day;
                     }
+
                 }, year, month, day);
                 datePickerDialog.show(manager,"show");
+
+                datePickerDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialogInterface) {
+                        holder.txt_dateexp.setText("");
+                        bb_expdate=null;
+                    }
+                });
             }
         });
+
+
 
     }
 
