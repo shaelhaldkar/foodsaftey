@@ -118,14 +118,14 @@
                 android:id="@+id/rdt_1monthto6month"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1 Month to Month"
+                android:text="1 Month to 6 Months"
                 android:textSize="@dimen/textsize" />
 
             <RadioButton
                 android:id="@+id/rdt_more6months"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="More then 6 Months"
+                android:text="More than 6 Months"
                 android:textSize="@dimen/textsize" />
 
         </RadioGroup>

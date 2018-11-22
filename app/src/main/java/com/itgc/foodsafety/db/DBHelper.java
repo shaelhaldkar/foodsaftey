@@ -260,7 +260,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(TABLE_QUESTION_CREATE);
         db.execSQL(TABLE_QUESTION_ANSWER_CREATE);
         db.execSQL(TABLE_QUESTION_ANSWER_IMAGE_CREATE);
-        db.execSQL(TABLE_QUESTION_ANSWER_PATH_CREATE);
+    //    db.execSQL(TABLE_QUESTION_ANSWER_PATH_CREATE);
         db.execSQL(TABLE_SAMPLE_CREATE);
         db.execSQL(TABLE_STORE_DETAILSE_CREATE);
         db.execSQL(TABLE_STORE_START_DATE_TIME_CREATE);
@@ -285,7 +285,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(TABLE_QUESTION_DROP);
         db.execSQL(TABLE_QUESTION_ANSWER_DROP);
         db.execSQL(TABLE_QUESTION_ANSWER_IMAGE_DROP);
-        db.execSQL(TABLE_QUESTION_ANSWER_PATh_DROP);
+    //    db.execSQL(TABLE_QUESTION_ANSWER_PATh_DROP);
         db.execSQL(TABLE_SAMPLE_DROP);
         db.execSQL(TABLE_STORE_DETAILS_DROP);
         db.execSQL(TABLE_STORE_START_DATE_TIME_DROP);
@@ -384,11 +384,11 @@ public class DBHelper extends SQLiteOpenHelper {
     private final String TABLE_QUESTION_ANSWER_IMAGE_CREATE = "CREATE TABLE " + ANSWER_IMAGE_TBL_NAME + " ("+ STORE_ID + " INTEGER," + CATEGORY_ID + " INTEGER,"+ QUESTION_ID + " INTEGER,"+ ANSWER_IMAGE + " TEXT" +")";
     private final String TABLE_QUESTION_ANSWER_IMAGE_DROP = "DROP TABLE IF EXISTS " + ANSWER_IMAGE_TBL_NAME;
 
-    public static final String ANSWER_IMAGE_TBL_PATH="answerpath";
-    public static final String ANSWER_PATH="answerpath";
+   // public static final String ANSWER_IMAGE_TBL_PATH="answerpath";
+  //  public static final String ANSWER_PATH="answerpath";
 
-    private final String TABLE_QUESTION_ANSWER_PATH_CREATE = "CREATE TABLE " + ANSWER_IMAGE_TBL_PATH + " ("+ STORE_ID + " INTEGER," + CATEGORY_ID + " INTEGER,"+ QUESTION_ID + " INTEGER,"+ ANSWER_PATH + " TEXT" +")";
-    private final String TABLE_QUESTION_ANSWER_PATh_DROP = "DROP TABLE IF EXISTS " + ANSWER_IMAGE_TBL_PATH;
+  //  private final String TABLE_QUESTION_ANSWER_PATH_CREATE = "CREATE TABLE " + ANSWER_IMAGE_TBL_PATH + " ("+ STORE_ID + " INTEGER," + CATEGORY_ID + " INTEGER,"+ QUESTION_ID + " INTEGER,"+ ANSWER_PATH + " TEXT" +")";
+  //  private final String TABLE_QUESTION_ANSWER_PATh_DROP = "DROP TABLE IF EXISTS " + ANSWER_IMAGE_TBL_PATH;
 
 
     // For Sample Audits

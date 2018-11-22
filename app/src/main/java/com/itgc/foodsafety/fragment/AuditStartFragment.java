@@ -842,11 +842,12 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             try {
                 Uri uri=data.getData();
                 String imageUrl = FilePathUtils.getPath(getActivity(), uri);
-                saveimagepath(imageUrl);
+
+               // saveimagepath(imageUrl);
 
                 String name= getDateTime1()+"_"+AppPrefrences.getMerchatId(ctx)+"_"+AppPrefrences.getAuditCODE(ctx)+
                         "_"+Store_id+"_"+questionID+"_"+Cat_id+"_"+questionSubCatId+ ".jpg";
-                saveanswerImages(name);
+                saveanswerImages(name+">>"+ imageUrl);
 //                Bitmap photo = (Bitmap) data.getExtras().get("data");
 //                ByteArrayOutputStream bos = new ByteArrayOutputStream();
 //                photo.compress(Bitmap.CompressFormat.JPEG, 40, bos);
@@ -865,7 +866,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 Uri uri = data.getData();
 
                 String imageUrl = FilePathUtils.getPath(getActivity(), uri);
-                saveimagepath(imageUrl);
+               // saveimagepath(imageUrl);
 
                 String name= getDateTime1()+"_"+AppPrefrences.getMerchatId(ctx)+"_"+AppPrefrences.getAuditCODE(ctx)+
                         "_"+Store_id+"_"+questionID+"_"+Cat_id+"_"+questionSubCatId+ ".jpg";
@@ -874,7 +875,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
 //                scalledBitmap.compress(Bitmap.CompressFormat.JPEG, 40, bos);
 //                byte[] dataOfImage = bos.toByteArray();
 //                encodedImage = Base64.encodeToString(dataOfImage, Base64.DEFAULT);
-                saveanswerImages(name);
+                saveanswerImages(name+">>"+ imageUrl);
     //            encodedImage = "";
                 int imsize = getAnswerImageCount(questionID);
                 Toast.makeText(getContext(), imsize + "/4 Images Added", Toast.LENGTH_SHORT).show();
@@ -890,10 +891,11 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
 
 
                 try {
-                    saveimagepath(photoFile.getAbsolutePath());
+                  //  saveimagepath(photoFile.getAbsolutePath());
+
                     String name= getDateTime1()+"_"+AppPrefrences.getMerchatId(ctx)+"_"+AppPrefrences.getAuditCODE(ctx)+
                             "_"+Store_id+"_"+questionID+"_"+Cat_id+"_"+questionSubCatId+ ".jpg";
-                    saveanswerImages(name);
+                    saveanswerImages(name+">>"+ photoFile.getAbsolutePath());
                   //  Bitmap photo1 = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
          //           Bitmap photo = BitmapHelper.decodeSampledBitmapFromResource(photoFile.getAbsolutePath(), 300, 300); //scall the bitmap into given size
       //              Matrix m=new Matrix();
@@ -1343,15 +1345,15 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         DbManager.getInstance().insertDetails(c,DBHelper.ANSWER_IMAGE_TBL_NAME);
     }
 
-    private void saveimagepath(String path)
-    {
-        ContentValues c=new ContentValues();
-        c.put(DBHelper.STORE_ID,Store_id);
-        c.put(DBHelper.CATEGORY_ID,Cat_id);
-        c.put(DBHelper.QUESTION_ID,questionID);
-        c.put(DBHelper.ANSWER_PATH,path);
-        DbManager.getInstance().insertDetails(c,DBHelper.ANSWER_IMAGE_TBL_PATH);
-    }
+//    private void saveimagepath(String path)
+//    {
+//        ContentValues c=new ContentValues();
+//        c.put(DBHelper.STORE_ID,Store_id);
+//        c.put(DBHelper.CATEGORY_ID,Cat_id);
+//        c.put(DBHelper.QUESTION_ID,questionID);
+//        c.put(DBHelper.ANSWER_PATH,path);
+//        DbManager.getInstance().insertDetails(c,DBHelper.ANSWER_IMAGE_TBL_PATH);
+//    }
 
     public void updateSamples(int pos,int value,String no_sample_product,String product_name,String brand_name,
                               String mfdpkd,String mfd_date,String bb_exp,String bb_expdate,int Selflife_value,int temperature,int sample_value_fail)

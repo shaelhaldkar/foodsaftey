@@ -260,16 +260,9 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
             Toast.makeText(ctx, "Please Add Expiry Status", Toast.LENGTH_LONG).show();
         } else
             saveSignature(2);
-        o=getLocalSavedData(storeId,categoryIsList.get(idPosition));
 
-        if(imagename.size()>0) {
+        getdata();
 
-            uploadWithTransferUtility();
-        }
-        else
-        {
-            submitFirstStep();
-        }
     }
 
     private void submitData(final String data1)
@@ -322,6 +315,8 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                         AppUtils.encodedimage = "";
                         AppUtils.encodedstoreimage="";
                         deleteSubmittedData(String.valueOf(Store_id),String.valueOf(Cat_id));
+
+                        Toast.makeText(ctx, "Data Submitted Successfully", Toast.LENGTH_LONG).show();
 
                         try
                         {
@@ -611,7 +606,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                         String msg = jsonObject.getString("Message");
                         idPosition = idPosition + 1;
                         if (idPosition < categoryIsList.size()) {
-                            submitFirstStep();
+                            getdata();
                         }
 
                         if (idPosition == categoryIsList.size()) {
@@ -835,7 +830,11 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                         do {
 
                             String iamge=(imageCursor.getString(imageCursor.getColumnIndex(DBHelper.ANSWER_IMAGE)));
-                            imagename.add(iamge);
+                            String[] parts = iamge.split(">>");
+                            String part1 = parts[0]; // 004
+                            String part2 = parts[1];
+                            imagename.add(part1);
+                            imagepath.add(part2);
                             imageArray.put(iamge);
                         }while (imageCursor.moveToNext());
 
@@ -843,21 +842,21 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                     imageCursor.close();
                     o.put("image",imageArray);
 
-                    Cursor pathCursor = DbManager.getInstance().getDetails("SELECT answerpath FROM " + DBHelper.ANSWER_IMAGE_TBL_PATH + " WHERE " + DBHelper.STORE_ID + "=" + storeId + " AND " +
-                            DBHelper.CATEGORY_ID +"=" + categoryId + " AND " +
-                            DBHelper.QUESTION_ID +"=" + quesId);
-                    //Log.e("Image Count", imageCursor.getCount() + "");
-                    if(pathCursor.getCount()>0)
-                    {
-                        pathCursor.moveToFirst();
-                        do {
-
-                            String iamge=(pathCursor.getString(pathCursor.getColumnIndex(DBHelper.ANSWER_PATH)));
-                            imagepath.add(iamge);
-                        }while (imageCursor.moveToNext());
-
-                    }
-                    pathCursor.close();
+//                    Cursor pathCursor = DbManager.getInstance().getDetails("SELECT answerpath FROM " + DBHelper.ANSWER_IMAGE_TBL_PATH + " WHERE " + DBHelper.STORE_ID + "=" + storeId + " AND " +
+//                            DBHelper.CATEGORY_ID +"=" + categoryId + " AND " +
+//                            DBHelper.QUESTION_ID +"=" + quesId);
+//                    //Log.e("Image Count", imageCursor.getCount() + "");
+//                    if(pathCursor.getCount()>0)
+//                    {
+//                        pathCursor.moveToFirst();
+//                        do {
+//
+//                            String iamge=(pathCursor.getString(pathCursor.getColumnIndex(DBHelper.ANSWER_PATH)));
+//
+//                        }while (imageCursor.moveToNext());
+//
+//                    }
+//                    pathCursor.close();
 
                     String sampleQuery="SELECT * FROM " + DBHelper.AUDIT_SAMPLE_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + storeId + " AND " +
                             DBHelper.CATEGORY_ID + "=" + categoryId + " AND " +
@@ -1174,6 +1173,23 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
             }
         });
 
+
+    }
+
+
+    public void getdata()
+    {
+        o=null;
+        o=getLocalSavedData(storeId,categoryIsList.get(idPosition));
+
+        if(imagename.size()>0) {
+
+            uploadWithTransferUtility();
+        }
+        else
+        {
+            submitFirstStep();
+        }
 
     }
 

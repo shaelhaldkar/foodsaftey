@@ -101,6 +101,7 @@ public class DbManager {
         mDb.execSQL("DELETE FROM " + DBHelper.QUESTION_TBL_NAME);
         mDb.execSQL("DELETE FROM " + DBHelper.ANSWER_TBL_NAME);
         mDb.execSQL("DELETE FROM " + DBHelper.ANSWER_IMAGE_TBL_NAME);
+      //  mDb.execSQL("DELETE FROM " + DBHelper.ANSWER_IMAGE_TBL_PATH);
         mDb.execSQL("DELETE FROM " + DBHelper.AUDIT_SAMPLE_TBL_NAME);
         mDb.execSQL("DELETE FROM " + DBHelper.STORE_DETAILS_TBL_NAME);
         mDb.execSQL("DELETE FROM " + DBHelper.STORE_START_TIME_TABLE);
