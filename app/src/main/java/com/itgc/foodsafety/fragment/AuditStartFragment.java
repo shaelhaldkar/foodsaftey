@@ -159,7 +159,6 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         category = b.getString("Cat_name");
         Store_id = b.getInt("Store_id");
         store_loc = b.getString("Store_region");
-        type = b.getInt("Type");
         Store_name = b.getString("Store_name");
         formattedDate = new SimpleDateFormat("dd MMM yyyy HH:mm a").format(Calendar.getInstance().getTime());
         dbHelper = new DBHelper(ctx, "FoodSafety.db");
@@ -1142,15 +1141,16 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 qId=c.getInt(c.getColumnIndex(DBHelper.QUESTION_ID));
                 questionID=qId;
                 sampleCount=c.getInt(c.getColumnIndex(DBHelper.QUESTION_SAMPLES));
+                type=Integer.parseInt(c.getString(c.getColumnIndex(DBHelper.QUESTION_TYPE)));
                 maxSample=sampleCount;
             } while (c.moveToNext());
 
             if (type == 1) {
                 rg1.setVisibility(View.GONE);
-                //       lin_audit.setVisibility(View.GONE);
+                       lin_audit.setVisibility(View.GONE);
             } else if (type ==  2|| type==3) {
                 rg1.setVisibility(View.VISIBLE);
-                //      lin_audit.setVisibility(View.VISIBLE);
+                      lin_audit.setVisibility(View.VISIBLE);
             }
 
             setSampleSpinnerData(sampleCount);
@@ -1178,6 +1178,17 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             edt_remark.setText(answer.getString(answer.getColumnIndex(DBHelper.ANSWER_REMARK)));
             actions.setText(answer.getString(answer.getColumnIndex(DBHelper.ANSWER_ACTION)));
             String skipInfo=answer.getString(answer.getColumnIndex(DBHelper.ANSWER_QUES_SKIP));
+
+
+            int checked = Integer.parseInt(answer.getString(answer.getColumnIndex(DBHelper.ANSWER_TYPE)));
+            if (checked==0) {
+                rg_yes.setChecked(true);
+            } else if (checked==1) {
+                rg_no.setChecked(true);
+            } else {
+                rg_partial.setChecked(true);
+            }
+
             if(skipInfo.equalsIgnoreCase("no")){
                 skip="no";
                 txt_skip.setChecked(false);
@@ -1187,16 +1198,24 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             }
 
             int sample=answer.getInt(answer.getColumnIndex(DBHelper.ANSWER_NO_SAMPLE));
-            if(answer.getInt(answer.getColumnIndex(DBHelper.ANSWER_TYPE))==3)
-            {
-                rg_partial.setChecked(true);
-            }else if(answer.getInt(answer.getColumnIndex(DBHelper.ANSWER_TYPE))==2)
-            {
-                rg_no.setChecked(true);
-            }else
-            {
-                rg_yes.setChecked(true);
+            if (type == 1) {
+                rg1.setVisibility(View.GONE);
+                       lin_audit.setVisibility(View.GONE);
+            } else if (type ==  2|| type==3) {
+                rg1.setVisibility(View.VISIBLE);
+                      lin_audit.setVisibility(View.VISIBLE);
             }
+
+//            if(answer.getInt(answer.getColumnIndex(DBHelper.ANSWER_TYPE))==3)
+//            {
+//                rg_partial.setChecked(true);
+//            }else if(answer.getInt(answer.getColumnIndex(DBHelper.ANSWER_TYPE))==2)
+//            {
+//                rg_no.setChecked(true);
+//            }else
+//            {
+//                rg_yes.setChecked(true);
+//            }
             list_sampleno.setSelection(sample-1);
 
             String sampleQuery="SELECT * FROM " + DBHelper.AUDIT_SAMPLE_TBL_NAME + " WHERE " +
@@ -1230,6 +1249,9 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                     samples.add(d);
                     Log.e("Samples Rates",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_CURRENT_RATE))+"");
                 }while (samplesCursor.moveToNext());
+
+                sampleAuditAdapter.setData(samples);
+               // sampleAuditAdapter = new SampleAuditAdapter(samples,ctx,Store_id,Cat_id,questionID,AuditStartFragment.this);
                 sampleAuditAdapter.notifyDataSetChanged();
             }
 

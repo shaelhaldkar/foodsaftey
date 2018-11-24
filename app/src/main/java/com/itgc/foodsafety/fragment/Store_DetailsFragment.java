@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -223,6 +224,7 @@ public class Store_DetailsFragment extends Fragment implements View.OnClickListe
                             JSONObject jsonObject=jsonArray.getJSONObject(0);
                             String message=jsonObject.getString("Message");
                             Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                            startActivity(new Intent(context,MainActivity.class));
 
                         } catch (Exception e) {
                             e.printStackTrace();

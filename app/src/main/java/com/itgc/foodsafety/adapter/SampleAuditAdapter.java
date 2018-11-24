@@ -73,7 +73,31 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
         holder.txt_sample.setText("Sample " + (position+1));
 
         holder.edt_rate.setText(samples.get(position).getSampleCurrentRate()+"");
+        holder.edit_product_name.setText(samples.get(position).getProduct_name());
+        holder.edit_brand_name.setText(samples.get(position).getBrand_name());
+        holder.txt_dateexp.setText(samples.get(position).getBb_exp_date());
+        holder.txt_datemfd.setText(samples.get(position).getMfd_date());
+        holder.recycle_view_sample.setText(samples.get(position).getNo_sample_product());
         holder.progressBar.setProgress(samples.get(position).getSampleCurrentRate()*2);
+        int vaolue=samples.get(position).getShellife_value();
+        if(vaolue==0)
+        {
+            holder.rdt_none.setChecked(true);
+        }
+        else if(vaolue==1)
+        {
+            holder.rdt_upto30.setChecked(true);
+        }
+        else if(vaolue==2)
+        {
+            holder.rdt_1month6mont.setChecked(true);
+        }
+        else
+        {
+            holder.rdt_more6month.setChecked(true);
+        }
+
+
 
         holder.txt_datemfd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -250,14 +274,6 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
                             Selflife_value=3;
                         }
 
-                        if(my_recycler_view_sample_fail.isChecked())
-                        {
-                            sample_fail_value=1;
-                        }
-                        else
-                        {
-                            sample_fail_value=0;
-                        }
                         no_samples_product=recycle_view_sample.getText().toString();
                         brand_name=edit_brand_name.getText().toString();
                         product_name=edit_product_name.getText().toString();
@@ -265,6 +281,22 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
                                 mfdpkd,mfd_date,bb_exp,bb_expdate,Selflife_value,temperature,sample_fail_value);
                     }else {
                         Toast.makeText(c, "Value should not more than 10", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+            my_recycler_view_sample_fail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(sample_fail_value==0)
+                    {
+                        sample_fail_value=1;
+                        my_recycler_view_sample_fail.setChecked(true);
+                    }
+                    else
+                    {
+                        sample_fail_value=0;
+                        my_recycler_view_sample_fail.setChecked(false);
                     }
                 }
             });
@@ -306,14 +338,7 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
                         Selflife_value=3;
                     }
 
-                    if(my_recycler_view_sample_fail.isChecked())
-                    {
-                        sample_fail_value=1;
-                    }
-                    else
-                    {
-                        sample_fail_value=0;
-                    }
+
 
                     no_samples_product=recycle_view_sample.getText().toString();
                     brand_name=edit_brand_name.getText().toString();
@@ -356,33 +381,9 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
         }
     }
 
-    public  void showpicker()
+    public void setData(ArrayList<SampleDetails> items)
     {
-        FragmentManager manager = ((Activity) c).getFragmentManager();
-        Calendar calendar=Calendar.getInstance();
-        int day=calendar.get(Calendar.YEAR);
-        int month=calendar.get(Calendar.MONTH);
-        int year=calendar.get(Calendar.DAY_OF_MONTH);
-
-        DatePickerDialog datePickerDialog=DatePickerDialog.newInstance(new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-                String day= String.valueOf(dayOfMonth); String month=String.valueOf(monthOfYear);
-                if(dayOfMonth<10)
-                {
-                    day="0"+dayOfMonth;
-                }
-                if (monthOfYear<9)
-                {
-                    month="0"+ (monthOfYear+1);
-                }
-                else {
-                    month=String.valueOf(monthOfYear+1);
-                }
-
-            }
-        }, year, month, day);
-        datePickerDialog.setMinDate(calendar);
-        datePickerDialog.show(manager,"show");
+        samples = items;
     }
+
 }
