@@ -1117,6 +1117,10 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             } while (c.moveToNext());
             getQuestionDetails(categoryQuestionsArrayList.get(questionPos).getQuestionId());
         }
+        else
+        {
+            Toast.makeText(ctx, "No Question Found in this section", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void getQuestionDetails(int questionId)
@@ -1302,6 +1306,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         if(checkRadio()>0)
         {
             Log.e("Partial","Checked");
+
             for (int i = 0; i < samples.size(); i++)
             {
                 ContentValues c = new ContentValues();

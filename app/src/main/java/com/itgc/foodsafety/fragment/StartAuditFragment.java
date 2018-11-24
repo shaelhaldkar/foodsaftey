@@ -372,6 +372,7 @@ public class StartAuditFragment extends Fragment implements View.OnClickListener
                             auditObject.put("sample_count",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_COUNT)));
                             auditObject.put("sample_current_rate",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_CURRENT_RATE)));
                             auditObject.put("sample_pos",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_POS)));
+
                             auditSamples.put(auditObject);
                         }while (samplesCursor.moveToNext());
                         samplesCursor.close();
