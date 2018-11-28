@@ -375,6 +375,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 d.setBb_exp("");
                 d.setBb_exp_date("");
 
+
                 samples.add(d);
             }
             sampleAuditAdapter.notifyDataSetChanged();

@@ -606,6 +606,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                         String msg = jsonObject.getString("Message");
                         idPosition = idPosition + 1;
                         if (idPosition < categoryIsList.size()) {
+                            bb=0;
                             getdata();
                         }
 
@@ -1099,7 +1100,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
 
                 }catch (Exception e)
                 {
-
+                    Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
                 }
 
             }
@@ -1168,7 +1169,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
 
-                Toast.makeText(ctx,"Error in uploading image",Toast.LENGTH_SHORT).show();
+                Toast.makeText(ctx,"Error in uploading image. Please try after some time..",Toast.LENGTH_SHORT).show();
 
             }
         });
