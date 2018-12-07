@@ -13,9 +13,7 @@ import android.graphics.BitmapFactory;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Base64;
 import android.util.Log;
@@ -349,76 +347,6 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         });
 
 
-//        StringRequest str = new StringRequest(Request.Method.POST,Vars.BASE_URL + Vars.SUBMIT_REPORT, new Response.Listener<String>()
-//        {
-//            @Override
-//            public void onResponse(String response)
-//            {
-//                Log.e("Final Submit Response ", response);
-//                if (pd != null && pd.isShowing())
-//                    pd.dismiss();
-//                if (response != null)
-//                {
-//                    try
-//                    {
-//                        JSONObject jsonObject = new JSONObject(response);
-//                        String msg = jsonObject.getString("Message");
-//                        if(msg.contains("success"))
-//                        {
-//                            AppUtils.encodedimage = "";
-//                            AppUtils.encodedstoreimage="";
-//                            deleteSubmittedData(String.valueOf(Store_id),String.valueOf(Cat_id));
-//
-//                        }
-//                        Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
-//                        try
-//                        {
-//                            Intent intent = new Intent("DraftsCount");
-//                            ctx.sendBroadcast(intent);
-//                            getFragmentManager().beginTransaction().replace(R.id.container_body, new Store_Fragement()).addToBackStack("Store").commit();
-//                        } catch (Exception e) {}
-//
-//                    } catch (Exception e)
-//                    {
-//                        if (pd != null && pd.isShowing())
-//                            pd.dismiss();
-//                    }
-//                }
-//            }
-//        }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError v)
-//            {
-//                v.printStackTrace();
-//                if (pd != null && pd.isShowing())
-//                    pd.dismiss();
-//                Toast.makeText(ctx, "Failed", Toast.LENGTH_LONG).show();
-//            }
-//        })
-//
-//        {
-//            @Override
-//            protected Map<String, String> getParams()
-//            {
-//                Map<String, String> params = new HashMap<String, String>();
-//                params.put("data", "");
-//                params.put("audit_id", auditId);
-//                params.put("final_submit", "true");
-//                params.put("audit_sign",AppUtils.encodedimage);
-//                params.put("store_sign",AppUtils.encodedstoreimage);
-//                params.put("cat_id", "0");//categoryId);
-//                params.put("audit_contact", auditerContactNumberEditText.getText().toString());
-//                params.put("auditor_id", AppPrefrences.getUserId(ctx));
-//                params.put("lat", AppPrefrences.getLatitude(ctx));
-//                params.put("long", AppPrefrences.getLongitude(ctx));
-//                params.put("startdateTime", storeStartTime);
-//                params.put("enddatetime", getDateTime());
-//                params.put("store_id", storeId);
-//                params.put("expiry_question", expiry);
-//                Log.e("Final Post Data ",params.toString());
-//                return params;
-//            }
-//        };
         jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(120000,DefaultRetryPolicy.DEFAULT_MAX_RETRIES,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         MySingleton.getInstance(ctx).addToRequestQueue(jsonObjectRequest);
     }
@@ -559,14 +487,10 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         JSONObject jsonObject = new JSONObject();
 
         try {
-
-
               data=o.getJSONArray("data").toString();
             categoryId= String.valueOf(Integer.parseInt(o.getString("cat_id")));
             startTime= o.getString("startdateTime");
             endTime= o.getString("enddatetime");
-
-
 
             jsonObject.put("marchent_id", AppPrefrences.getMerchatId(ctx));
             jsonObject.put("store_id",storeId);
@@ -602,7 +526,8 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
 
                     boolean status=jsonObject.getBoolean("Status");
 
-                    if(status) {
+                    if(status)
+                    {
                         String msg = jsonObject.getString("Message");
                         idPosition = idPosition + 1;
                         if (idPosition < categoryIsList.size()) {
@@ -836,7 +761,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                             String part2 = parts[1];
                             imagename.add(part1);
                             imagepath.add(part2);
-                            imageArray.put(iamge);
+                            imageArray.put(part1);
                         }while (imageCursor.moveToNext());
 
                     }

@@ -566,102 +566,6 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 .addApi(LocationServices.API).build();
     }
 
-//    private void submitData(final String data1)
-//    {
-//        final ProgressDialog pd = new ProgressDialog(ctx);
-//        pd.setMessage("Please Wait...");
-//        pd.setCancelable(false);
-//        pd.show();
-//
-//        StringRequest str = new StringRequest(Request.Method.POST,
-//                Vars.BASE_URL + Vars.SUBMIT_REPORT, new Response.Listener<String>() {
-//
-//            @Override
-//            public void onResponse(String response) {
-//                Log.e("SUBMIT_RESPONCE---", response);
-//
-//                if (pd != null && pd.isShowing())
-//                    pd.dismiss();
-//                if (response != null) {
-//                    try {
-//                        JSONObject jsonObject = new JSONObject(response);
-//                        JSONObject payload = jsonObject.getJSONObject("Payload");
-//                        String msg = jsonObject.getString("Message");
-//
-//                        Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
-//
-//                        AppUtils.encodedimage = "";
-//                        AppPrefrences.setAuditId(ctx, payload.getString("audit_id"));
-//                        String Code = jsonObject.getString("Code");
-//                        if (!Code.equalsIgnoreCase("ok")) {
-//                            deleteData();
-//                            Toast.makeText(ctx, "Error! Please ReSubmit", Toast.LENGTH_SHORT).show();
-//                        }
-//                        // deleteData();
-//                        try {
-//
-//                            Intent intent = new Intent("DraftsCount");
-//                            ctx.sendBroadcast(intent);
-//
-//                            Fragment fragment = new StartAuditFragment();
-//                            Bundle bundle = new Bundle();
-//                            bundle.putInt("Store_id", Store_id);
-//                            bundle.putString("Store_name", Store_name);
-//                            fragment.setArguments(bundle);
-//                            getFragmentManager().beginTransaction().replace(R.id.container_body, fragment).addToBackStack("Store").commit();
-//
-//                        } catch (Exception e) {
-//                            // TODO Auto-generated catch block
-//                            e.printStackTrace();
-//                        }
-//
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//        }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError v) {
-//                v.printStackTrace();
-//                if (pd != null && pd.isShowing())
-//                    pd.dismiss();
-//                Toast.makeText(ctx, "Failed", Toast.LENGTH_LONG).show();
-//            }
-//        }) {
-//
-//            @Override
-//            protected Map<String, String> getParams() {
-//                Map<String, String> params = new HashMap<String, String>();
-//                params.put("data", data1);
-////              params.put("audit_by", auditerName);
-//                params.put("audit_id", AppPrefrences.getAuditId(ctx));
-////              params.put("audit_no", auditerContactNumber);
-//                params.put("cat_id", Cat_id + "");
-//                params.put("audit_sign", "");
-//                params.put("final_submit", "false");
-//                params.put("store_sign", "");
-//                params.put("audit_contact", "");
-//                params.put("auditor_id", AppPrefrences.getUserId(ctx));
-//                params.put("lat", AppPrefrences.getLatitude(ctx));
-//                params.put("long", AppPrefrences.getLongitude(ctx));
-//                params.put("startdateTime", AppPrefrences.getStartTime(ctx));
-//                params.put("enddatetime", getDateTime());
-//                params.put("store_id", String.valueOf(Store_id));
-//                params.put("expiry_question", "0");
-//                JSONObject o = new JSONObject(params);
-//                Log.e("Submit Params", o.toString());
-//                return params;
-//            }
-//        };
-//
-//        str.setRetryPolicy(new DefaultRetryPolicy(
-//                120000,
-//                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-//                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-//        str.setShouldCache(false);
-//        MySingleton.getInstance(ctx).addToRequestQueue(str);
-//    }
 
     private void deleteData() {
         DbManager.getInstance().deleteDetails(DBHelper.ANSWER_Tbl_NAME, DBHelper.ANSWER_Store_id + "='" + Store_id + "' and " +
@@ -1149,9 +1053,17 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             if (type == 1) {
                 rg1.setVisibility(View.GONE);
                        lin_audit.setVisibility(View.GONE);
-            } else if (type ==  2|| type==3) {
+            } else if (type ==  2) {
                 rg1.setVisibility(View.VISIBLE);
                       lin_audit.setVisibility(View.VISIBLE);
+         //       samples.get(0).setIs_temp_visible(false);
+
+            }
+            else
+            {
+                rg1.setVisibility(View.VISIBLE);
+                lin_audit.setVisibility(View.VISIBLE);
+        //        samples.get(0).setIs_temp_visible(true);
             }
 
             setSampleSpinnerData(sampleCount);
@@ -1207,16 +1119,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                       lin_audit.setVisibility(View.VISIBLE);
             }
 
-//            if(answer.getInt(answer.getColumnIndex(DBHelper.ANSWER_TYPE))==3)
-//            {
-//                rg_partial.setChecked(true);
-//            }else if(answer.getInt(answer.getColumnIndex(DBHelper.ANSWER_TYPE))==2)
-//            {
-//                rg_no.setChecked(true);
-//            }else
-//            {
-//                rg_yes.setChecked(true);
-//            }
+
             list_sampleno.setSelection(sample-1);
 
             String sampleQuery="SELECT * FROM " + DBHelper.AUDIT_SAMPLE_TBL_NAME + " WHERE " +
@@ -1232,6 +1135,15 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 do
                 {
                     SampleDetails d=new SampleDetails();
+                    if(type==3)
+                    {
+                        d.setIs_temp_visible(true);
+                    }
+                    else
+                    {
+                        d.setIs_temp_visible(false);
+                    }
+
                     d.setClicked(Boolean.parseBoolean(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.SAMPLE_IS_CLICKED))));
                     d.setIs_sample_failed(samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.IS_SAMPLE_CLICKED)));
                     d.setSamplePos(samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_POS)));
@@ -1251,7 +1163,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                     Log.e("Samples Rates",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_CURRENT_RATE))+"");
                 }while (samplesCursor.moveToNext());
 
-                sampleAuditAdapter.setData(samples);
+               // sampleAuditAdapter.setData(samples);
                // sampleAuditAdapter = new SampleAuditAdapter(samples,ctx,Store_id,Cat_id,questionID,AuditStartFragment.this);
                 sampleAuditAdapter.notifyDataSetChanged();
             }
@@ -1265,6 +1177,21 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             rg_yes.setChecked(true);
             skip="no";
             txt_skip.setChecked(false);
+            samples.clear();
+
+            SampleDetails d=new SampleDetails();
+            if(type==3)
+            {
+                d.setIs_temp_visible(true);
+            }
+            else
+            {
+                d.setIs_temp_visible(false);
+            }
+            samples.add(d);
+            sampleAuditAdapter.notifyDataSetChanged();
+
+
         }
         answer.close();
     }

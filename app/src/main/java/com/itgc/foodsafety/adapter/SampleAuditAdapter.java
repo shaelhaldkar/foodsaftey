@@ -46,7 +46,6 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
     Context c;
     int progressChanged = 0;
     float trueprogress = 0;
-    int storeId,categoryId,questionId;
     String mfdpkd, mfd_date=null,bb_exp,bb_expdate=null;
     String no_samples_product="",product_name="",brand_name="";
     int Selflife_value=0,temperature=0,sample_fail_value=0;
@@ -54,9 +53,6 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
     public SampleAuditAdapter(ArrayList<SampleDetails> samples, Context c, int storeId, int categoryId, int questionId, AuditStartFragment auditStartFragment) {
         this.samples = samples;
         this.c = c;
-        this.storeId = storeId;
-        this.categoryId = categoryId;
-        this.questionId = questionId;
         this.fragment=auditStartFragment;
     }
 
@@ -70,6 +66,14 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
     @Override
     public void onBindViewHolder(final Samples holder, int position)
     {
+        if (samples.get(0).isIs_temp_visible())
+        {
+            holder.temperatire.setVisibility(View.VISIBLE);
+            holder.recycle_view_sample.setHint("Temperature");
+        }else
+        {
+            holder.temperatire.setVisibility(View.GONE);
+        }
         holder.txt_sample.setText("Sample " + (position+1));
 
         holder.edt_rate.setText(samples.get(position).getSampleCurrentRate()+"");
@@ -198,7 +202,7 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
     {
 
         TextView txt_sample,txt_datemfd,txt_dateexp;
-        EditText recycle_view_sample,edit_product_name,edit_brand_name,edt_rate;
+        EditText recycle_view_sample,edit_product_name,edit_brand_name,edt_rate,temperatire;
         SeekBar progressBar;
         RadioButton my_recycler_view_sample_fail,rdt_none,rdt_upto30,rdt_1month6mont,rdt_more6month;
         Button btn_rate;
@@ -214,6 +218,7 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
             rdt_upto30=(RadioButton)itemView.findViewById(R.id.rdt_upto30);
             rdt_1month6mont=(RadioButton)itemView.findViewById(R.id.rdt_1monthto6month);
             rdt_more6month=(RadioButton)itemView.findViewById(R.id.rdt_more6months);
+            temperatire=(EditText)itemView.findViewById(R.id.my_recycler_view_temp);
 
 
             edt_rate=(EditText)itemView.findViewById(R.id.edt_rate);
@@ -381,9 +386,10 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
         }
     }
 
-    public void setData(ArrayList<SampleDetails> items)
+    public void istemp(boolean vlaue)
     {
-        samples = items;
+
     }
+
 
 }

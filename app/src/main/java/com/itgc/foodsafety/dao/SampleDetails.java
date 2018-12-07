@@ -8,6 +8,7 @@ public class SampleDetails
 {
     private boolean isClicked;
 
+
     public String getNo_sample_product() {
         return no_sample_product;
     }
@@ -98,6 +99,16 @@ public class SampleDetails
     public int  shellife_value;
     public int temperature;
     public int is_sample_failed;
+
+    public boolean isIs_temp_visible() {
+        return is_temp_visible;
+    }
+
+    public void setIs_temp_visible(boolean is_temp_visible) {
+        this.is_temp_visible = is_temp_visible;
+    }
+
+    public  boolean is_temp_visible;
     private int rateX,sampleCount, sampleCurrentRate,sampleRate,samplePos;
 
     public int getSamplePos() {
