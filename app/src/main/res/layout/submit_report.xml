@@ -226,7 +226,23 @@
                     android:textColor="@color/white"
                     android:padding="@dimen/padding1"/>
 
+
+
+
+
             </LinearLayout>
+
+            <Button
+                android:id="@+id/submitimage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textColor="@color/white"
+                android:padding="@dimen/padding1"
+                android:layout_marginTop="20dp"
+                android:text="Submit Images"
+                android:background="@drawable/forget_btn"
+                android:drawableRight="@mipmap/submit_arrow"/>
 
 
 

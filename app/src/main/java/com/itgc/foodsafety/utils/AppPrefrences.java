@@ -145,4 +145,14 @@ public class AppPrefrences {
         return PreferenceManager.getDefaultSharedPreferences(ctx).getString("longitude", "0");
     }
 
+    public static void setimageuploadcount(Context ctx,int value)
+    {
+        PreferenceManager.getDefaultSharedPreferences(ctx).edit().putInt("imageuploadcount",value).commit();
+    }
+
+
+    public static int getimageuploadcount(Context cyx)
+    {
+        return PreferenceManager.getDefaultSharedPreferences(cyx).getInt("imageuploadcount",0);
+    }
 }

@@ -217,6 +217,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
                                     new saveDatatoLocal().execute();
                                     // Locally Saving End //
                                 }
+                                else
+                                {
+                                    Toast.makeText(ctx, "No Store Assigned", Toast.LENGTH_SHORT).show();
+                                }
 
                             } else {
                                 Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
@@ -245,84 +249,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
             }
         });
 
-//        StringRequest str = new StringRequest(Request.Method.POST,
-//                Vars.BASE_URL + Vars.OFFLINELOGIN, new Response.Listener<String>() {
-//
-//            @Override
-//            public void onResponse(String response) {
-//                Log.e("Login Response--", response);
-//                if (response != null) {
-//                    try {
-//                        JSONObject jsonObject = new JSONObject(response);
-//
-//                        boolean Status = jsonObject.getBoolean("Status");
-//                        String msg = jsonObject.getString("Message");
-//
-//                        JSONObject payload = jsonObject.getJSONObject("Payload");
-//
-//                        if (Status)
-//                        {
-//                            AppPrefrences.setUserId(ctx, payload.getString("UserId"));
-//                            AppPrefrences.setEmail(ctx, payload.getString("email"));
-//                            AppPrefrences.setUserName(ctx, payload.getString("userName"));
-//                            AppPrefrences.setMobileNo(ctx, payload.getString("mobileNumber"));
-//
-//                            JSONArray jsonArray = payload.getJSONArray("store");
-//                            AppPrefrences.setStoreJson(ctx, jsonArray.toString());
-//
-//                            if (jsonArray.length() > 0)
-//                            {
-//                                DbManager.getInstance().openDatabase();
-//                                DbManager.getInstance().deleteStoreDetails();
-//                                JSONObject ob = jsonArray.getJSONObject(0);
-//                                AppPrefrences.setMerchantId(ctx, ob.getString("merchantId"));
-//
-//                                // Locally Saving Start //
-//                                for(int i=0;i<jsonArray.length();i++)
-//                                {
-//                                    storeObject.add(jsonArray.getJSONObject(i));
-//                                }
-//                                new saveDatatoLocal().execute();
-//                                // Locally Saving End //
-//                            }
-//
-//                        } else {
-//                            Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
-//                            edt_username.setText("");
-//                            edt_password.setText("");
-//                            if (pd != null && pd.isShowing())
-//                                pd.dismiss();
-//                        }
-//
-//                    } catch (Exception e) {
-//
-//                        if (pd != null && pd.isShowing())
-//                            pd.dismiss();
-//                        e.printStackTrace();
-//                    }
-//
-//                }
-//            }
-//        }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError v) {
-//                if (pd != null && pd.isShowing())
-//                    pd.dismiss();
-//                v.printStackTrace();
-//            }
-//        }) {
-//
-//            @Override
-//            protected Map<String, String> getParams() {
-//                Map<String, String> params = new HashMap<String, String>();
-//                params.put("email", username);
-//                params.put("password", password);
-//                params.put("deviceType", "a");
-//                params.put("deviceId", DeviceId);
-//                Log.e("Login Params",new JSONObject(params).toString());
-//                return params;
-//            }
-//        };
+
         req.setRetryPolicy(new DefaultRetryPolicy(
                 5000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,

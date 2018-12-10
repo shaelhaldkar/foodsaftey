@@ -304,43 +304,46 @@ public class Store_DetailsFragment extends Fragment implements View.OnClickListe
 
     private void saveStoreDetailsLocally()
     {
-        DbManager.getInstance().deleteDetails(DBHelper.STORE_DETAILS_TBL_NAME,DBHelper.STORE_ID+"="+String.valueOf(store_id));
+        DbManager.getInstance().deleteDetails(DBHelper.STORE_DETAILS_TBL_NAME1,DBHelper.STORE_ID+"="+String.valueOf(store_id));
 
         ContentValues cv = new ContentValues();
         cv.put(DBHelper.STORE_ID, String.valueOf(store_id));
-        cv.put(DBHelper.AUDITOR_ID, AppPrefrences.getUserId(context));
+        cv.put(DBHelper.ACCOUNT_NAME, AppPrefrences.getUserId(context));
         cv.put(DBHelper.CHILLERS, store_chiller_no.getText().toString());
         cv.put(DBHelper.FREZERS, store_freezer_no.getText().toString());
         cv.put(DBHelper.VENDOR_CHILLERS, store_vendor_chiller_no.getText().toString());
         cv.put(DBHelper.VENDOR_FREZEERS, store_vendor_freezer_no.getText().toString());
-        cv.put(DBHelper.BOXEX, store_rodent_no.getText().toString());
+        cv.put(DBHelper.REDANT_BOXEX, store_rodent_no.getText().toString());
         cv.put(DBHelper.FLY_CATCHERS, store_flycatcher_no.getText().toString());
         cv.put(DBHelper.AIR_CUTTERS, store_aircutter_no.getText().toString());
         cv.put(DBHelper.THERMOMETERS, store_thermo_no.getText().toString());
         cv.put(DBHelper.MANAGER_NAME, store_manager_name.getText().toString());
+        cv.put(DBHelper.FSSAI_LIC,fssai_lic.getText().toString());
         cv.put(DBHelper.MANAGER_EMAIL, store_manager_email.getText().toString());
-        DbManager.getInstance().insertDetails(cv, DBHelper.STORE_DETAILS_TBL_NAME);
+        DbManager.getInstance().insertDetails(cv, DBHelper.STORE_DETAILS_TBL_NAME1);
     }
 
     private void getStoreDetails()
     {
-        String query = "SELECT * FROM " + DBHelper.STORE_DETAILS_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + store_id;
+        String query = "SELECT * FROM " + DBHelper.STORE_DETAILS_TBL_NAME1 + " WHERE " + DBHelper.STORE_ID + "=" + store_id;
         DbManager.getInstance().openDatabase();
         Cursor cursor = DbManager.getInstance().getDetails(query);
         Log.e("StoreDetails", cursor.getCount() + "   " + query);
         if(cursor.getCount()>0)
         {
             cursor.moveToFirst();
+            account_name.setText(cursor.getString(cursor.getColumnIndex(DBHelper.ACCOUNT_NAME)));
             store_chiller_no.setText(cursor.getString(cursor.getColumnIndex(DBHelper.CHILLERS)));
             store_freezer_no.setText(cursor.getString(cursor.getColumnIndex(DBHelper.FREZERS)));
             store_vendor_chiller_no.setText(cursor.getString(cursor.getColumnIndex(DBHelper.VENDOR_CHILLERS)));
             store_vendor_freezer_no.setText(cursor.getString(cursor.getColumnIndex(DBHelper.VENDOR_FREZEERS)));
-            store_rodent_no.setText(cursor.getString(cursor.getColumnIndex(DBHelper.BOXEX)));
+            store_rodent_no.setText(cursor.getString(cursor.getColumnIndex(DBHelper.REDANT_BOXEX)));
             store_flycatcher_no.setText(cursor.getString(cursor.getColumnIndex(DBHelper.FLY_CATCHERS)));
             store_aircutter_no.setText(cursor.getString(cursor.getColumnIndex(DBHelper.AIR_CUTTERS)));
             store_thermo_no.setText(cursor.getString(cursor.getColumnIndex(DBHelper.THERMOMETERS)));
             store_manager_name.setText(cursor.getString(cursor.getColumnIndex(DBHelper.MANAGER_NAME)));
             store_manager_email.setText(cursor.getString(cursor.getColumnIndex(DBHelper.MANAGER_EMAIL)));
+            fssai_lic.setText(cursor.getString(cursor.getColumnIndex(DBHelper.FSSAI_LIC)));
         }
     }
 

@@ -119,6 +119,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:editable="false"
+                    android:textColor="#000"
                     android:maxLength="100"
                     android:singleLine="true"
                     android:textAppearance="?android:attr/textAppearanceSmall"

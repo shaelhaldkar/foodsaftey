@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.itgc.foodsafety.utils.AppPrefrences;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -103,7 +105,7 @@ public class DbManager {
         mDb.execSQL("DELETE FROM " + DBHelper.ANSWER_IMAGE_TBL_NAME);
       //  mDb.execSQL("DELETE FROM " + DBHelper.ANSWER_IMAGE_TBL_PATH);
         mDb.execSQL("DELETE FROM " + DBHelper.AUDIT_SAMPLE_TBL_NAME);
-        mDb.execSQL("DELETE FROM " + DBHelper.STORE_DETAILS_TBL_NAME);
+        mDb.execSQL("DELETE FROM " + DBHelper.STORE_DETAILS_TBL_NAME1);
         mDb.execSQL("DELETE FROM " + DBHelper.STORE_START_TIME_TABLE);
         Log.e("Delete", "Data From StoreInfo,CategoryInfo & QuestionInfo Table");
     }
@@ -128,6 +130,22 @@ public class DbManager {
             latitude=object.getString("lat");
             longitude=object.getString("longs");
             merchantname=object.getString("merchantName");
+
+            ContentValues cv = new ContentValues();
+            cv.put(DBHelper.STORE_ID, String.valueOf(storeID));
+            cv.put(DBHelper.ACCOUNT_NAME, object.getString("AccountName"));
+            cv.put(DBHelper.CHILLERS, object.getString("NoofChillers"));
+            cv.put(DBHelper.FREZERS, object.getString("NoofFreezers"));
+            cv.put(DBHelper.VENDOR_CHILLERS, object.getString("NoofChillersVendors"));
+            cv.put(DBHelper.VENDOR_FREZEERS, object.getString("NoofFreezersVendors"));
+            cv.put(DBHelper.REDANT_BOXEX, object.getString("NoofRodentBoxes"));
+            cv.put(DBHelper.FLY_CATCHERS, object.getString("NoofFlyCatchers"));
+            cv.put(DBHelper.AIR_CUTTERS, object.getString("NoofAirCutters"));
+            cv.put(DBHelper.THERMOMETERS, object.getString("NoofThermometers"));
+            cv.put(DBHelper.MANAGER_NAME, object.getString("StoreManagerName"));
+            cv.put(DBHelper.MANAGER_EMAIL, object.getString("StoreManagerEmailID"));
+            cv.put(DBHelper.FSSAI_LIC,object.getString("FSSAILicDate"));
+            DbManager.getInstance().insertDetails(cv, DBHelper.STORE_DETAILS_TBL_NAME1);
         }catch (Exception e){Log.e("Error","At saveStoreDetails()"+e.getMessage());}
 
         ContentValues c=new ContentValues();
@@ -199,5 +217,7 @@ public class DbManager {
 
         }catch (Exception e){Log.e("Error","At saveCategotyQuestion()"+e.getMessage());}
     }
+
+
 
 }

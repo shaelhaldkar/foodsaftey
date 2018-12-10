@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
@@ -69,10 +70,11 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
         if (samples.get(0).isIs_temp_visible())
         {
             holder.temperatire.setVisibility(View.VISIBLE);
-            holder.recycle_view_sample.setHint("Temperature");
+            holder.recycle_view_sample.setHint("No of Chillers/Freezers");
         }else
         {
             holder.temperatire.setVisibility(View.GONE);
+            holder.recycle_view_sample.setHint("No of Sample");
         }
         holder.txt_sample.setText("Sample " + (position+1));
 
@@ -279,6 +281,13 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
                             Selflife_value=3;
                         }
 
+                        if (samples.get(0).isIs_temp_visible())
+                        {
+                            temperature=Integer.valueOf(temperatire.getText().toString());
+                        }
+
+
+
                         no_samples_product=recycle_view_sample.getText().toString();
                         brand_name=edit_brand_name.getText().toString();
                         product_name=edit_product_name.getText().toString();
@@ -342,6 +351,10 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
                     {
                         Selflife_value=3;
                     }
+                    if (samples.get(0).isIs_temp_visible())
+                    {
+                        temperature=Integer.valueOf(temperatire.getText().toString());
+                    }
 
 
 
@@ -384,11 +397,6 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
 //            });
 
         }
-    }
-
-    public void istemp(boolean vlaue)
-    {
-
     }
 
 

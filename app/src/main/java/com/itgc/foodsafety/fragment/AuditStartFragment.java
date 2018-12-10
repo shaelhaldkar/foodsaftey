@@ -1047,6 +1047,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 questionID=qId;
                 sampleCount=c.getInt(c.getColumnIndex(DBHelper.QUESTION_SAMPLES));
                 type=Integer.parseInt(c.getString(c.getColumnIndex(DBHelper.QUESTION_TYPE)));
+                rdt_isfail.setChecked(false);
                 maxSample=sampleCount;
             } while (c.moveToNext());
 
@@ -1323,7 +1324,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         samples.get(pos).setBb_exp_date(bb_expdate);
         samples.get(pos).setShellife_value(Selflife_value);
         samples.get(pos).setTemperature(temperature);
-        samples.get(pos).getIs_sample_failed();
+        samples.get(pos).setIs_sample_failed(sample_value_fail);
         for(int i=0;i<samples.size();i++)
         {
             Log.e("Sample Rate",samples.get(i).getSampleCurrentRate()+"");

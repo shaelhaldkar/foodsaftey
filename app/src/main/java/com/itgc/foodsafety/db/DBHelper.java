@@ -262,8 +262,11 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(TABLE_QUESTION_ANSWER_IMAGE_CREATE);
     //    db.execSQL(TABLE_QUESTION_ANSWER_PATH_CREATE);
         db.execSQL(TABLE_SAMPLE_CREATE);
-        db.execSQL(TABLE_STORE_DETAILSE_CREATE);
         db.execSQL(TABLE_STORE_START_DATE_TIME_CREATE);
+
+
+        db.execSQL(TABLE_STORE_DETAILSE_CREATE);
+
         Log.d("Table created", "Table created");
     }
 
@@ -289,6 +292,8 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(TABLE_SAMPLE_DROP);
         db.execSQL(TABLE_STORE_DETAILS_DROP);
         db.execSQL(TABLE_STORE_START_DATE_TIME_DROP);
+        db.execSQL(TABLE_STORE_DETAILS_DROP);
+
 
         onCreate(db);
     }
@@ -412,30 +417,38 @@ public class DBHelper extends SQLiteOpenHelper {
     private final String TABLE_SAMPLE_DROP = "DROP TABLE IF EXISTS " + AUDIT_SAMPLE_TBL_NAME;
 
     // For Store Details
-    public static final String STORE_DETAILS_TBL_NAME="storeDetails";
-    public static final String AUDITOR_ID= "auditor_id";
-    public static final String CHILLERS="chillers";
-    public static final String FREZERS="freezers";
-    public static final String VENDOR_CHILLERS="chillers_from_vendors";
-    public static final String VENDOR_FREZEERS="freezers_from_vendors";
-    public static final String BOXEX="rodent_boxes";
-    public static final String FLY_CATCHERS="flyCatchers";
-    public static final String AIR_CUTTERS="airCutters";
-    public static final String THERMOMETERS="thermometers";
-    public static final String MANAGER_NAME="manager_name";
-    public static final String MANAGER_EMAIL="manager_email";
+    public static final String STORE_DETAILS_TBL_NAME1="_storeDetails";
 
-    private final String TABLE_STORE_DETAILSE_CREATE = "CREATE TABLE " + STORE_DETAILS_TBL_NAME + " ("+
-            STORE_ID + " INTEGER,"+ AUDITOR_ID + " INTEGER,"+
+    public static final String ACCOUNT_NAME= "_account_name";
+    public static final String MANAGER_NAME="_manager_name";
+    public static final String MANAGER_EMAIL="_email";
+    public static final String CHILLERS="_chillers";
+    public static final String FREZERS="_freezers";
+    public static final String VENDOR_CHILLERS="_chillers_from_vendors";
+    public static final String VENDOR_FREZEERS="_freezers_from_vendors";
+    public static final String REDANT_BOXEX="_rodent_boxes";
+    public static final String FLY_CATCHERS="_flyCatchers";
+    public static final String AIR_CUTTERS="_airCutters";
+    public static final String THERMOMETERS="_thermometers";
+    public static final String FSSAI_LIC="_fssailic";
+
+    private final String TABLE_STORE_DETAILSE_CREATE = "CREATE TABLE " + STORE_DETAILS_TBL_NAME1 + " (" + STORE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            ACCOUNT_NAME + " TEXT, " + MANAGER_NAME + " TEXT, " + MANAGER_EMAIL + " TEXT, " + CHILLERS + " TEXT, "
+            + FREZERS + " TEXT, " + VENDOR_CHILLERS + " TEXT, " + VENDOR_FREZEERS + " TEXT, " + REDANT_BOXEX + " TEXT, " + FLY_CATCHERS + " TEXT, "
+            + AIR_CUTTERS + " TEXT, " + THERMOMETERS + " TEXT, " +
+            FSSAI_LIC + " TEXT); ";
+
+    /*private final String TABLE_STORE_DETAILSE_CREATE = "CREATE TABLE " + STORE_DETAILS_TBL_NAME1 + " ("+
+            STORE_ID + " INTEGER,"+ ACCOUNT_NAME + " TEXT,"+
             CHILLERS + " TEXT,"+ FREZERS + " TEXT,"+
             VENDOR_CHILLERS + " TEXT,"+VENDOR_FREZEERS + " TEXT,"+
-            BOXEX + " TEXT,"+FLY_CATCHERS + " TEXT,"+
+            REDANT_BOXEX + " TEXT,"+FLY_CATCHERS + " TEXT,"+
             AIR_CUTTERS + " TEXT,"+THERMOMETERS + " TEXT,"+
-            MANAGER_NAME + " TEXT,"+MANAGER_EMAIL + " TEXT"+")";
-    private final String TABLE_STORE_DETAILS_DROP = "DROP TABLE IF EXISTS " + STORE_DETAILS_TBL_NAME;
+            MANAGER_NAME + " TEXT,"+FSSAI_LIC + " TEXT,"+MANAGER_EMAIL + " TEXT"+")";*/
 
 
 
+    private final String TABLE_STORE_DETAILS_DROP = "DROP TABLE IF EXISTS " + STORE_DETAILS_TBL_NAME1;
     // For Store Start & End Date Time
     public static final String STORE_START_TIME_TABLE="startTimeTable";
     public static final String DATE_TIME="startDateTime";

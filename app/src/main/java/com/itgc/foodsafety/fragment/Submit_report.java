@@ -7,12 +7,14 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Base64;
@@ -31,7 +33,6 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.itgc.foodsafety.Capture;
@@ -70,7 +71,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
     public static final int SIGNATURE_ACTIVITY = 4;
     private Context ctx;
     private EditText auditerNameEditText, auditerContactNumberEditText;
-    private Button signatureButton, submitReport, signatureButton1, expiry_btn,saveLocally;
+    private Button signatureButton, submitReport, signatureButton1, expiry_btn,saveLocally,submitimagebutton;
     private String auditerName, auditerId, auditerContactNumber, Store_name, audit_sign,data="",startTime,endTime,storeStartTime="";
     private ArrayList<Answers> answersArrayList;
     private Bundle b;
@@ -90,8 +91,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
     private int idPosition=0;
     JSONObject o;
 
-    int a=0;
-    int bb=0;
+    int a=0,bb=0;
 
     @Override
     public void onAttach(Context context) {
@@ -150,6 +150,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
 
         auditerNameEditText.setText(AppPrefrences.getUserName(ctx));
         auditerContactNumberEditText.setText(AppPrefrences.getMobileNo(ctx));
+        submitimagebutton=(Button)view.findViewById(R.id.submitimage);
 
         img_back = (ImageView) view.findViewById(R.id.img_back);
 
@@ -165,6 +166,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         img_back.setOnClickListener(this);
         expiry_btn.setOnClickListener(this);
         saveLocally.setOnClickListener(this);
+        submitimagebutton.setOnClickListener(this);
     }
 
     private void restoreToolbar() {
@@ -203,6 +205,19 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
             case R.id.signatureButton1:
                 openSignatureDialog("store");
                 break;
+
+            case R.id.submitimage :
+             {
+                 SharedPreferences mSharedPreference1 =   PreferenceManager.getDefaultSharedPreferences(ctx);
+                 if(mSharedPreference1.getInt("Status_size", 0)>0)
+                 {
+                     uploadimage();
+                 }
+                 else
+                 {
+                     submitsignature();
+                 }
+             }
 
             case R.id.img_back:
                 getFragmentManager().popBackStack();
@@ -259,11 +274,14 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         } else
             saveSignature(2);
 
+
+        imagepath=new ArrayList<>();
+        imagename=new ArrayList<>();
         getdata();
 
     }
 
-    private void submitData(final String data1)
+    private void submitfinalData(final String data1)
     {
         Log.d("", "data1 " + data1);
         pd = new ProgressDialog(ctx);
@@ -531,12 +549,15 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                         String msg = jsonObject.getString("Message");
                         idPosition = idPosition + 1;
                         if (idPosition < categoryIsList.size()) {
-                            bb=0;
+
                             getdata();
                         }
-
-                        if (idPosition == categoryIsList.size()) {
-                            submitsignature();
+//
+                        if (idPosition == categoryIsList.size())
+                        {
+                            if(imagepath.size()>0) {
+                                saveArray();
+                            }
                         }
                     }
                     else {
@@ -560,110 +581,6 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                 Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
             }
         });
-
-//        StringRequest str = new StringRequest(Request.Method.POST,
-//                URL , new Response.Listener<String>() {
-//
-//            @Override
-//            public void onResponse(String response)
-//            {
-//                if (pd != null && pd.isShowing())
-//                    pd.dismiss();
-//                Log.e("First Submit Response", response);
-//                if (response != null)
-//                {
-//                    try
-//                    {
-//                        JSONObject jsonObject = new JSONObject(response);
-//                        JSONObject payload = jsonObject.getJSONObject("Payload");
-//                        String msg = jsonObject.getString("Message");
-//                        //Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
-//                        //AppUtils.encodedimage = "";
-//
-//                        String Code = jsonObject.getString("Code");
-//                        if (Code.equalsIgnoreCase("ok"))
-//                        {
-//                            AppPrefrences.setAuditId(ctx, payload.getString("audit_id"));
-//                            auditId=payload.getString("audit_id");
-//                            idPosition=idPosition+1;
-//                            if(idPosition<categoryIsList.size())
-//                            {
-//                                submitFirstStep();
-//                            }
-//
-//                            if(idPosition==categoryIsList.size())
-//                            {
-//                                submitData("");
-//                            }
-//                        }
-//
-////                        idPosition=idPosition+1;
-////                        if(idPosition<categoryIsList.size())
-////                        {
-////                            submitFirstStep();
-////                        }
-////                        // deleteData();
-////                        try {
-////
-////                            Intent intent = new Intent("DraftsCount");
-////                            ctx.sendBroadcast(intent);
-////
-////                            Fragment fragment = new StartAuditFragment();
-////                            Bundle bundle = new Bundle();
-////                            bundle.putInt("Store_id", Store_id);
-////                            bundle.putString("Store_name", Store_name);
-////                            fragment.setArguments(bundle);
-////                            getFragmentManager().beginTransaction().replace(R.id.container_body, fragment).addToBackStack("Store").commit();
-//
-//                        } catch (Exception e) {
-//
-//                        }
-//                }
-//            }
-//        }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError v)
-//            {
-//                v.printStackTrace();
-//                if (pd != null && pd.isShowing())
-//                    pd.dismiss();
-//                Toast.makeText(ctx, "Failed", Toast.LENGTH_LONG).show();
-//            }
-//        }) {
-//
-//            @Override
-//            protected Map<String, String> getParams()
-//            {
-//                Map<String, String> params = new HashMap<String, String>();
-//                JSONObject o=getLocalSavedData(storeId,categoryIsList.get(idPosition));
-//                try {
-//                    data=o.getJSONArray("data").toString();
-//                    categoryId= String.valueOf(Integer.parseInt(o.getString("cat_id")));
-//                    startTime= o.getString("startdateTime");
-//                    endTime= o.getString("enddatetime");
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//
-//                params.put("data", data);
-//                params.put("marchent_id",AppPrefrences.getMerchatId(ctx));
-//                params.put("store_id", storeId);
-//                params.put("audit_code", AppPrefrences.getAuditCODE(ctx));
-//                params.put("startdateTime", storeStartTime);
-//                params.put("store_sign", "");
-//                params.put("audit_sign", "");
-//                params.put("cat_id", categoryId);
-//
-//                params.put("auditor_id",AppPrefrences.getUserId(ctx));
-//                params.put("lat",AppPrefrences.getLatitude(ctx));
-//                params.put("longs",AppPrefrences.getLongitude(ctx));
-//                params.put("final_submit","false");
-//                params.put("enddatetime",getDateTime());
-//                Log.e("First Post Data", params.toString());
-//
-//                return params;
-//            }
-//        };
 
         jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
                 120000,
@@ -724,8 +641,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         //Log.e("Category Count", c.getCount() + "");
         JSONObject storeObject=new JSONObject();
         JSONArray array=new JSONArray();
-        imagepath=new ArrayList<>();
-        imagename=new ArrayList<>();
+
         JSONObject o;
         if (c.getCount()>0)
         {
@@ -1013,7 +929,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                         }
                         else {
                             storefilename=jsonObject1.getString("FileName");
-                            submitData("");
+                            submitfinalData("");
                         }
 
 
@@ -1049,15 +965,18 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
 
     }
 
-    private void uploadWithTransferUtility()
+    private void uploadimage()
     {
         final ProgressDialog pd = new ProgressDialog(ctx);
         pd.setMessage("Please Wait...");
         pd.setCancelable(false);
         pd.show();
 
+        final SharedPreferences mSharedPreference1 =   PreferenceManager.getDefaultSharedPreferences(ctx);
+
+
         S3FileUploadHelper transferHelper = new S3FileUploadHelper(ctx);
-        transferHelper.upload(imagepath.get(bb), imagename.get(bb));///
+        transferHelper.upload(mSharedPreference1.getString("imagepath" + AppPrefrences.getimageuploadcount(ctx), null), mSharedPreference1.getString("imagename" + AppPrefrences.getimageuploadcount(ctx), null));///
 
         transferHelper.setFileTransferListener(new S3FileUploadHelper.FileTransferListener() {
             @Override
@@ -1065,14 +984,15 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
             {
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
-                if(imagename.size()-1==bb)
+                if(bb==mSharedPreference1.getInt("Status_size", 0)-1 )
                 {
-                    submitFirstStep();
+                    submitsignature();
                 }
                 else
                 {
                     bb=bb+1;
-                    uploadWithTransferUtility();
+                    AppPrefrences.setimageuploadcount(ctx,bb);
+                    uploadimage();
                 }
                // AppLogger.d("S3FileUpload", String.format("%s uploaded successfully!", fileName));
                // profileImage = fileName;
@@ -1108,15 +1028,29 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         o=null;
         o=getLocalSavedData(storeId,categoryIsList.get(idPosition));
 
-        if(imagename.size()>0) {
-
-            uploadWithTransferUtility();
-        }
-        else
-        {
             submitFirstStep();
+
+    }
+
+
+    public void saveArray()
+    {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
+        SharedPreferences.Editor i_path = sp.edit();
+        SharedPreferences.Editor i_name=sp.edit();
+        SharedPreferences.Editor image_size=sp.edit();
+        image_size.putInt("Status_size", imagepath.size());
+        /* sKey is an array */
+
+        for(int i=0;i<imagepath.size();i++)
+        {
+            i_path.putString("imagepath" + i, imagepath.get(i));
+            i_name.putString("imagename"+i,imagename.get(i));
         }
 
+        i_path.commit();
+        i_name.commit();
+        image_size.commit();
     }
 
 
