@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
@@ -71,7 +72,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
     public static final int SIGNATURE_ACTIVITY = 4;
     private Context ctx;
     private EditText auditerNameEditText, auditerContactNumberEditText;
-    private Button signatureButton, submitReport, signatureButton1, expiry_btn,saveLocally,submitimagebutton;
+    private Button signatureButton, submitReport, signatureButton1,saveLocally,submitimagebutton;
     private String auditerName, auditerId, auditerContactNumber, Store_name, audit_sign,data="",startTime,endTime,storeStartTime="";
     private ArrayList<Answers> answersArrayList;
     private Bundle b;
@@ -90,6 +91,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
     private ArrayList<String> categoryIsList=new ArrayList<>();
     private int idPosition=0;
     JSONObject o;
+    TextView imagecount;
 
     int a=0,bb=0;
 
@@ -151,20 +153,20 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         auditerNameEditText.setText(AppPrefrences.getUserName(ctx));
         auditerContactNumberEditText.setText(AppPrefrences.getMobileNo(ctx));
         submitimagebutton=(Button)view.findViewById(R.id.submitimage);
-
+        imagecount=(TextView)view.findViewById(R.id.remainingimagecount);
         img_back = (ImageView) view.findViewById(R.id.img_back);
 
         signatureButton = (Button) view.findViewById(R.id.signatureButton);
         signatureButton1 = (Button) view.findViewById(R.id.signatureButton1);
         submitReport = (Button) view.findViewById(R.id.submitReport);
-        expiry_btn = (Button) view.findViewById(R.id.expiry_btn);
+      //  expiry_btn = (Button) view.findViewById(R.id.expiry_btn);
         saveLocally = (Button) view.findViewById(R.id.submitLocally);
 
         signatureButton.setOnClickListener(this);
         signatureButton1.setOnClickListener(this);
         submitReport.setOnClickListener(this);
         img_back.setOnClickListener(this);
-        expiry_btn.setOnClickListener(this);
+     //   expiry_btn.setOnClickListener(this);
         saveLocally.setOnClickListener(this);
         submitimagebutton.setOnClickListener(this);
     }
@@ -269,9 +271,6 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
 
     private void submitReport() {
         //getSignature();
-        if (expiry!=null) {
-            Toast.makeText(ctx, "Please Add Expiry Status", Toast.LENGTH_LONG).show();
-        } else
             saveSignature(2);
 
 
@@ -290,6 +289,8 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         pd.show();
 
         JSONObject jsonObject = new JSONObject();
+
+        imagecount.setText("Submitting final data....");
 
         try {
             JSONArray jsonArray=new JSONArray();
@@ -332,7 +333,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                         AppUtils.encodedstoreimage="";
                         deleteSubmittedData(String.valueOf(Store_id),String.valueOf(Cat_id));
 
-                        Toast.makeText(ctx, "Data Submitted Successfully", Toast.LENGTH_LONG).show();
+                        Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
 
                         try
                         {
@@ -501,6 +502,8 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         pd.setCancelable(false);
         pd.show();
 
+        imagecount.setText("Uploading data....");
+
 
         JSONObject jsonObject = new JSONObject();
 
@@ -523,6 +526,8 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
             jsonObject.put("final_submit","false");
             jsonObject.put("enddatetime",getDateTime());
             jsonObject.put("data",o.getJSONArray("data").toString());
+
+
 
 
         }catch (Exception e){
@@ -557,6 +562,10 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                         {
                             if(imagepath.size()>0) {
                                 saveArray();
+
+                                imagecount.setText("Please click on image button");
+                                submitReport.setClickable(false);
+
                             }
                         }
                     }
@@ -987,10 +996,13 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                 if(bb==mSharedPreference1.getInt("Status_size", 0)-1 )
                 {
                     submitsignature();
+                    imagecount.setText("Uploading signature....");
                 }
                 else
                 {
+                    imagecount.setText((bb+1)+"/"+mSharedPreference1.getInt("Status_size", 0)+" image uploaded");
                     bb=bb+1;
+
                     AppPrefrences.setimageuploadcount(ctx,bb);
                     uploadimage();
                 }

@@ -1157,7 +1157,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                     d.setBb_exp(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.BB_EXP)));
                     d.setBb_exp_date(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.BBEXPDATA)));
                     d.setShellife_value(samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SELFLIFE)));
-                    d.setTemperature(samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.TEMPERATURE)));
+                    d.setTemperature(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.TEMPERATURE)));
                     d.setSampleCurrentRate(samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_CURRENT_RATE)));
 //                    d.setIs_sample_failed(Integer.parseInt(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.is_sample_failed))));
                     samples.add(d);
@@ -1312,7 +1312,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
 //    }
 
     public void updateSamples(int pos,int value,String no_sample_product,String product_name,String brand_name,
-                              String mfdpkd,String mfd_date,String bb_exp,String bb_expdate,int Selflife_value,int temperature,int sample_value_fail)
+                              String mfdpkd,String mfd_date,String bb_exp,String bb_expdate,int Selflife_value,String temperature,int sample_value_fail)
     {
         samples.get(pos).setSampleCurrentRate(value);
         samples.get(pos).setNo_sample_product(no_sample_product);

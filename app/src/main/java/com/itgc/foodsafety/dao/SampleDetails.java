@@ -73,11 +73,11 @@ public class SampleDetails
         this.shellife_value = shellife_value;
     }
 
-    public int getTemperature() {
+    public String getTemperature() {
         return temperature;
     }
 
-    public void setTemperature(int temperature) {
+    public void setTemperature(String temperature) {
         this.temperature = temperature;
     }
 
@@ -97,7 +97,7 @@ public class SampleDetails
     public String bb_exp;
     public String bb_exp_date;
     public int  shellife_value;
-    public int temperature;
+    public String temperature;
     public int is_sample_failed;
 
     public boolean isIs_temp_visible() {

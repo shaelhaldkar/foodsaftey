@@ -68,7 +68,6 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 android:hint="No. of Sample"
-                android:inputType="number"
                 android:maxLines="1"
                 android:padding="10dp"
                 android:singleLine="true">

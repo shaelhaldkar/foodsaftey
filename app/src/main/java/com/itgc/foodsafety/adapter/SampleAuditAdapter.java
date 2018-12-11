@@ -48,8 +48,8 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
     int progressChanged = 0;
     float trueprogress = 0;
     String mfdpkd, mfd_date=null,bb_exp,bb_expdate=null;
-    String no_samples_product="",product_name="",brand_name="";
-    int Selflife_value=0,temperature=0,sample_fail_value=0;
+    String no_samples_product="",product_name="",brand_name="",temperature="0";
+    int Selflife_value=0,sample_fail_value=0;
 
     public SampleAuditAdapter(ArrayList<SampleDetails> samples, Context c, int storeId, int categoryId, int questionId, AuditStartFragment auditStartFragment) {
         this.samples = samples;
@@ -283,7 +283,7 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
 
                         if (samples.get(0).isIs_temp_visible())
                         {
-                            temperature=Integer.valueOf(temperatire.getText().toString());
+                            temperature=(temperatire.getText().toString());
                         }
 
 
@@ -353,7 +353,7 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
                     }
                     if (samples.get(0).isIs_temp_visible())
                     {
-                        temperature=Integer.valueOf(temperatire.getText().toString());
+                        temperature=(temperatire.getText().toString());
                     }
 
 
