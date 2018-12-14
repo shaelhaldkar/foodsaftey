@@ -337,9 +337,11 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
 
                         try
                         {
-                            Intent intent = new Intent("DraftsCount");
-                            ctx.sendBroadcast(intent);
-                            getFragmentManager().beginTransaction().replace(R.id.container_body, new Store_Fragement()).addToBackStack("Store").commit();
+
+                            startActivity(new Intent(ctx,MainActivity.class));
+//                            Intent intent = new Intent("DraftsCount");
+//                            ctx.sendBroadcast(intent);
+//                           getFragmentManager().beginTransaction().replace(R.id.container_body, new Store_Fragement()).addToBackStack("Store").commit();
                         } catch (Exception e) {}
 
                     }

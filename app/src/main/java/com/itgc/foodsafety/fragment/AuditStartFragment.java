@@ -1214,7 +1214,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             c.put(DBHelper.ANSWER_TYPE, checkRadio());
             c.put(DBHelper.ANSWER_CAT_SKIP, "no");
             c.put(DBHelper.ANSWER_IS_SEEN, "false");
-            c.put(DBHelper.ANSWER_MAX_NO, max_num.getText().toString());//sample_selected*10);
+            c.put(DBHelper.ANSWER_MAX_NO, sample_selected);
             c.put(DBHelper.ANSWER_MAX_SAMPLE, maxSample);
             c.put(DBHelper.ANSWER_NO_SAMPLE, sample_selected);
             c.put(DBHelper.ANSWER_QUES_SKIP, skip);
