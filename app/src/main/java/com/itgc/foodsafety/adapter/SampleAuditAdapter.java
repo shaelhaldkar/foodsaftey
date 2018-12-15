@@ -132,7 +132,6 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
                         }
 
                         holder.txt_datemfd.setText(day+"-"+month+"-"+year);
-                        mfd_date=year+"-"+month+"-"+day;
                     }
                 }, year, month, day);
                 datePickerDialog.show(manager,"show");
@@ -141,7 +140,6 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
                     @Override
                     public void onCancel(DialogInterface dialogInterface) {
                         holder.txt_datemfd.setText("");
-                        mfd_date=null;
                     }
                 });
             }
@@ -185,7 +183,6 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
                     @Override
                     public void onCancel(DialogInterface dialogInterface) {
                         holder.txt_dateexp.setText("");
-                        bb_expdate=null;
                     }
                 });
             }
@@ -287,7 +284,8 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
                         }
 
 
-
+                        mfd_date=txt_datemfd.getText().toString();
+                        bb_expdate=txt_dateexp.getText().toString();
                         no_samples_product=recycle_view_sample.getText().toString();
                         brand_name=edit_brand_name.getText().toString();
                         product_name=edit_product_name.getText().toString();
@@ -356,8 +354,8 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
                         temperature=(temperatire.getText().toString());
                     }
 
-
-
+                    mfd_date=txt_datemfd.getText().toString();
+                    bb_expdate=txt_dateexp.getText().toString();
                     no_samples_product=recycle_view_sample.getText().toString();
                     brand_name=edit_brand_name.getText().toString();
                     product_name=edit_product_name.getText().toString();
