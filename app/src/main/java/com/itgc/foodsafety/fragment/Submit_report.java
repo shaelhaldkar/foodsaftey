@@ -217,7 +217,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                  }
                  else
                  {
-                     submitsignature();
+                     Toast.makeText(ctx,"No Image Found",Toast.LENGTH_SHORT).show();
                  }
              }
 
@@ -329,16 +329,27 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                     if(status) {
                         String msg = jsonObject.getString("Message");
                         Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show();
-                        AppUtils.encodedimage = "";
-                        AppUtils.encodedstoreimage="";
-                        deleteSubmittedData(String.valueOf(Store_id),String.valueOf(Cat_id));
-
-                        Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
 
                         try
                         {
+                            if(imagepath.size()>0) {
+                                saveArray();
 
-                            startActivity(new Intent(ctx,MainActivity.class));
+                                imagecount.setText("Please click on image button");
+                                submitReport.setClickable(false);
+
+                            }
+                            else {
+                                AppUtils.encodedimage = "";
+                                AppUtils.encodedstoreimage="";
+                                deleteSubmittedData(String.valueOf(Store_id),String.valueOf(Cat_id));
+                                Toast.makeText(ctx, "ALL DATA SUBMITTED SUCCESSFULLY", Toast.LENGTH_LONG).show();
+                                startActivity(new Intent(ctx,MainActivity.class));
+
+
+                            }
+
+
 //                            Intent intent = new Intent("DraftsCount");
 //                            ctx.sendBroadcast(intent);
 //                           getFragmentManager().beginTransaction().replace(R.id.container_body, new Store_Fragement()).addToBackStack("Store").commit();
@@ -562,13 +573,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
 //
                         if (idPosition == categoryIsList.size())
                         {
-                            if(imagepath.size()>0) {
-                                saveArray();
-
-                                imagecount.setText("Please click on image button");
-                                submitReport.setClickable(false);
-
-                            }
+                            submitsignature();
                         }
                     }
                     else {
@@ -987,6 +992,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
 
 
         S3FileUploadHelper transferHelper = new S3FileUploadHelper(ctx);
+
         transferHelper.upload(mSharedPreference1.getString("imagepath" + AppPrefrences.getimageuploadcount(ctx), null), mSharedPreference1.getString("imagename" + AppPrefrences.getimageuploadcount(ctx), null));///
 
         transferHelper.setFileTransferListener(new S3FileUploadHelper.FileTransferListener() {
@@ -997,8 +1003,11 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                     pd.dismiss();
                 if(bb==mSharedPreference1.getInt("Status_size", 0)-1 )
                 {
-                    submitsignature();
-                    imagecount.setText("Uploading signature....");
+                    AppUtils.encodedimage = "";
+                    AppUtils.encodedstoreimage="";
+                    deleteSubmittedData(String.valueOf(Store_id),String.valueOf(Cat_id));
+                    Toast.makeText(ctx, "ALL DATA SUBMITTED SUCCESSFULLY", Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(ctx,MainActivity.class));
                 }
                 else
                 {

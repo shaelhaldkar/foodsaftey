@@ -365,35 +365,6 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
                 }
             });
 
-//            progressBar.setOnTouchListener(new View.OnTouchListener() {
-//                @Override
-//                public boolean onTouch(View view, MotionEvent motionEvent)
-//                {
-//                    fragment.updateSamplesRateX(getAdapterPosition(),(int)motionEvent.getX());
-//                    float trans = motionEvent.getX() - holder.seekBar.getWidth() / 2;
-//                    float limit = holder.seekBar.getWidth();
-//
-//                    switch (motionEvent.getAction()) {
-//                        case MotionEvent.ACTION_MOVE:
-//                            if (trans >= 0 && trans < limit) {
-//                                holder.view_state.setTranslationX(trans);
-//                                break;
-//                            }
-//                        case MotionEvent.ACTION_DOWN:
-//                            if (trans >= 0 && trans < limit) {
-//                                holder.view_state.setTranslationX(trans);
-//                                break;
-//                            }
-//                        case MotionEvent.ACTION_UP:
-//                            if (trans >= 0 && trans < limit) {
-//                                holder.view_state.setTranslationX(trans);
-//                                break;
-//                            }
-//                    }
-//                    return false;
-//                }
-//            });
-
         }
     }
 
