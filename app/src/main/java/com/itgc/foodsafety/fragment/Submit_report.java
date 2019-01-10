@@ -82,7 +82,9 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
     private ImageView img_back;
     private String expiry = null;
     private ArrayList<String> imagepath;
-    private ArrayList<String> imagename;//=new ArrayList<>();
+    private ArrayList<String> imagename;
+
+
 
     private String auditId="";
     String auditor_filename="",storefilename="";
@@ -92,6 +94,8 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
     private int idPosition=0;
     JSONObject o;
     TextView imagecount;
+    int image_counter=1;
+    String image_progressdialog="Please wait...";
 
     int a=0,bb=0;
 
@@ -379,7 +383,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         });
 
 
-        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(120000,DefaultRetryPolicy.DEFAULT_MAX_RETRIES,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(50000,DefaultRetryPolicy.DEFAULT_MAX_RETRIES,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         MySingleton.getInstance(ctx).addToRequestQueue(jsonObjectRequest);
     }
 
@@ -973,7 +977,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         });
 
         jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
-                120000,
+                50000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         jsonObjectRequest.setShouldCache(false);
@@ -983,13 +987,13 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
 
     private void uploadimage()
     {
-        final ProgressDialog pd = new ProgressDialog(ctx);
-        pd.setMessage("Please Wait...");
+       final ProgressDialog pd = new ProgressDialog(ctx);
+       image_counter=(AppPrefrences.getimageuploadcount(ctx)+1);
+        final SharedPreferences mSharedPreference1 =   PreferenceManager.getDefaultSharedPreferences(ctx);
+        image_progressdialog=(String.valueOf(image_counter)+"/"+String.valueOf(mSharedPreference1.getInt("Status_size", 0))+" image uploading...");
+        pd.setMessage(image_progressdialog);
         pd.setCancelable(false);
         pd.show();
-
-        final SharedPreferences mSharedPreference1 =   PreferenceManager.getDefaultSharedPreferences(ctx);
-
 
         S3FileUploadHelper transferHelper = new S3FileUploadHelper(ctx);
 
@@ -1001,6 +1005,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
             {
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
+                image_counter=image_counter+1;
                 if(bb==mSharedPreference1.getInt("Status_size", 0)-1 )
                 {
                     AppUtils.encodedimage = "";

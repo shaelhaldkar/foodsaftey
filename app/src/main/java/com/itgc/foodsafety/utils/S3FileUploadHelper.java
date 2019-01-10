@@ -3,6 +3,7 @@ package com.itgc.foodsafety.utils;
 import android.content.Context;
 import android.util.Log;
 
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
@@ -17,7 +18,8 @@ import java.io.File;
  * Created by anil on 13/04/18.
  */
 
-public class S3FileUploadHelper {
+public class S3FileUploadHelper
+{
 
     private static final String TAG = S3FileUploadHelper.class.getSimpleName();
 
@@ -26,18 +28,24 @@ public class S3FileUploadHelper {
     String fileName;
 
 
+
     public S3FileUploadHelper(Context context) {
         this.context = context;
     }
 
     public void upload(String sourceFilePath, String fileName1)
     {
+        ClientConfiguration s3Config = new ClientConfiguration();
+        s3Config.setConnectionTimeout(90000);
+        s3Config.setSocketTimeout(90000);
+        s3Config.setMaxConnections(2);
+
         this.fileName=fileName1;
         TransferUtility transferUtility =
                 TransferUtility.builder()
                         .context(context.getApplicationContext())
                         .awsConfiguration(AWSMobileClient.getInstance().getConfiguration())
-                        .s3Client(new AmazonS3Client(AWSMobileClient.getInstance().getCredentialsProvider()))
+                        .s3Client(new AmazonS3Client(AWSMobileClient.getInstance().getCredentialsProvider(),s3Config))
                         .build();
 
         TransferObserver uploadObserver =
