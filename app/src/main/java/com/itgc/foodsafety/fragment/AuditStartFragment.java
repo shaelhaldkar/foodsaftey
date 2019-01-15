@@ -1107,7 +1107,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     }
 
 
-    public void updateSamples(int pos, int value, String no_sample_product, String product_name, String brand_name,
+    public void updateSamples(int pos, double value, String no_sample_product, String product_name, String brand_name,
                               String mfdpkd, String mfd_date, String bb_exp, String bb_expdate, int Selflife_value, String temperature, int sample_value_fail) {
         samples.get(pos).setSampleCurrentRate(value);
         samples.get(pos).setNo_sample_product(no_sample_product);

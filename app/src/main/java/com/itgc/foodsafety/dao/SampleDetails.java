@@ -109,7 +109,8 @@ public class SampleDetails
     }
 
     public  boolean is_temp_visible;
-    private int rateX,sampleCount, sampleCurrentRate,sampleRate,samplePos;
+    private int rateX,sampleCount,sampleRate,samplePos;
+    double  sampleCurrentRate;
 
     public int getSamplePos() {
         return samplePos;
@@ -143,11 +144,11 @@ public class SampleDetails
         this.sampleCount = sampleCount;
     }
 
-    public int getSampleCurrentRate() {
+    public double getSampleCurrentRate() {
         return sampleCurrentRate;
     }
 
-    public void setSampleCurrentRate(int sampleCurrentRate) {
+    public void setSampleCurrentRate(double sampleCurrentRate) {
         this.sampleCurrentRate = sampleCurrentRate;
     }
 

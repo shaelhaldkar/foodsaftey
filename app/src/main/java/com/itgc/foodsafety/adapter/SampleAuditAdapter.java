@@ -84,7 +84,7 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
         holder.txt_dateexp.setText(samples.get(position).getBb_exp_date());
         holder.txt_datemfd.setText(samples.get(position).getMfd_date());
         holder.recycle_view_sample.setText(samples.get(position).getNo_sample_product());
-        holder.progressBar.setProgress(samples.get(position).getSampleCurrentRate()*2);
+        holder.progressBar.setProgress((int)(samples.get(position).getSampleCurrentRate()*2));
         int vaolue=samples.get(position).getShellife_value();
         if(vaolue==0)
         {
@@ -258,9 +258,9 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
             btn_rate.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    int rate=Double.valueOf(edt_rate.getText().toString()).intValue();
+                   double rate=Double.valueOf(edt_rate.getText().toString());
                     if(rate<=10){
-                        progressBar.setProgress(rate*2);
+                        progressBar.setProgress(((int)rate)*2);
                         if (rdt_none.isChecked())
                         {
                             Selflife_value=0;
