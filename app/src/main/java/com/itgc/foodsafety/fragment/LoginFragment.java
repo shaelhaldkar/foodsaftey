@@ -95,8 +95,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
         return view;
     }
 
-    private void setData()
-    {
+    private void setData() {
         edt_password.setText("admin");
         edt_username.setText("test@gmail.com");
     }
@@ -168,29 +167,30 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
 
 
             jsonObject.put("email", username);
-            jsonObject.put("password",password);
+            jsonObject.put("password", password);
             jsonObject.put("deviceType", "a");
             jsonObject.put("deviceId", DeviceId);
-        }catch (Exception e){}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        String URL=Vars.BASE_URL + Vars.OFFLINELOGIN;
+        String URL = Vars.BASE_URL + Vars.OFFLINELOGIN;
 
-        JsonObjectRequest req = new JsonObjectRequest(1,URL, jsonObject,
+        JsonObjectRequest req = new JsonObjectRequest(1, URL, jsonObject,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            JSONArray jsonArray1=response.getJSONArray("loginResult");
-                            JSONObject jsonObject1=jsonArray1.getJSONObject(0);
+                            JSONArray jsonArray1 = response.getJSONArray("loginResult");
+                            JSONObject jsonObject1 = jsonArray1.getJSONObject(0);
 
                             boolean Status = jsonObject1.getBoolean("Status");
                             String msg = jsonObject1.getString("Message");
 
 
-                            if (Status)
-                            {
+                            if (Status) {
                                 JSONArray jsonArray_payload = new JSONArray(jsonObject1.getString("Payload"));
-                                JSONObject payload =jsonArray_payload.getJSONObject(0);
+                                JSONObject payload = jsonArray_payload.getJSONObject(0);
 
                                 AppPrefrences.setUserId(ctx, payload.getString("UserID"));
                                 AppPrefrences.setEmail(ctx, payload.getString("email"));
@@ -201,24 +201,20 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
                                 JSONArray jsonArray = payload.getJSONArray("Store");
                                 AppPrefrences.setStoreJson(ctx, jsonArray.toString());
 
-                                if (jsonArray.length() > 0)
-                                {
+                                if (jsonArray.length() > 0) {
                                     DbManager.getInstance().openDatabase();
                                     DbManager.getInstance().deleteStoreDetails();
                                     JSONObject ob = jsonArray.getJSONObject(0);
                                     AppPrefrences.setMerchantId(ctx, ob.getString("merchantId"));
-                                    AppPrefrences.setAuditCODE(ctx,ob.getString("auditcode"));
+                                    AppPrefrences.setAuditCODE(ctx, ob.getString("auditcode"));
 
                                     // Locally Saving Start //
-                                    for(int i=0;i<jsonArray.length();i++)
-                                    {
+                                    for (int i = 0; i < jsonArray.length(); i++) {
                                         storeObject.add(jsonArray.getJSONObject(i));
                                     }
                                     new saveDatatoLocal().execute();
                                     // Locally Saving End //
-                                }
-                                else
-                                {
+                                } else {
                                     Toast.makeText(ctx, "No Store Assigned", Toast.LENGTH_SHORT).show();
                                 }
 
@@ -251,7 +247,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
 
 
         req.setRetryPolicy(new DefaultRetryPolicy(
-                5000,
+                10000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         MySingleton.getInstance(ctx).addToRequestQueue(req);
@@ -333,28 +329,23 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
         Log.d("LatLong", latitude + ", " + longitude);
     }
 
-    class saveDatatoLocal extends AsyncTask<String,Void,String>
-    {
+    class saveDatatoLocal extends AsyncTask<String, Void, String> {
         @Override
-        protected String doInBackground(String... strings)
-        {
+        protected String doInBackground(String... strings) {
             DbManager.getInstance().saveStoreDetails(storeObject.get(storePosition));
-            return storePosition+"";
+            return storePosition + "";
         }
 
         @Override
-        protected void onPostExecute(String s)
-        {
-            storePosition=storePosition+1;
-            if(storePosition<storeObject.size())
-            {
+        protected void onPostExecute(String s) {
+            storePosition = storePosition + 1;
+            if (storePosition < storeObject.size()) {
                 new saveDatatoLocal().execute();
-            }else
-            {
+            } else {
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
-                Log.e("Data","Saved Locally");
-                storePosition=0;
+                Log.e("Data", "Saved Locally");
+                storePosition = 0;
                 AppPrefrences.setIsLogin(ctx, true);
                 Intent i = new Intent(ctx, MainActivity.class);
                 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -363,7 +354,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
         }
     }
 
-    int storePosition=0;
-    ArrayList<JSONObject> storeObject=new ArrayList<>();
+    int storePosition = 0;
+    ArrayList<JSONObject> storeObject = new ArrayList<>();
 
 }

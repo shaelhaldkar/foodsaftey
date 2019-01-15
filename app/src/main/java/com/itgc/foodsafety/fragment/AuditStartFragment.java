@@ -71,7 +71,10 @@ import com.itgc.foodsafety.utils.AppPrefrences;
 import com.itgc.foodsafety.utils.AppUtils;
 import com.itgc.foodsafety.utils.BitmapHelper;
 import com.itgc.foodsafety.utils.FilePathUtils;
+import com.itgc.foodsafety.utils.ImageUtils;
 import com.itgc.foodsafety.utils.Vars;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import org.json.JSONObject;
 
@@ -93,6 +96,8 @@ import java.util.Map;
  */
 public class AuditStartFragment extends Fragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
+
+    public static final String TAG = AuditStartFragment.class.getCanonicalName();
     private GoogleApiClient mGoogleApiClient;
     private ArrayList<ArrayList<Answers>> lists;
     private double latitude, longitude;
@@ -103,7 +108,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     private Bundle b;
     private String category, formattedDate, Store_name, skip = "no", store_loc;
     private TextView audit_date, question, max_num, txt_title, txt_subcat, discription_txt, read_more;
-    private RadioButton rg_yes, rg_no, rg_partial,rdt_isfail;
+    private RadioButton rg_yes, rg_no, rg_partial, rdt_isfail;
     private AutoCompleteTextView edt_remark, edt_comment;
     private LinearLayout btn_previous, btn_next;
     private ImageView btn_camera, img_back, img_info, img_info1;
@@ -124,26 +129,26 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     private com.itgc.foodsafety.ui.LinearLayoutManager mLayoutManager;
     private Boolean isImg = false;
     private int audit_id = 0;
-    private String Previous_data = "",is_failed="0";
+    private String Previous_data = "", is_failed = "0";
     private int Image_count = 0;
     private EditText actions;
     private AlertDialog d;
     private static final int PICK_IMAGE_REQUEST_PERMISSION = 1;
-    private Uri fileUri;
+    //private Uri fileUri;
     private String picturePath;
     private File photoFile;
     public static int LOAD_CAMERA_RESULTS = 11;
     private ArrayList<String> imagesarray;
 
 
-    private ArrayList<CategoryQuestions> categoryQuestionsArrayList=new ArrayList<>();
-    private int questionPos=0;
-    private int questionSubCatId=0;
-    private int questionID=0;
-    private int maxSample=0;
+    private ArrayList<CategoryQuestions> categoryQuestionsArrayList = new ArrayList<>();
+    private int questionPos = 0;
+    private int questionSubCatId = 0;
+    private int questionID = 0;
+    private int maxSample = 0;
     private SampleAuditAdapter sampleAuditAdapter;
-    private ArrayList<SampleDetails> samples=new ArrayList<>();
-    boolean sampleBind =false;
+    private ArrayList<SampleDetails> samples = new ArrayList<>();
+    boolean sampleBind = false;
 
     @Override
     public void onAttach(Context context) {
@@ -189,22 +194,21 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         return view;
     }
 
-    private void setStartTime(){
-        String checkStartDateTime="SELECT " + DBHelper.DATE_TIME +" FROM " + DBHelper.STORE_START_TIME_TABLE + " WHERE " + DBHelper.STORE_ID +"=" + Store_id;
-        Cursor checkStartDate=DbManager.getInstance().getDetails(checkStartDateTime);
-        Log.e("StoreDateTime",checkStartDate.getCount()+"");
-        if(checkStartDate.getCount()<=0)
-        {
-            ContentValues contentValues=new ContentValues();
-            contentValues.put(DBHelper.DATE_TIME,getDateTime());
-            contentValues.put(DBHelper.STORE_ID,Store_id);
-            DbManager.getInstance().insertDetails(contentValues,DBHelper.STORE_START_TIME_TABLE);
+    private void setStartTime() {
+        String checkStartDateTime = "SELECT " + DBHelper.DATE_TIME + " FROM " + DBHelper.STORE_START_TIME_TABLE + " WHERE " + DBHelper.STORE_ID + "=" + Store_id;
+        Cursor checkStartDate = DbManager.getInstance().getDetails(checkStartDateTime);
+        Log.e("StoreDateTime", checkStartDate.getCount() + "");
+        if (checkStartDate.getCount() <= 0) {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(DBHelper.DATE_TIME, getDateTime());
+            contentValues.put(DBHelper.STORE_ID, Store_id);
+            DbManager.getInstance().insertDetails(contentValues, DBHelper.STORE_START_TIME_TABLE);
         }
     }
 
 
     private void setUpView(View view) {
-        rdt_isfail=(RadioButton) view.findViewById(R.id.rdt_isfail);
+        rdt_isfail = (RadioButton) view.findViewById(R.id.rdt_isfail);
         txt_skip = (CheckBox) view.findViewById(R.id.txt_skip);
         txt_title = (TextView) view.findViewById(R.id.txt_title);
         question = (TextView) view.findViewById(R.id.question);
@@ -246,10 +250,10 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
 
         edt_comment = (AutoCompleteTextView) view.findViewById(R.id.edt_comment);
         edt_remark = (AutoCompleteTextView) view.findViewById(R.id.edt_remark);
-        ArrayAdapter<String> remarks_data = new ArrayAdapter<String>(ctx,android.R.layout.simple_list_item_1, Vars.remarks);
+        ArrayAdapter<String> remarks_data = new ArrayAdapter<String>(ctx, android.R.layout.simple_list_item_1, Vars.remarks);
         edt_remark.setAdapter(remarks_data);
 
-        ArrayAdapter<String> comment_data = new ArrayAdapter<String>(ctx,android.R.layout.simple_list_item_1, Vars.comments);
+        ArrayAdapter<String> comment_data = new ArrayAdapter<String>(ctx, android.R.layout.simple_list_item_1, Vars.comments);
         edt_comment.setAdapter(comment_data);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.list_sample);
@@ -309,14 +313,11 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         rdt_isfail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(is_failed.equalsIgnoreCase("0"))
-                {
-                    is_failed="1";
+                if (is_failed.equalsIgnoreCase("0")) {
+                    is_failed = "1";
                     rdt_isfail.setChecked(true);
-                }
-                else
-                {
-                    is_failed="0";
+                } else {
+                    is_failed = "0";
                     rdt_isfail.setChecked(false);
                 }
             }
@@ -326,44 +327,37 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         AppPrefrences.setStartTime(ctx, getDateTime());
         btn_previous.setVisibility(View.INVISIBLE);
 
-        sampleAuditAdapter = new SampleAuditAdapter(samples,ctx,Store_id,Cat_id,questionID,AuditStartFragment.this);
+        sampleAuditAdapter = new SampleAuditAdapter(samples, ctx, Store_id, Cat_id, questionID, AuditStartFragment.this);
         mRecyclerView.setAdapter(sampleAuditAdapter);
     }
 
-    private void setSampleSpinnerData(int count)
-    {
+    private void setSampleSpinnerData(int count) {
         AppPrefrences.setStartTime(ctx, getDateTime());
-        list_sampleno.setAdapter(new ArrayAdapter<>(ctx, android.R.layout.simple_spinner_item,getSampleCount(count)));
+        list_sampleno.setAdapter(new ArrayAdapter<>(ctx, android.R.layout.simple_spinner_item, getSampleCount(count)));
     }
 
-    private ArrayList<Integer> getSampleCount(int sample_no)
-    {
+    private ArrayList<Integer> getSampleCount(int sample_no) {
         ArrayList<Integer> integers = new ArrayList<>();
-        if (sample_no > 0)
-        {
-            for (int i = 1; i < sample_no + 1; i++)
-            {
+        if (sample_no > 0) {
+            for (int i = 1; i < sample_no + 1; i++) {
                 integers.add(i);
             }
-        } else
-            {
+        } else {
             integers.add(1);
-            }
+        }
         return integers;
     }
 
-    private void setAdapter(int size)
-    {
-     if (size>samples.size())
-        {
-            int newItem=size-samples.size();
+    private void setAdapter(int size) {
+        if (size > samples.size()) {
+            int newItem = size - samples.size();
             for (int i = 0; i < newItem; i++) {
                 SampleDetails d = new SampleDetails();
                 d.setClicked(true);
                 d.setRateX(0);
-                d.setSampleCount((samples.size()+i+1));
+                d.setSampleCount((samples.size() + i + 1));
                 d.setSampleCurrentRate(0);
-                d.setSamplePos((samples.size()+i+1));
+                d.setSamplePos((samples.size() + i + 1));
                 d.setSampleRate(0);
                 d.setProduct_name("");
                 d.setMfdpkd("");
@@ -379,14 +373,13 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 samples.add(d);
             }
             sampleAuditAdapter.notifyDataSetChanged();
-        }else if(size<samples.size())
-        {
+        } else if (size < samples.size()) {
             samples.clear();
             for (int i = 0; i < size; i++) {
                 SampleDetails d = new SampleDetails();
                 d.setClicked(true);
                 d.setRateX(0);
-                d.setSampleCount((samples.size()+i+1));
+                d.setSampleCount((samples.size() + i + 1));
                 d.setSampleCurrentRate(0);
                 d.setSamplePos((i));
                 d.setSampleRate(0);
@@ -412,41 +405,36 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
 
     @Override
     public void onClick(View v) {
-        switch (v.getId())
-        {
+        switch (v.getId()) {
             case R.id.btn_next:
 
-                if(questionPos<=0)
-                {
-                    String checkStartDateTime="SELECT " + DBHelper.CATEGORY_START_DATE +" FROM " + DBHelper.CATEGORY_TBL_NAME + " WHERE " + DBHelper.STORE_ID +"=" + Store_id + " AND " + DBHelper.CATEGORY_ID +"=" + Cat_id + " AND " + DBHelper.CATEGORY_STATUS +"='Incomplete'";
-                    Cursor checkStartDate=DbManager.getInstance().getDetails(checkStartDateTime);
-                    Log.e("StartDateTime",checkStartDate.getCount()+"");
-                    if(checkStartDate.getCount()<=0)
-                    {
-                        ContentValues contentValues=new ContentValues();
-                        contentValues.put(DBHelper.CATEGORY_STATUS,"Incomplete");
-                        contentValues.put(DBHelper.CATEGORY_START_DATE,getDateTime());
-                        DbManager.getInstance().updateDetails(contentValues,DBHelper.CATEGORY_TBL_NAME,DBHelper.STORE_ID +"=" + Store_id + " AND " + DBHelper.CATEGORY_ID +"=" + Cat_id);
+                if (questionPos <= 0) {
+                    String checkStartDateTime = "SELECT " + DBHelper.CATEGORY_START_DATE + " FROM " + DBHelper.CATEGORY_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + Store_id + " AND " + DBHelper.CATEGORY_ID + "=" + Cat_id + " AND " + DBHelper.CATEGORY_STATUS + "='Incomplete'";
+                    Cursor checkStartDate = DbManager.getInstance().getDetails(checkStartDateTime);
+                    Log.e("StartDateTime", checkStartDate.getCount() + "");
+                    if (checkStartDate.getCount() <= 0) {
+                        ContentValues contentValues = new ContentValues();
+                        contentValues.put(DBHelper.CATEGORY_STATUS, "Incomplete");
+                        contentValues.put(DBHelper.CATEGORY_START_DATE, getDateTime());
+                        DbManager.getInstance().updateDetails(contentValues, DBHelper.CATEGORY_TBL_NAME, DBHelper.STORE_ID + "=" + Store_id + " AND " + DBHelper.CATEGORY_ID + "=" + Cat_id);
                     }
                 }
 
-                if(questionPos<(categoryQuestionsArrayList.size()-1))
-                {
-                    saveAnswer(Store_id,Cat_id,categoryQuestionsArrayList.get(questionPos).getQuestionId(),questionSubCatId,edt_comment.getText().toString(),edt_remark.getText().toString(),actions.getText().toString());
-                    questionPos=questionPos+1;
-                    txt_title.setText("Question No." + (questionPos+1) + "/" + String.valueOf(categoryQuestionsArrayList.size()));
+                if (questionPos < (categoryQuestionsArrayList.size() - 1)) {
+                    saveAnswer(Store_id, Cat_id, categoryQuestionsArrayList.get(questionPos).getQuestionId(), questionSubCatId, edt_comment.getText().toString(), edt_remark.getText().toString(), actions.getText().toString());
+                    questionPos = questionPos + 1;
+                    txt_title.setText("Question No." + (questionPos + 1) + "/" + String.valueOf(categoryQuestionsArrayList.size()));
                     btn_previous.setVisibility(View.VISIBLE);
                     getQuestionDetails(categoryQuestionsArrayList.get(questionPos).getQuestionId());
                     //txt_skip.setChecked(false);
                     //skip="no";
-                }else
-                {
-                    saveAnswer(Store_id,Cat_id,categoryQuestionsArrayList.get(questionPos).getQuestionId(),questionSubCatId,edt_comment.getText().toString(),edt_remark.getText().toString(),actions.getText().toString());
+                } else {
+                    saveAnswer(Store_id, Cat_id, categoryQuestionsArrayList.get(questionPos).getQuestionId(), questionSubCatId, edt_comment.getText().toString(), edt_remark.getText().toString(), actions.getText().toString());
                     Toast.makeText(ctx, "Audit complete.", Toast.LENGTH_LONG).show();
-                    ContentValues contentValues=new ContentValues();
-                    contentValues.put(DBHelper.CATEGORY_STATUS,"Complete");
-                    contentValues.put(DBHelper.CATEGORY_END_DATE,getDateTime());
-                    DbManager.getInstance().updateDetails(contentValues,DBHelper.CATEGORY_TBL_NAME,DBHelper.STORE_ID +"=" + Store_id + " AND " + DBHelper.CATEGORY_ID +"=" + Cat_id);
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put(DBHelper.CATEGORY_STATUS, "Complete");
+                    contentValues.put(DBHelper.CATEGORY_END_DATE, getDateTime());
+                    DbManager.getInstance().updateDetails(contentValues, DBHelper.CATEGORY_TBL_NAME, DBHelper.STORE_ID + "=" + Store_id + " AND " + DBHelper.CATEGORY_ID + "=" + Cat_id);
 
                     try {
                         Intent intent = new Intent("DraftsCount");
@@ -468,30 +456,36 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
 
             case R.id.btn_camera:
 
-                if (getAnswerImageCount(questionID)< 4)
-                    checkPermission();
-                else
+                if (getAnswerImageCount(questionID) < 4) {
+                    //checkPermission();
+
+                    CropImage.activity()
+                            .setGuidelines(CropImageView.Guidelines.ON)
+                            .setOutputCompressQuality(40)
+                            .start(getContext(), AuditStartFragment.this);
+
+
+                } else {
                     Toast.makeText(getActivity(), "Only four images are allowed", Toast.LENGTH_SHORT).show();
+
+                }
+
                 break;
 
             case R.id.btn_previous:
                 isClicked = false;
                 hideKeyboard(btn_previous);
-                if(questionPos==1)
-                {
+                if (questionPos == 1) {
                     btn_previous.setVisibility(View.INVISIBLE);
                 }
-                if (questionPos>=1)
-                {
-                    saveAnswer(Store_id,Cat_id,categoryQuestionsArrayList.get(questionPos).getQuestionId(),questionSubCatId,edt_comment.getText().toString(),edt_remark.getText().toString(),actions.getText().toString());
-                    questionPos=questionPos-1;
-                    txt_title.setText("Question No." + (questionPos+1) + "/" + String.valueOf(categoryQuestionsArrayList.size()));
+                if (questionPos >= 1) {
+                    saveAnswer(Store_id, Cat_id, categoryQuestionsArrayList.get(questionPos).getQuestionId(), questionSubCatId, edt_comment.getText().toString(), edt_remark.getText().toString(), actions.getText().toString());
+                    questionPos = questionPos - 1;
+                    txt_title.setText("Question No." + (questionPos + 1) + "/" + String.valueOf(categoryQuestionsArrayList.size()));
                     getQuestionDetails(categoryQuestionsArrayList.get(questionPos).getQuestionId());
                     //txt_skip.setChecked(false);
                     //skip="no";
-                }
-                else
-                {
+                } else {
                     Toast.makeText(ctx, "You are currently on the first question", Toast.LENGTH_LONG).show();
                 }
 
@@ -501,8 +495,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 break;
 
             case R.id.txt_skip:
-                if (txt_skip.isChecked())
-                {
+                if (txt_skip.isChecked()) {
                     txt_skip.setChecked(true);
                     skip = "yes";
                 } else {
@@ -520,12 +513,10 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 break;
 
             case R.id.read_more:
-                if (read_more.getText().toString().equalsIgnoreCase("more"))
-                {
+                if (read_more.getText().toString().equalsIgnoreCase("more")) {
                     discription_txt.setVisibility(View.VISIBLE);
                     read_more.setText("Hide");
-                } else
-                    {
+                } else {
                     discription_txt.setVisibility(View.GONE);
                     read_more.setText("More");
                 }
@@ -599,12 +590,10 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         hideKeyboard(btn_next);
-                        if (AppUtils.isDraft)
-                        {
+                        if (AppUtils.isDraft) {
                             insertDraft();
                             getFragmentManager().beginTransaction().replace(R.id.container_body, new DraftsFragment()).addToBackStack("Drafts").commit();
-                        } else
-                            {
+                        } else {
                             insertDraft();
                             Intent intent = new Intent("DraftsCount");
                             ctx.sendBroadcast(intent);
@@ -670,9 +659,9 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             ex.printStackTrace();
         }
 
-        fileUri = FileProvider.getUriForFile(ctx,
-                "com.itgc.foodsafety.provider", //(use your app signature + ".provider" )
-                photoFile);
+//        fileUri = FileProvider.getUriForFile(ctx,
+//                "com.itgc.foodsafety.provider", //(use your app signature + ".provider" )
+//                photoFile);
 
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
@@ -680,13 +669,13 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         Intent takePictureIntent = new Intent(
                 MediaStore.ACTION_IMAGE_CAPTURE);
 
-       // Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-      //  getActivity().startActivityForResult(cameraIntent, LOAD_CAMERA_RESULTS);
+        // Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        //  getActivity().startActivityForResult(cameraIntent, LOAD_CAMERA_RESULTS);
 
         if (photoFile != null) {
             if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-               getActivity().startActivityForResult(takePictureIntent, LOAD_CAMERA_RESULTS);
+                getActivity().startActivityForResult(takePictureIntent, LOAD_CAMERA_RESULTS);
             }
         }
     }
@@ -697,8 +686,8 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         File dir = new File(Environment.getExternalStorageDirectory(), "FoodSafety");
         if (!dir.exists())
             dir.mkdir();
-        String name= getDateTime1()+"_"+AppPrefrences.getMerchatId(ctx)+"_"+AppPrefrences.getAuditCODE(ctx)+
-                "_"+Store_id+"_"+Cat_id+"_"+questionSubCatId+ ".jpg";
+        String name = getDateTime1() + "_" + AppPrefrences.getMerchatId(ctx) + "_" + AppPrefrences.getAuditCODE(ctx) +
+                "_" + Store_id + "_" + Cat_id + "_" + questionSubCatId + ".jpg";
         File pictureFile = new File(dir, "foodsafety_" + System.currentTimeMillis() + ".jpg");
 
 
@@ -739,142 +728,46 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-       // Toast.makeText(ctx, requestCode+ "", Toast.LENGTH_SHORT).show();
-
-        if (requestCode == TAKE_PHOTO_CODE && resultCode == Activity.RESULT_OK && data != null) {
-            try {
-                Uri uri=data.getData();
-                String imageUrl = FilePathUtils.getPath(getActivity(), uri);
-
-               // saveimagepath(imageUrl);
-
-                String name= getDateTime1()+"_"+AppPrefrences.getMerchatId(ctx)+"_"+AppPrefrences.getAuditCODE(ctx)+
-                        "_"+Store_id+"_"+questionID+"_"+Cat_id+"_"+questionSubCatId+ ".jpg";
-                saveanswerImages(name+">>"+ imageUrl);
-//                Bitmap photo = (Bitmap) data.getExtras().get("data");
-//                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-//                photo.compress(Bitmap.CompressFormat.JPEG, 40, bos);
-//                byte[] dataOfImage = bos.toByteArray();
-//                encodedImage = Base64.encodeToString(dataOfImage, Base64.DEFAULT);
-//                saveanswerImages(encodedImage);
-//              //  saveimagepath();
-                encodedImage = "";
-                int imsize = getAnswerImageCount(questionID);
-                Toast.makeText(getContext(), imsize + "/4 Images Added", Toast.LENGTH_SHORT).show();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else if (requestCode == GALLERY_IMG && resultCode == Activity.RESULT_OK && data != null) {
-            try {
-                Uri uri = data.getData();
-
-                String imageUrl = FilePathUtils.getPath(getActivity(), uri);
-               // saveimagepath(imageUrl);
-
-                String name= getDateTime1()+"_"+AppPrefrences.getMerchatId(ctx)+"_"+AppPrefrences.getAuditCODE(ctx)+
-                        "_"+Store_id+"_"+questionID+"_"+Cat_id+"_"+questionSubCatId+ ".jpg";
-//                Bitmap scalledBitmap = BitmapHelper.decodeSampledBitmapFromResource(imageUrl, 300, 300); //scall the bitmap into given size
-//                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-//                scalledBitmap.compress(Bitmap.CompressFormat.JPEG, 40, bos);
-//                byte[] dataOfImage = bos.toByteArray();
-//                encodedImage = Base64.encodeToString(dataOfImage, Base64.DEFAULT);
-                saveanswerImages(name+">>"+ imageUrl);
-    //            encodedImage = "";
-                int imsize = getAnswerImageCount(questionID);
-                Toast.makeText(getContext(), imsize + "/4 Images Added", Toast.LENGTH_SHORT).show();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        } else if (requestCode == LOAD_CAMERA_RESULTS
-                && resultCode == Activity.RESULT_OK) {
-            galleryAddPic();
-            if (photoFile != null) {
-                Log.d("", "imagefilepath notcrop " + photoFile.getAbsolutePath());
+        //super.onActivityResult(requestCode, resultCode, data);
 
 
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == Activity.RESULT_OK) {
+                Uri resultUri = result.getUri();
                 try {
-                  //  saveimagepath(photoFile.getAbsolutePath());
+                    File targetFile = ImageUtils.createImageFile(
+                            ctx,
+                            AppPrefrences.getMerchatId(ctx),
+                            AppPrefrences.getAuditCODE(ctx),
+                            String.valueOf(Store_id),
+                            String.valueOf(questionID),
+                            String.valueOf(Cat_id),
+                            String.valueOf(questionSubCatId)
 
-                    String name= getDateTime1()+"_"+AppPrefrences.getMerchatId(ctx)+"_"+AppPrefrences.getAuditCODE(ctx)+
-                            "_"+Store_id+"_"+questionID+"_"+Cat_id+"_"+questionSubCatId+ ".jpg";
-                    saveanswerImages(name+">>"+ photoFile.getAbsolutePath());
-                  //  Bitmap photo1 = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-         //           Bitmap photo = BitmapHelper.decodeSampledBitmapFromResource(photoFile.getAbsolutePath(), 300, 300); //scall the bitmap into given size
-      //              Matrix m=new Matrix();
-   //                 m.setRotate(rotationForImage(ctx,Uri.fromFile(photoFile)));
+                    );
 
-//                    photo=Bitmap.createBitmap(photo,0,0,photo.getWidth(),photo.getHeight(),m,true);
-//                   // Bitmap image = (Bitmap) data.getExtras().get("data");
-//                    if (photo != null) {
-//                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-//                        photo.compress(Bitmap.CompressFormat.JPEG, 40, bos);
-//                        byte[] dataOfImage = bos.toByteArray();
-//                        encodedImage = Base64.encodeToString(dataOfImage, Base64.DEFAULT);
-//                        saveanswerImages(encodedImage);
-//                        encodedImage = "";
-                        int imsize = getAnswerImageCount(questionID);
-                        Toast.makeText(getContext(), imsize + "/4 Images Added", Toast.LENGTH_SHORT).show();
-                   // }
-                    //else {
+                    saveImageLocal(resultUri, targetFile);
 
-
-                    //}
-                } catch (Exception e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }
-            else
-            {
-                Toast.makeText(getContext(), "Unable to save", Toast.LENGTH_SHORT).show();
-            }
 
 
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+                Log.e(TAG, error != null ? error.getMessage() : "Error in getting image in onActivityResult");
+            }
         }
 
     }
 
-
-    public static float rotationForImage(Context context, Uri uri) {
-        if (uri.getScheme().equals("content")) {
-            String[] projection = { MediaStore.Images.ImageColumns.ORIENTATION };
-            Cursor c = context.getContentResolver().query(
-                    uri, projection, null, null, null);
-            if (c.moveToFirst()) {
-                return c.getInt(0);
-            }
-        } else if (uri.getScheme().equals("file")) {
-            try {
-                ExifInterface exif = new ExifInterface(uri.getPath());
-                int rotation = (int)exifOrientationToDegrees(
-                        exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
-                                ExifInterface.ORIENTATION_NORMAL));
-                return rotation;
-            } catch (IOException e) {
-                Log.e("Error..", "Error checking exif", e);
-            }
-        }
-        return 0f;
-    }
-
-    private static float exifOrientationToDegrees(int exifOrientation) {
-        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
-            return 90;
-        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
-            return 180;
-        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
-            return 270;
-        }
-        return 0;
-    }
-
-    private void galleryAddPic() {
-        Intent mediaScanIntent = new Intent(
-                Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        mediaScanIntent.setData(fileUri);
-        getActivity().sendBroadcast(mediaScanIntent);
-
+    private void saveImageLocal(Uri resultUri, File targetFile) {
+        ImageUtils.saveImage(resultUri, targetFile.getAbsolutePath());
+        saveanswerImages(targetFile.getName() + ">>" + targetFile.getAbsolutePath());
+        encodedImage = "";
+        int imsize = getAnswerImageCount(questionID);
+        Toast.makeText(getContext(), imsize + "/4 Images Added", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -884,10 +777,9 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         FragmentDrawer.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
     }
 
-    private void restoreToolbar()
-    {
+    private void restoreToolbar() {
         MainActivity.mToolbar.setVisibility(View.GONE);
-        txt_title.setText("Question No." + (questionPos+1) + "/" + String.valueOf(categoryQuestionsArrayList.size()));
+        txt_title.setText("Question No." + (questionPos + 1) + "/" + String.valueOf(categoryQuestionsArrayList.size()));
     }
 
     private void insertDraft() {
@@ -895,10 +787,8 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     }
 
     @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-    {
-        switch (buttonView.getId())
-        {
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        switch (buttonView.getId()) {
             case R.id.rdt_yes:
                 if (isChecked)
                     mRecyclerView.setVisibility(View.GONE);
@@ -946,202 +836,129 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
 
     }
 
-    public void checkPermission() {
-
-        if ((ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
-                && (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
-                && (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
-            showOption();
-        } else {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                Toast.makeText(getActivity(), "These permissions requared for accessing you gallery and camera.", Toast.LENGTH_SHORT).show();
-            }
-
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA},
-                    PICK_IMAGE_REQUEST_PERMISSION);
-        }
-    }
-
-    private void showOption() {
-        final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-        dialog.setMessage("Add photo using");
-        dialog.setPositiveButton("Camera",
-                new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        doTakePhotoAction();
-                        d.dismiss();
-                    }
-                });
-
-        dialog.setNeutralButton("Gallery",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        openGallery();
-                    }
-                });
-
-        dialog.setNegativeButton("Cancel",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        d.dismiss();
-                    }
-                });
-        d = dialog.create();
-        d.show();
-    }
-
-    void openGallery() {
-        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-       getActivity().startActivityForResult(Intent.createChooser(galleryIntent, "Select Photo"), GALLERY_IMG);
-    }
-
-
     /////////////////// NEW ////////////////////////
 
-    private void getCategoryQuestion()
-    {
-        String query="SELECT " + DBHelper.QUESTION_ID + " FROM " + DBHelper.QUESTION_TBL_NAME +" WHERE " + DBHelper.STORE_ID +"=" + Store_id + " AND " + DBHelper.CATEGORY_ID +"=" + Cat_id;
+    private void getCategoryQuestion() {
+        String query = "SELECT " + DBHelper.QUESTION_ID + " FROM " + DBHelper.QUESTION_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + Store_id + " AND " + DBHelper.CATEGORY_ID + "=" + Cat_id;
         //Log.e("Query",query);
-        Cursor c=DbManager.getInstance().getDetails(query);
+        Cursor c = DbManager.getInstance().getDetails(query);
         //Log.e("Total Questions",c.getCount()+"");
-        if(c.getCount()>0)
-        {
+        if (c.getCount() > 0) {
             c.moveToFirst();
-            do
-            {
-                CategoryQuestions categoryQuestions=new CategoryQuestions();
+            do {
+                CategoryQuestions categoryQuestions = new CategoryQuestions();
                 categoryQuestions.setQuestionId(c.getInt(c.getColumnIndex(DBHelper.QUESTION_ID)));
                 categoryQuestionsArrayList.add(categoryQuestions);
             } while (c.moveToNext());
             getQuestionDetails(categoryQuestionsArrayList.get(questionPos).getQuestionId());
-        }
-        else
-        {
+        } else {
             Toast.makeText(ctx, "No Question Found in this section", Toast.LENGTH_LONG).show();
         }
     }
 
-    private void getQuestionDetails(int questionId)
-    {
-        int strId=0,catId=0,qId=0,sampleCount=1;
-        String query="SELECT * FROM " + DBHelper.QUESTION_TBL_NAME +" WHERE " + DBHelper.STORE_ID +"=" + Store_id + " AND " + DBHelper.CATEGORY_ID +"=" + Cat_id + " AND " + DBHelper.QUESTION_ID +"=" + questionId;
-        Cursor c=DbManager.getInstance().getDetails(query);
-        if(c.getCount()>0)
-        {
+    private void getQuestionDetails(int questionId) {
+        int strId = 0, catId = 0, qId = 0, sampleCount = 1;
+        String query = "SELECT * FROM " + DBHelper.QUESTION_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + Store_id + " AND " + DBHelper.CATEGORY_ID + "=" + Cat_id + " AND " + DBHelper.QUESTION_ID + "=" + questionId;
+        Cursor c = DbManager.getInstance().getDetails(query);
+        if (c.getCount() > 0) {
             c.moveToFirst();
-            do
-            {
+            do {
                 question.setText(c.getString(c.getColumnIndex(DBHelper.QUESTION_TEXT)));
                 txt_subcat.setText(category + "/" + c.getString(c.getColumnIndex(DBHelper.QUESTION_SUB_CAT_NAME)));
                 discription_txt.setText(c.getString(c.getColumnIndex(DBHelper.QUESTION_DESC)));
-                questionSubCatId=c.getInt(c.getColumnIndex(DBHelper.QUESTION_SUB_CAT_ID));
-                catId=c.getInt(c.getColumnIndex(DBHelper.CATEGORY_ID));
-                strId=c.getInt(c.getColumnIndex(DBHelper.STORE_ID));
-                qId=c.getInt(c.getColumnIndex(DBHelper.QUESTION_ID));
-                questionID=qId;
-                sampleCount=c.getInt(c.getColumnIndex(DBHelper.QUESTION_SAMPLES));
-                type=Integer.parseInt(c.getString(c.getColumnIndex(DBHelper.QUESTION_TYPE)));
+                questionSubCatId = c.getInt(c.getColumnIndex(DBHelper.QUESTION_SUB_CAT_ID));
+                catId = c.getInt(c.getColumnIndex(DBHelper.CATEGORY_ID));
+                strId = c.getInt(c.getColumnIndex(DBHelper.STORE_ID));
+                qId = c.getInt(c.getColumnIndex(DBHelper.QUESTION_ID));
+                questionID = qId;
+                sampleCount = c.getInt(c.getColumnIndex(DBHelper.QUESTION_SAMPLES));
+                type = Integer.parseInt(c.getString(c.getColumnIndex(DBHelper.QUESTION_TYPE)));
                 rdt_isfail.setChecked(false);
-                maxSample=sampleCount;
+                maxSample = sampleCount;
             } while (c.moveToNext());
 
             if (type == 1) {
                 rg1.setVisibility(View.GONE);
-                       lin_audit.setVisibility(View.GONE);
-            } else if (type ==  2) {
-                rg1.setVisibility(View.VISIBLE);
-                      lin_audit.setVisibility(View.VISIBLE);
-         //       samples.get(0).setIs_temp_visible(false);
-
-            }
-            else
-            {
+                lin_audit.setVisibility(View.GONE);
+            } else if (type == 2) {
                 rg1.setVisibility(View.VISIBLE);
                 lin_audit.setVisibility(View.VISIBLE);
-        //        samples.get(0).setIs_temp_visible(true);
+                //       samples.get(0).setIs_temp_visible(false);
+
+            } else {
+                rg1.setVisibility(View.VISIBLE);
+                lin_audit.setVisibility(View.VISIBLE);
+                //        samples.get(0).setIs_temp_visible(true);
             }
 
             setSampleSpinnerData(sampleCount);
-            getQuestionAnswer(strId,catId,qId);
+            getQuestionAnswer(strId, catId, qId);
         }
     }
 
-    private void getQuestionAnswer(int storeId,int categoryId,int questionId)
-    {
-        String answerQuery="SELECT * FROM " + DBHelper.ANSWER_TBL_NAME + " WHERE " +
+    private void getQuestionAnswer(int storeId, int categoryId, int questionId) {
+        String answerQuery = "SELECT * FROM " + DBHelper.ANSWER_TBL_NAME + " WHERE " +
                 DBHelper.STORE_ID + "=" + storeId + " AND " +
                 DBHelper.CATEGORY_ID + "=" + categoryId + " AND " +
-                DBHelper.QUESTION_ID + "=" +questionId;
+                DBHelper.QUESTION_ID + "=" + questionId;
 
-        Log.e("Answer Query",answerQuery);
-        Cursor answer=DbManager.getInstance().getDetails(answerQuery);
-        if(answer.getCount()>0)
-        {
-            Log.e("Answer","Available");
+        Log.e("Answer Query", answerQuery);
+        Cursor answer = DbManager.getInstance().getDetails(answerQuery);
+        if (answer.getCount() > 0) {
+            Log.e("Answer", "Available");
             answer.moveToFirst();
             //do {
-                Log.e("Answer",answer.getString(answer.getColumnIndex(DBHelper.STORE_ID)) + " " +answer.getString(answer.getColumnIndex(DBHelper.CATEGORY_ID)) + " " +answer.getString(answer.getColumnIndex(DBHelper.QUESTION_ID)) + " " +answer.getString(answer.getColumnIndex(DBHelper.ANSWER_COMMENT)) + " " + answer.getString(answer.getColumnIndex(DBHelper.ANSWER_REMARK)) + " " + answer.getString(answer.getColumnIndex(DBHelper.ANSWER_ACTION)) + " " + answer.getString(answer.getColumnIndex(DBHelper.ANSWER_DATETIME)));
+            Log.e("Answer", answer.getString(answer.getColumnIndex(DBHelper.STORE_ID)) + " " + answer.getString(answer.getColumnIndex(DBHelper.CATEGORY_ID)) + " " + answer.getString(answer.getColumnIndex(DBHelper.QUESTION_ID)) + " " + answer.getString(answer.getColumnIndex(DBHelper.ANSWER_COMMENT)) + " " + answer.getString(answer.getColumnIndex(DBHelper.ANSWER_REMARK)) + " " + answer.getString(answer.getColumnIndex(DBHelper.ANSWER_ACTION)) + " " + answer.getString(answer.getColumnIndex(DBHelper.ANSWER_DATETIME)));
             //}while (answer.moveToNext());
             edt_comment.setText(answer.getString(answer.getColumnIndex(DBHelper.ANSWER_COMMENT)));
             edt_remark.setText(answer.getString(answer.getColumnIndex(DBHelper.ANSWER_REMARK)));
             actions.setText(answer.getString(answer.getColumnIndex(DBHelper.ANSWER_ACTION)));
-            String skipInfo=answer.getString(answer.getColumnIndex(DBHelper.ANSWER_QUES_SKIP));
+            String skipInfo = answer.getString(answer.getColumnIndex(DBHelper.ANSWER_QUES_SKIP));
 
 
             int checked = Integer.parseInt(answer.getString(answer.getColumnIndex(DBHelper.ANSWER_TYPE)));
-            if (checked==0) {
+            if (checked == 0) {
                 rg_yes.setChecked(true);
-            } else if (checked==1) {
+            } else if (checked == 1) {
                 rg_no.setChecked(true);
             } else {
                 rg_partial.setChecked(true);
             }
 
-            if(skipInfo.equalsIgnoreCase("no")){
-                skip="no";
+            if (skipInfo.equalsIgnoreCase("no")) {
+                skip = "no";
                 txt_skip.setChecked(false);
-            }else {
-                skip="yes";
+            } else {
+                skip = "yes";
                 txt_skip.setChecked(true);
             }
 
-            int sample=answer.getInt(answer.getColumnIndex(DBHelper.ANSWER_NO_SAMPLE));
+            int sample = answer.getInt(answer.getColumnIndex(DBHelper.ANSWER_NO_SAMPLE));
             if (type == 1) {
                 rg1.setVisibility(View.GONE);
-                       lin_audit.setVisibility(View.GONE);
-            } else if (type ==  2|| type==3) {
+                lin_audit.setVisibility(View.GONE);
+            } else if (type == 2 || type == 3) {
                 rg1.setVisibility(View.VISIBLE);
-                      lin_audit.setVisibility(View.VISIBLE);
+                lin_audit.setVisibility(View.VISIBLE);
             }
 
 
-            list_sampleno.setSelection(sample-1);
+            list_sampleno.setSelection(sample - 1);
 
-            String sampleQuery="SELECT * FROM " + DBHelper.AUDIT_SAMPLE_TBL_NAME + " WHERE " +
+            String sampleQuery = "SELECT * FROM " + DBHelper.AUDIT_SAMPLE_TBL_NAME + " WHERE " +
                     DBHelper.STORE_ID + "=" + storeId + " AND " +
                     DBHelper.CATEGORY_ID + "=" + categoryId + " AND " +
-                    DBHelper.QUESTION_ID + "=" +questionId;
-            Cursor samplesCursor=DbManager.getInstance().getDetails(sampleQuery);
-            Log.e("Total Samples",samplesCursor.getCount()+"");
-            if(samplesCursor.getCount()>0)
-            {
+                    DBHelper.QUESTION_ID + "=" + questionId;
+            Cursor samplesCursor = DbManager.getInstance().getDetails(sampleQuery);
+            Log.e("Total Samples", samplesCursor.getCount() + "");
+            if (samplesCursor.getCount() > 0) {
                 samples.clear();
                 samplesCursor.moveToFirst();
-                do
-                {
-                    SampleDetails d=new SampleDetails();
-                    if(type==3)
-                    {
+                do {
+                    SampleDetails d = new SampleDetails();
+                    if (type == 3) {
                         d.setIs_temp_visible(true);
-                    }
-                    else
-                    {
+                    } else {
                         d.setIs_temp_visible(false);
                     }
 
@@ -1161,32 +978,28 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                     d.setSampleCurrentRate(samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_CURRENT_RATE)));
 //                    d.setIs_sample_failed(Integer.parseInt(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.is_sample_failed))));
                     samples.add(d);
-                    Log.e("Samples Rates",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_CURRENT_RATE))+"");
-                }while (samplesCursor.moveToNext());
+                    Log.e("Samples Rates", samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_CURRENT_RATE)) + "");
+                } while (samplesCursor.moveToNext());
 
-               // sampleAuditAdapter.setData(samples);
-               // sampleAuditAdapter = new SampleAuditAdapter(samples,ctx,Store_id,Cat_id,questionID,AuditStartFragment.this);
+                // sampleAuditAdapter.setData(samples);
+                // sampleAuditAdapter = new SampleAuditAdapter(samples,ctx,Store_id,Cat_id,questionID,AuditStartFragment.this);
                 sampleAuditAdapter.notifyDataSetChanged();
             }
 
-        }else
-        {
-            Log.e("Answer","Not Available");
+        } else {
+            Log.e("Answer", "Not Available");
             edt_comment.setText("");
             edt_remark.setText("");
             actions.setText("");
             rg_yes.setChecked(true);
-            skip="no";
+            skip = "no";
             txt_skip.setChecked(false);
             samples.clear();
 
-            SampleDetails d=new SampleDetails();
-            if(type==3)
-            {
+            SampleDetails d = new SampleDetails();
+            if (type == 3) {
                 d.setIs_temp_visible(true);
-            }
-            else
-            {
+            } else {
                 d.setIs_temp_visible(false);
             }
             samples.add(d);
@@ -1197,15 +1010,13 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         answer.close();
     }
 
-    private void saveAnswer(int storeId,int categoryId,int questionId,int subCatId,String comment,String remark,String action)
-    {
+    private void saveAnswer(int storeId, int categoryId, int questionId, int subCatId, String comment, String remark, String action) {
         String currentDateTime = new SimpleDateFormat("dd MMM yyyy HH:mm a").format(Calendar.getInstance().getTime());
-        Cursor checkIfExists=DbManager.getInstance().getDetails("SELECT * FROM " + DBHelper.ANSWER_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + storeId + " AND " +
-                                                                                                                          DBHelper.CATEGORY_ID + "=" + categoryId + " AND " +
-                                                                                                                          DBHelper.QUESTION_ID + "=" +questionId );
-        if(checkIfExists.getCount()>0)
-        {
-            Log.e("Answer Available"," So Update The Existing Answer");
+        Cursor checkIfExists = DbManager.getInstance().getDetails("SELECT * FROM " + DBHelper.ANSWER_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + storeId + " AND " +
+                DBHelper.CATEGORY_ID + "=" + categoryId + " AND " +
+                DBHelper.QUESTION_ID + "=" + questionId);
+        if (checkIfExists.getCount() > 0) {
+            Log.e("Answer Available", " So Update The Existing Answer");
             ContentValues c = new ContentValues();
             c.put(DBHelper.ANSWER_COMMENT, comment);
             c.put(DBHelper.ANSWER_REMARK, remark);
@@ -1218,15 +1029,14 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             c.put(DBHelper.ANSWER_MAX_SAMPLE, maxSample);
             c.put(DBHelper.ANSWER_NO_SAMPLE, sample_selected);
             c.put(DBHelper.ANSWER_QUES_SKIP, skip);
-            c.put(DBHelper.ANSWER_SUBCAT_ID,subCatId);
-            c.put(DBHelper.SEC_EXISTS,"1");
-            c.put(DBHelper.QUESTION_FAIL,is_failed);
+            c.put(DBHelper.ANSWER_SUBCAT_ID, subCatId);
+            c.put(DBHelper.SEC_EXISTS, "1");
+            c.put(DBHelper.QUESTION_FAIL, is_failed);
             c.put(DBHelper.ANSWER_CAT_TYPE, type);
 
-            DbManager.getInstance().updateDetails(c,DBHelper.ANSWER_TBL_NAME,DBHelper.STORE_ID +"=" + storeId + " AND " + DBHelper.CATEGORY_ID +"=" + categoryId+ " AND " + DBHelper.QUESTION_ID + "=" +questionId );
-        }else
-        {
-            Log.e("Answer Not Available"," So Inserting Answer");
+            DbManager.getInstance().updateDetails(c, DBHelper.ANSWER_TBL_NAME, DBHelper.STORE_ID + "=" + storeId + " AND " + DBHelper.CATEGORY_ID + "=" + categoryId + " AND " + DBHelper.QUESTION_ID + "=" + questionId);
+        } else {
+            Log.e("Answer Not Available", " So Inserting Answer");
             ContentValues c = new ContentValues();
             c.put(DBHelper.STORE_ID, storeId);
             c.put(DBHelper.CATEGORY_ID, categoryId);
@@ -1243,38 +1053,35 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             c.put(DBHelper.ANSWER_MAX_SAMPLE, maxSample);
             c.put(DBHelper.ANSWER_NO_SAMPLE, sample_selected);
             c.put(DBHelper.ANSWER_QUES_SKIP, skip);
-            c.put(DBHelper.SEC_EXISTS,"1");
-            c.put(DBHelper.QUESTION_FAIL,is_failed);
+            c.put(DBHelper.SEC_EXISTS, "1");
+            c.put(DBHelper.QUESTION_FAIL, is_failed);
             c.put(DBHelper.ANSWER_CAT_TYPE, type);
             DbManager.getInstance().insertDetails(c, DBHelper.ANSWER_TBL_NAME);
         }
-        saveSampleAudits(storeId,categoryId,questionId);
+        saveSampleAudits(storeId, categoryId, questionId);
     }
 
-    private void saveSampleAudits(int storeId,int categoryId,int questionId)
-    {
-        DbManager.getInstance().deleteDetails(DBHelper.AUDIT_SAMPLE_TBL_NAME,DBHelper.STORE_ID +"=" + storeId + " AND " + DBHelper.CATEGORY_ID +"=" + categoryId + " AND " + DBHelper.QUESTION_ID +"=" + questionId);
-        if(checkRadio()>0)
-        {
-            Log.e("Partial","Checked");
+    private void saveSampleAudits(int storeId, int categoryId, int questionId) {
+        DbManager.getInstance().deleteDetails(DBHelper.AUDIT_SAMPLE_TBL_NAME, DBHelper.STORE_ID + "=" + storeId + " AND " + DBHelper.CATEGORY_ID + "=" + categoryId + " AND " + DBHelper.QUESTION_ID + "=" + questionId);
+        if (checkRadio() > 0) {
+            Log.e("Partial", "Checked");
 
-            for (int i = 0; i < samples.size(); i++)
-            {
+            for (int i = 0; i < samples.size(); i++) {
                 ContentValues c = new ContentValues();
                 c.put(DBHelper.STORE_ID, storeId);
                 c.put(DBHelper.CATEGORY_ID, categoryId);
                 c.put(DBHelper.QUESTION_ID, questionId);
                 c.put(DBHelper.SAMPLE_IS_CLICKED, "true");
                 c.put(DBHelper.SAMPLE_POS, samples.get(i).getSamplePos());
-                c.put(DBHelper.NO_SAMPLE_PRODUCT,samples.get(i).getNo_sample_product());
-                c.put(DBHelper.PRODUCCT_NAME,samples.get(i).getProduct_name());
-                c.put(DBHelper.BRAND_NAME,samples.get(i).getBrand_name());
-                c.put(DBHelper.MFDPKD,samples.get(i).getMfdpkd());
-                c.put(DBHelper.MFDDATA,samples.get(i).getMfd_date());
-                c.put(DBHelper.BB_EXP,samples.get(i).getBb_exp());
-                c.put(DBHelper.BBEXPDATA,samples.get(i).getBb_exp_date());
-                c.put(DBHelper.SELFLIFE,samples.get(i).getShellife_value());
-                c.put(DBHelper.TEMPERATURE,samples.get(i).getTemperature());
+                c.put(DBHelper.NO_SAMPLE_PRODUCT, samples.get(i).getNo_sample_product());
+                c.put(DBHelper.PRODUCCT_NAME, samples.get(i).getProduct_name());
+                c.put(DBHelper.BRAND_NAME, samples.get(i).getBrand_name());
+                c.put(DBHelper.MFDPKD, samples.get(i).getMfdpkd());
+                c.put(DBHelper.MFDDATA, samples.get(i).getMfd_date());
+                c.put(DBHelper.BB_EXP, samples.get(i).getBb_exp());
+                c.put(DBHelper.BBEXPDATA, samples.get(i).getBb_exp_date());
+                c.put(DBHelper.SELFLIFE, samples.get(i).getShellife_value());
+                c.put(DBHelper.TEMPERATURE, samples.get(i).getTemperature());
                 c.put(DBHelper.IS_SAMPLE_CLICKED, samples.get(i).getIs_sample_failed());
                 c.put(DBHelper.SAMPLE_COUNT, samples.get(i).getSampleCount());
                 c.put(DBHelper.SAMPLE_CURRENT_RATE, samples.get(i).getSampleCurrentRate());
@@ -1283,37 +1090,25 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         }
     }
 
-    private int getAnswerImageCount(int questionId)
-    {
-        String query="SELECT * FROM " + DBHelper.ANSWER_IMAGE_TBL_NAME +" WHERE " + DBHelper.STORE_ID +"=" + Store_id + " AND " + DBHelper.CATEGORY_ID +"=" + Cat_id + " AND " + DBHelper.QUESTION_ID +"=" + questionId;
-        Cursor c=DbManager.getInstance().getDetails(query);
+    private int getAnswerImageCount(int questionId) {
+        String query = "SELECT * FROM " + DBHelper.ANSWER_IMAGE_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + Store_id + " AND " + DBHelper.CATEGORY_ID + "=" + Cat_id + " AND " + DBHelper.QUESTION_ID + "=" + questionId;
+        Cursor c = DbManager.getInstance().getDetails(query);
         //Toast.makeText(ctx,"Image Count "+ c.getCount()+"", Toast.LENGTH_SHORT).show();
         return c.getCount();
     }
 
-    private void saveanswerImages(String imageString)
-    {
-        ContentValues c=new ContentValues();
-        c.put(DBHelper.STORE_ID,Store_id);
-        c.put(DBHelper.CATEGORY_ID,Cat_id);
-        c.put(DBHelper.QUESTION_ID,questionID);
-        c.put(DBHelper.ANSWER_IMAGE,imageString);
-        DbManager.getInstance().insertDetails(c,DBHelper.ANSWER_IMAGE_TBL_NAME);
+    private void saveanswerImages(String imageString) {
+        ContentValues c = new ContentValues();
+        c.put(DBHelper.STORE_ID, Store_id);
+        c.put(DBHelper.CATEGORY_ID, Cat_id);
+        c.put(DBHelper.QUESTION_ID, questionID);
+        c.put(DBHelper.ANSWER_IMAGE, imageString);
+        DbManager.getInstance().insertDetails(c, DBHelper.ANSWER_IMAGE_TBL_NAME);
     }
 
-//    private void saveimagepath(String path)
-//    {
-//        ContentValues c=new ContentValues();
-//        c.put(DBHelper.STORE_ID,Store_id);
-//        c.put(DBHelper.CATEGORY_ID,Cat_id);
-//        c.put(DBHelper.QUESTION_ID,questionID);
-//        c.put(DBHelper.ANSWER_PATH,path);
-//        DbManager.getInstance().insertDetails(c,DBHelper.ANSWER_IMAGE_TBL_PATH);
-//    }
 
-    public void updateSamples(int pos,int value,String no_sample_product,String product_name,String brand_name,
-                              String mfdpkd,String mfd_date,String bb_exp,String bb_expdate,int Selflife_value,String temperature,int sample_value_fail)
-    {
+    public void updateSamples(int pos, int value, String no_sample_product, String product_name, String brand_name,
+                              String mfdpkd, String mfd_date, String bb_exp, String bb_expdate, int Selflife_value, String temperature, int sample_value_fail) {
         samples.get(pos).setSampleCurrentRate(value);
         samples.get(pos).setNo_sample_product(no_sample_product);
         samples.get(pos).setProduct_name(product_name);
@@ -1325,22 +1120,8 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         samples.get(pos).setShellife_value(Selflife_value);
         samples.get(pos).setTemperature(temperature);
         samples.get(pos).setIs_sample_failed(sample_value_fail);
-        for(int i=0;i<samples.size();i++)
-        {
-            Log.e("Sample Rate",samples.get(i).getSampleCurrentRate()+"");
+        for (int i = 0; i < samples.size(); i++) {
+            Log.e("Sample Rate", samples.get(i).getSampleCurrentRate() + "");
         }
     }
-
-    public void updateSamplesRateX(int pos,int value)
-    {
-//        samples.get(pos).setSampleCurrentRate(value);
-//        for(int i=0;i<samples.size();i++)
-//        {
-//            Log.e("Sample Rate",samples.get(i).getSampleRate()+"");
-//        }
-        Log.e("Sample Rate X",value+"");
-    }
-
-
-
 }

@@ -4,7 +4,7 @@
     "CognitoIdentity": {
       "Default": {
 
-        "PoolId": "us-east-1:65679f01-f7c0-41ac-a039-7dd38b56865d",
+        "PoolId": "us-east-1:fdf43403-cbd4-4a11-ac3e-c53cef3ede43",
         "Region": "us-east-1"
       }
     }
@@ -16,7 +16,7 @@
   },
   "S3TransferUtility": {
     "Default": {
-      "Bucket": "foodsaftyauditimage",
+      "Bucket": "test-app",
       "Region": "us-east-1"
     }
   }

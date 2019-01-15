@@ -18,8 +18,7 @@ import java.io.File;
  * Created by anil on 13/04/18.
  */
 
-public class S3FileUploadHelper
-{
+public class S3FileUploadHelper {
 
     private static final String TAG = S3FileUploadHelper.class.getSimpleName();
 
@@ -28,24 +27,26 @@ public class S3FileUploadHelper
     String fileName;
 
 
-
     public S3FileUploadHelper(Context context) {
         this.context = context;
     }
 
-    public void upload(String sourceFilePath, String fileName1)
-    {
+    public void upload(String sourceFilePath, String fileName1) {
         ClientConfiguration s3Config = new ClientConfiguration();
-        s3Config.setConnectionTimeout(90000);
-        s3Config.setSocketTimeout(90000);
-        s3Config.setMaxConnections(2);
+        //s3Config.setConnectionTimeout(90000);
+        s3Config.setSocketTimeout(2 * 60 * 1000);
+        //s3Config.setMaxConnections(2);
 
-        this.fileName=fileName1;
+        AmazonS3Client s3Client = new AmazonS3Client(AWSMobileClient.getInstance()
+                .getCredentialsProvider(), s3Config);
+
+
+        this.fileName = fileName1;
         TransferUtility transferUtility =
                 TransferUtility.builder()
                         .context(context.getApplicationContext())
                         .awsConfiguration(AWSMobileClient.getInstance().getConfiguration())
-                        .s3Client(new AmazonS3Client(AWSMobileClient.getInstance().getCredentialsProvider(),s3Config))
+                        .s3Client(s3Client)
                         .build();
 
         TransferObserver uploadObserver =
@@ -60,9 +61,9 @@ public class S3FileUploadHelper
             public void onStateChanged(int id, TransferState state) {
                 if (TransferState.COMPLETED == state) {
                     // Handle a completed upload.
-                   // AppLogger.d("YourActivity", "s3 file transfer completed");
+                    // AppLogger.d("YourActivity", "s3 file transfer completed");
 
-                    if (transferListener != null){
+                    if (transferListener != null) {
                         transferListener.onSuccess(id, state, fileName);
                     }
 
@@ -78,7 +79,7 @@ public class S3FileUploadHelper
                 Log.d("YourActivity", "ID:" + id + " bytesCurrent: " + bytesCurrent
                         + " bytesTotal: " + bytesTotal + " " + percentDone + "%");
 
-                if (transferListener != null){
+                if (transferListener != null) {
                     transferListener.onProgressChanged(id, bytesCurrent, bytesTotal);
                 }
             }
@@ -86,12 +87,12 @@ public class S3FileUploadHelper
             @Override
             public void onError(int id, Exception ex) {
 
-                if (transferListener != null){
+                if (transferListener != null) {
                     transferListener.onError(id, ex);
                 }
                 // Handle errors
                 ex.printStackTrace();
-           //     AppLogger.d("YourActivity", "s3 file transfer error");
+                //     AppLogger.d("YourActivity", "s3 file transfer error");
 
             }
 

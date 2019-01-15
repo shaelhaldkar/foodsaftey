@@ -68,12 +68,12 @@ import static android.content.Context.LOCATION_SERVICE;
 /**
  * Created by root on 4/11/15.
  */
-public class Submit_report extends Fragment implements View.OnClickListener  {
+public class Submit_report extends Fragment implements View.OnClickListener {
     public static final int SIGNATURE_ACTIVITY = 4;
     private Context ctx;
     private EditText auditerNameEditText, auditerContactNumberEditText;
-    private Button signatureButton, submitReport, signatureButton1,saveLocally,submitimagebutton;
-    private String auditerName, auditerId, auditerContactNumber, Store_name, audit_sign,data="",startTime,endTime,storeStartTime="";
+    private Button signatureButton, submitReport, signatureButton1, saveLocally, submitimagebutton;
+    private String auditerName, auditerId, auditerContactNumber, Store_name, audit_sign, data = "", startTime, endTime, storeStartTime = "";
     private ArrayList<Answers> answersArrayList;
     private Bundle b;
     private int Cat_id, Store_id;
@@ -85,19 +85,18 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
     private ArrayList<String> imagename;
 
 
-
-    private String auditId="";
-    String auditor_filename="",storefilename="";
-    private String categoryId="";
-    private String storeId="";
-    private ArrayList<String> categoryIsList=new ArrayList<>();
-    private int idPosition=0;
+    private String auditId = "";
+    String auditor_filename = "", storefilename = "";
+    private String categoryId = "";
+    private String storeId = "";
+    private ArrayList<String> categoryIsList = new ArrayList<>();
+    private int idPosition = 0;
     JSONObject o;
     TextView imagecount;
-    int image_counter=1;
-    String image_progressdialog="Please wait...";
+    int image_counter = 1;
+    String image_progressdialog = "Please wait...";
 
-    int a=0,bb=0;
+    int a = 0, bb = 0;
 
     @Override
     public void onAttach(Context context) {
@@ -106,12 +105,11 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState)
-    {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         b = getArguments();
         Store_id = b.getInt("Store_id");
-        storeId=String.valueOf(Store_id);
+        storeId = String.valueOf(Store_id);
         Store_name = b.getString("Store_name");
         lists = new ArrayList<>();
     }
@@ -129,7 +127,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
 //            Cat_id= Integer.parseInt(AuditJson.getObject().getString("cat_id"));
 //            startTime= AuditJson.getObject().getString("startdateTime");
 //            endTime= AuditJson.getObject().getString("enddatetime");
-            getStoreSignature(String.valueOf(Store_id),String.valueOf(Cat_id));
+        getStoreSignature(String.valueOf(Store_id), String.valueOf(Cat_id));
 //            Log.e("Data", data);
 //            Log.e("Cat ID", Store_id+"");
 //            Log.e("Store ID", Cat_id +"");
@@ -140,10 +138,10 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         getAllCompleteAudits();
         getStoreStartTime();
 
-        if(isGpsEnabled()){
+        if (isGpsEnabled()) {
             new GetCurrentLatLong().execute();
-        }else {
-            Log.e("GPS " ,"NOT ENABLE");
+        } else {
+            Log.e("GPS ", "NOT ENABLE");
         }
 
         return view;
@@ -156,21 +154,21 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
 
         auditerNameEditText.setText(AppPrefrences.getUserName(ctx));
         auditerContactNumberEditText.setText(AppPrefrences.getMobileNo(ctx));
-        submitimagebutton=(Button)view.findViewById(R.id.submitimage);
-        imagecount=(TextView)view.findViewById(R.id.remainingimagecount);
+        submitimagebutton = (Button) view.findViewById(R.id.submitimage);
+        imagecount = (TextView) view.findViewById(R.id.remainingimagecount);
         img_back = (ImageView) view.findViewById(R.id.img_back);
 
         signatureButton = (Button) view.findViewById(R.id.signatureButton);
         signatureButton1 = (Button) view.findViewById(R.id.signatureButton1);
         submitReport = (Button) view.findViewById(R.id.submitReport);
-      //  expiry_btn = (Button) view.findViewById(R.id.expiry_btn);
+        //  expiry_btn = (Button) view.findViewById(R.id.expiry_btn);
         saveLocally = (Button) view.findViewById(R.id.submitLocally);
 
         signatureButton.setOnClickListener(this);
         signatureButton1.setOnClickListener(this);
         submitReport.setOnClickListener(this);
         img_back.setOnClickListener(this);
-     //   expiry_btn.setOnClickListener(this);
+        //   expiry_btn.setOnClickListener(this);
         saveLocally.setOnClickListener(this);
         submitimagebutton.setOnClickListener(this);
     }
@@ -182,26 +180,21 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
 
     @Override
     public void onClick(View v) {
-        switch (v.getId())
-        {
+        switch (v.getId()) {
             case R.id.submitLocally:
                 String error_message = "";
-             if (AppUtils.encodedimage.equals(""))
-            {
-                error_message = "Please get Auditor sign.";
-                Toast.makeText(ctx, error_message, Toast.LENGTH_LONG).show();
-            } else if (AppUtils.encodedstoreimage.equals(""))
-            {
-                error_message = "Please get Store Manager sign.";
-                Toast.makeText(ctx, error_message, Toast.LENGTH_LONG).show();
-            } else if (expiry.equalsIgnoreCase("")) 
-            {
-                 error_message = "Please Add Expiry Status";
-                 Toast.makeText(ctx, error_message, Toast.LENGTH_LONG).show();
-             } else
-             {
-                saveSignature(1);
-             }
+                if (AppUtils.encodedimage.equals("")) {
+                    error_message = "Please get Auditor sign.";
+                    Toast.makeText(ctx, error_message, Toast.LENGTH_LONG).show();
+                } else if (AppUtils.encodedstoreimage.equals("")) {
+                    error_message = "Please get Store Manager sign.";
+                    Toast.makeText(ctx, error_message, Toast.LENGTH_LONG).show();
+                } else if (expiry.equalsIgnoreCase("")) {
+                    error_message = "Please Add Expiry Status";
+                    Toast.makeText(ctx, error_message, Toast.LENGTH_LONG).show();
+                } else {
+                    saveSignature(1);
+                }
                 break;
 
             case R.id.signatureButton:
@@ -212,18 +205,14 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                 openSignatureDialog("store");
                 break;
 
-            case R.id.submitimage :
-             {
-                 SharedPreferences mSharedPreference1 =   PreferenceManager.getDefaultSharedPreferences(ctx);
-                 if(mSharedPreference1.getInt("Status_size", 0)>0)
-                 {
-                     uploadimage();
-                 }
-                 else
-                 {
-                     Toast.makeText(ctx,"No Image Found",Toast.LENGTH_SHORT).show();
-                 }
-             }
+            case R.id.submitimage:
+                SharedPreferences mSharedPreference1 = PreferenceManager.getDefaultSharedPreferences(ctx);
+                if (mSharedPreference1.getInt("Status_size", 0) > 0) {
+                    uploadimage();
+                } else {
+                    Toast.makeText(ctx, "No Image Found", Toast.LENGTH_SHORT).show();
+                }
+            break;
 
             case R.id.img_back:
                 getFragmentManager().popBackStack();
@@ -236,28 +225,22 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                 auditerContactNumber = auditerContactNumberEditText.getText()
                         .toString();
 
-                if (auditerName.isEmpty() || auditerName.equals(""))
-                {
+                if (auditerName.isEmpty() || auditerName.equals("")) {
                     message = "Please enter the Auditer name.";
                     Toast.makeText(ctx, message, Toast.LENGTH_LONG).show();
-                } else if (auditerContactNumber.isEmpty() || auditerContactNumber.equals(""))
-                {
+                } else if (auditerContactNumber.isEmpty() || auditerContactNumber.equals("")) {
                     message = "Please enter the Auditer Contact Number.";
                     Toast.makeText(ctx, message, Toast.LENGTH_LONG).show();
-                } else if (auditerContactNumber.length() > 10 || auditerContactNumber.length() < 10)
-                {
+                } else if (auditerContactNumber.length() > 10 || auditerContactNumber.length() < 10) {
                     message = "Please enter the Auditer Contact Number properly.";
                     Toast.makeText(ctx, message, Toast.LENGTH_LONG).show();
-                } else if (AppUtils.encodedimage.equals(""))
-                {
+                } else if (AppUtils.encodedimage.equals("")) {
                     message = "Please get Auditor sign.";
                     Toast.makeText(ctx, message, Toast.LENGTH_LONG).show();
-                } else if (AppUtils.encodedstoreimage.equals(""))
-                {
+                } else if (AppUtils.encodedstoreimage.equals("")) {
                     message = "Please get Store Manager sign.";
                     Toast.makeText(ctx, message, Toast.LENGTH_LONG).show();
-                } else
-                    {
+                } else {
                     submitReport();
                 }
                 break;
@@ -268,24 +251,22 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         }
     }
 
-    private void saveSignature(int from)
-    {
-        saveStoreSignature(String.valueOf(Store_id),String.valueOf(Cat_id),AppUtils.encodedstoreimage,AppUtils.encodedimage,from);
+    private void saveSignature(int from) {
+        saveStoreSignature(String.valueOf(Store_id), String.valueOf(Cat_id), AppUtils.encodedstoreimage, AppUtils.encodedimage, from);
     }
 
     private void submitReport() {
         //getSignature();
-            saveSignature(2);
+        saveSignature(2);
 
 
-        imagepath=new ArrayList<>();
-        imagename=new ArrayList<>();
+        imagepath = new ArrayList<>();
+        imagename = new ArrayList<>();
         getdata();
 
     }
 
-    private void submitfinalData(final String data1)
-    {
+    private void submitfinalData(final String data1) {
         Log.d("", "data1 " + data1);
         pd = new ProgressDialog(ctx);
         pd.setMessage("Please Wait...");
@@ -297,27 +278,28 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         imagecount.setText("Submitting final data....");
 
         try {
-            JSONArray jsonArray=new JSONArray();
+            JSONArray jsonArray = new JSONArray();
             jsonObject.put("marchent_id", AppPrefrences.getMerchatId(ctx));
-            jsonObject.put("store_id",storeId);
-            jsonObject.put("audit_code",AppPrefrences.getAuditCODE(ctx));
-            jsonObject.put("startdateTime",storeStartTime);
-            jsonObject.put("store_sign",storefilename);
-            jsonObject.put("audit_sign",auditor_filename);
-            jsonObject.put("cat_id",0);
-            jsonObject.put("auditor_id",AppPrefrences.getUserId(ctx));
-            jsonObject.put("lat",AppPrefrences.getLatitude(ctx));
-            jsonObject.put("longs",AppPrefrences.getLongitude(ctx));
-            jsonObject.put("final_submit","true");
-            jsonObject.put("enddatetime",getDateTime());
-            jsonObject.put("data",jsonArray.toString());
+            jsonObject.put("store_id", storeId);
+            jsonObject.put("audit_code", AppPrefrences.getAuditCODE(ctx));
+            jsonObject.put("startdateTime", storeStartTime);
+            jsonObject.put("store_sign", storefilename);
+            jsonObject.put("audit_sign", auditor_filename);
+            jsonObject.put("cat_id", 0);
+            jsonObject.put("auditor_id", AppPrefrences.getUserId(ctx));
+            jsonObject.put("lat", AppPrefrences.getLatitude(ctx));
+            jsonObject.put("longs", AppPrefrences.getLongitude(ctx));
+            jsonObject.put("final_submit", "true");
+            jsonObject.put("enddatetime", getDateTime());
+            jsonObject.put("data", jsonArray.toString());
 
 
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
 
-        String URL=Vars.BASE_URL+Vars.SUBMIT_REPORT;
+        String URL = Vars.BASE_URL + Vars.SUBMIT_REPORT;
 
-        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST, URL, jsonObject, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, jsonObject, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
 
@@ -325,30 +307,28 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                     pd.dismiss();
 
                 try {
-                    JSONArray jsonArray=response.getJSONArray("submit_reportResult");
-                    JSONObject jsonObject=jsonArray.getJSONObject(0);
+                    JSONArray jsonArray = response.getJSONArray("submit_reportResult");
+                    JSONObject jsonObject = jsonArray.getJSONObject(0);
 
-                    boolean status=jsonObject.getBoolean("Status");
+                    boolean status = jsonObject.getBoolean("Status");
 
-                    if(status) {
+                    if (status) {
                         String msg = jsonObject.getString("Message");
                         Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show();
 
-                        try
-                        {
-                            if(imagepath.size()>0) {
+                        try {
+                            if (imagepath.size() > 0) {
                                 saveArray();
 
                                 imagecount.setText("Please click on image button");
                                 submitReport.setClickable(false);
 
-                            }
-                            else {
+                            } else {
                                 AppUtils.encodedimage = "";
-                                AppUtils.encodedstoreimage="";
-                                deleteSubmittedData(String.valueOf(Store_id),String.valueOf(Cat_id));
+                                AppUtils.encodedstoreimage = "";
+                                deleteSubmittedData(String.valueOf(Store_id), String.valueOf(Cat_id));
                                 Toast.makeText(ctx, "ALL DATA SUBMITTED SUCCESSFULLY", Toast.LENGTH_LONG).show();
-                                startActivity(new Intent(ctx,MainActivity.class));
+                                openHomePage();
 
 
                             }
@@ -357,24 +337,22 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
 //                            Intent intent = new Intent("DraftsCount");
 //                            ctx.sendBroadcast(intent);
 //                           getFragmentManager().beginTransaction().replace(R.id.container_body, new Store_Fragement()).addToBackStack("Store").commit();
-                        } catch (Exception e) {}
+                        } catch (Exception e) {
+                        }
 
-                    }
-                    else {
+                    } else {
                         Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
                     }
 
 
-                }catch (Exception e)
-                {
+                } catch (Exception e) {
 
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError error)
-            {
+            public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
@@ -383,8 +361,14 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         });
 
 
-        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(50000,DefaultRetryPolicy.DEFAULT_MAX_RETRIES,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(50000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         MySingleton.getInstance(ctx).addToRequestQueue(jsonObjectRequest);
+    }
+
+    private void openHomePage() {
+        if (ctx != null){
+            ctx.startActivity(new Intent(ctx, MainActivity.class));
+        }
     }
 
     private String getDateTime() {
@@ -435,13 +419,11 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // TODO Auto-generated method stub
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == SIGNATURE_ACTIVITY)
-        {
-            
+        if (requestCode == SIGNATURE_ACTIVITY) {
+
         }
     }
 
@@ -471,10 +453,9 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
 
     }
 
-    private void saveStoreSignature(String storeId,String categoryId,String storeSign,String auditSign,int from)
-    {
-        DbManager.getInstance().deleteDetails(DBHelper.STORE_SIGNATURE_TBL_NAME,DBHelper.STORE_ID+"="+storeId);// + " AND " + DBHelper.CATEGORY_ID + "=" + categoryId);
-        
+    private void saveStoreSignature(String storeId, String categoryId, String storeSign, String auditSign, int from) {
+        DbManager.getInstance().deleteDetails(DBHelper.STORE_SIGNATURE_TBL_NAME, DBHelper.STORE_ID + "=" + storeId);// + " AND " + DBHelper.CATEGORY_ID + "=" + categoryId);
+
         ContentValues cv = new ContentValues();
         cv.put(DBHelper.STORE_ID, storeId);
         //cv.put(DBHelper.CATEGORY_ID, categoryId);
@@ -482,38 +463,32 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         cv.put(DBHelper.AUDIOTR_SIGNATURE_IMAGE, auditSign);
         cv.put(DBHelper.EXPIRY_QUESTION, expiry);
         DbManager.getInstance().insertDetails(cv, DBHelper.STORE_SIGNATURE_TBL_NAME);
-        if(from==1)
-        {
+        if (from == 1) {
             Toast.makeText(ctx, "Details saved", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(ctx,MainActivity.class));
+            openHomePage();
             getActivity().finish();
         }
     }
 
-    private void getStoreSignature(String storeId,String categoryId)
-    {
-        String query="SELECT * FROM "+ DBHelper.STORE_SIGNATURE_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + storeId;// + " AND " + DBHelper.CATEGORY_ID + "=" + categoryId;
+    private void getStoreSignature(String storeId, String categoryId) {
+        String query = "SELECT * FROM " + DBHelper.STORE_SIGNATURE_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + storeId;// + " AND " + DBHelper.CATEGORY_ID + "=" + categoryId;
         DbManager.getInstance().openDatabase();
         Cursor cursor = DbManager.getInstance().getDetails(query);
-        Log.e("Signature Count", cursor.getCount()+ "   " + query);
-        try
-        {
-            if(cursor.getCount()>0)
-            {
+        Log.e("Signature Count", cursor.getCount() + "   " + query);
+        try {
+            if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
-                AppUtils.encodedstoreimage=cursor.getString(2);
-                AppUtils.encodedimage=cursor.getString(3);
-                expiry=cursor.getString(4);
+                AppUtils.encodedstoreimage = cursor.getString(2);
+                AppUtils.encodedimage = cursor.getString(3);
+                expiry = cursor.getString(4);
             }
-        }catch (Exception e)
-        {
-            Log.e("Store Image Error",e.getMessage());
+        } catch (Exception e) {
+            Log.e("Store Image Error", e.getMessage());
         }
 
     }
 
-    private void submitFirstStep()
-    {
+    private void submitFirstStep() {
         final ProgressDialog pd = new ProgressDialog(ctx);
         pd.setMessage("Please Wait...");
         pd.setCancelable(false);
@@ -525,35 +500,33 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         JSONObject jsonObject = new JSONObject();
 
         try {
-              data=o.getJSONArray("data").toString();
-            categoryId= String.valueOf(Integer.parseInt(o.getString("cat_id")));
-            startTime= o.getString("startdateTime");
-            endTime= o.getString("enddatetime");
+            data = o.getJSONArray("data").toString();
+            categoryId = String.valueOf(Integer.parseInt(o.getString("cat_id")));
+            startTime = o.getString("startdateTime");
+            endTime = o.getString("enddatetime");
 
             jsonObject.put("marchent_id", AppPrefrences.getMerchatId(ctx));
-            jsonObject.put("store_id",storeId);
-            jsonObject.put("audit_code",AppPrefrences.getAuditCODE(ctx));
-            jsonObject.put("startdateTime",storeStartTime);
-            jsonObject.put("store_sign","");
-            jsonObject.put("audit_sign","");
-            jsonObject.put("cat_id",categoryId);
-            jsonObject.put("auditor_id",AppPrefrences.getUserId(ctx));
-            jsonObject.put("lat",AppPrefrences.getLatitude(ctx));
-            jsonObject.put("longs",AppPrefrences.getLongitude(ctx));
-            jsonObject.put("final_submit","false");
-            jsonObject.put("enddatetime",getDateTime());
-            jsonObject.put("data",o.getJSONArray("data").toString());
+            jsonObject.put("store_id", storeId);
+            jsonObject.put("audit_code", AppPrefrences.getAuditCODE(ctx));
+            jsonObject.put("startdateTime", storeStartTime);
+            jsonObject.put("store_sign", "");
+            jsonObject.put("audit_sign", "");
+            jsonObject.put("cat_id", categoryId);
+            jsonObject.put("auditor_id", AppPrefrences.getUserId(ctx));
+            jsonObject.put("lat", AppPrefrences.getLatitude(ctx));
+            jsonObject.put("longs", AppPrefrences.getLongitude(ctx));
+            jsonObject.put("final_submit", "false");
+            jsonObject.put("enddatetime", getDateTime());
+            jsonObject.put("data", o.getJSONArray("data").toString());
 
 
-
-
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-        String URL=Vars.BASE_URL+Vars.SUBMIT_REPORT;
+        String URL = Vars.BASE_URL + Vars.SUBMIT_REPORT;
 
-        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST, URL, jsonObject, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, jsonObject, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
 
@@ -561,13 +534,12 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                     pd.dismiss();
 
                 try {
-                    JSONArray jsonArray=response.getJSONArray("submit_reportResult");
-                    JSONObject jsonObject=jsonArray.getJSONObject(0);
+                    JSONArray jsonArray = response.getJSONArray("submit_reportResult");
+                    JSONObject jsonObject = jsonArray.getJSONObject(0);
 
-                    boolean status=jsonObject.getBoolean("Status");
+                    boolean status = jsonObject.getBoolean("Status");
 
-                    if(status)
-                    {
+                    if (status) {
                         String msg = jsonObject.getString("Message");
                         idPosition = idPosition + 1;
                         if (idPosition < categoryIsList.size()) {
@@ -575,26 +547,22 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                             getdata();
                         }
 //
-                        if (idPosition == categoryIsList.size())
-                        {
+                        if (idPosition == categoryIsList.size()) {
                             submitsignature();
                         }
-                    }
-                    else {
+                    } else {
                         Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
                     }
 
 
-                }catch (Exception e)
-                {
+                } catch (Exception e) {
 
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError error)
-            {
+            public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
@@ -610,8 +578,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         MySingleton.getInstance(ctx).addToRequestQueue(jsonObjectRequest);
     }
 
-    private void deleteSubmittedData(String storeId,String categoryId)
-    {
+    private void deleteSubmittedData(String storeId, String categoryId) {
         //Delete Store Manager & Auditor Singature
         DbManager.getInstance().deleteDetails(DBHelper.STORE_SIGNATURE_TBL_NAME, DBHelper.STORE_ID + "=" + storeId);// + " AND " + DBHelper.CATEGORY_ID + "=" + categoryId);
 
@@ -628,81 +595,73 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         DbManager.getInstance().deleteDetails(DBHelper.STORE_START_TIME_TABLE, DBHelper.STORE_ID + "=" + storeId);// + " AND " + DBHelper.CATEGORY_ID + "=" + categoryId);
 
         //Update Category Status
-        ContentValues contentValues=new ContentValues();
-        contentValues.put(DBHelper.CATEGORY_STATUS,"NULL");
-        contentValues.put(DBHelper.CATEGORY_START_DATE,"");
-        contentValues.put(DBHelper.CATEGORY_END_DATE,"");
-        DbManager.getInstance().updateDetails(contentValues,DBHelper.CATEGORY_TBL_NAME,DBHelper.STORE_ID +"=" + storeId + " AND " + DBHelper.CATEGORY_STATUS +"='Complete'");
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DBHelper.CATEGORY_STATUS, "NULL");
+        contentValues.put(DBHelper.CATEGORY_START_DATE, "");
+        contentValues.put(DBHelper.CATEGORY_END_DATE, "");
+        DbManager.getInstance().updateDetails(contentValues, DBHelper.CATEGORY_TBL_NAME, DBHelper.STORE_ID + "=" + storeId + " AND " + DBHelper.CATEGORY_STATUS + "='Complete'");
     }
 
-    private void getAllCompleteAudits()
-    {
+    private void getAllCompleteAudits() {
         categoryIsList.clear();
-        String completeAudit="SELECT * FROM " + DBHelper.CATEGORY_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + Store_id + " AND " + DBHelper.CATEGORY_STATUS + "='Complete'";
-        Cursor completed=DbManager.getInstance().getDetails(completeAudit);
+        String completeAudit = "SELECT * FROM " + DBHelper.CATEGORY_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + Store_id + " AND " + DBHelper.CATEGORY_STATUS + "='Complete'";
+        Cursor completed = DbManager.getInstance().getDetails(completeAudit);
 
-        if(completed.getCount()>0)
-        {
+        if (completed.getCount() > 0) {
             completed.moveToFirst();
-            do
-            {
-                categoryId=completed.getString(completed.getColumnIndex(DBHelper.CATEGORY_ID));
+            do {
+                categoryId = completed.getString(completed.getColumnIndex(DBHelper.CATEGORY_ID));
                 categoryIsList.add(categoryId);
-                Log.e("Category Id",categoryId);
-            }while (completed.moveToNext());
-            Log.e("Total Category ",categoryIsList.size()+"");
+                Log.e("Category Id", categoryId);
+            } while (completed.moveToNext());
+            Log.e("Total Category ", categoryIsList.size() + "");
         }
     }
 
-    private JSONObject getLocalSavedData(String storeId,String categoryId)
-    {
+    private JSONObject getLocalSavedData(String storeId, String categoryId) {
         DbManager.getInstance().openDatabase();
-        Cursor c = DbManager.getInstance().getDetails("SELECT * FROM " + DBHelper.ANSWER_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + storeId + " AND " + DBHelper.CATEGORY_ID +"=" + categoryId);
+        Cursor c = DbManager.getInstance().getDetails("SELECT * FROM " + DBHelper.ANSWER_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + storeId + " AND " + DBHelper.CATEGORY_ID + "=" + categoryId);
         //Log.e("Category Count", c.getCount() + "");
-        JSONObject storeObject=new JSONObject();
-        JSONArray array=new JSONArray();
+        JSONObject storeObject = new JSONObject();
+        JSONArray array = new JSONArray();
 
         JSONObject o;
-        if (c.getCount()>0)
-        {
+        if (c.getCount() > 0) {
             c.moveToFirst();
-            do
-            {
-                o=new JSONObject();
-                try
-                {
-                    o.put("store_id",c.getInt(c.getColumnIndex(DBHelper.STORE_ID)));
-                    o.put("cat_id",c.getInt(c.getColumnIndex(DBHelper.CATEGORY_ID)));
-                    o.put("subcat_id",c.getInt(c.getColumnIndex(DBHelper.ANSWER_SUBCAT_ID)));
-                    o.put("question_id",c.getInt(c.getColumnIndex(DBHelper.QUESTION_ID)));
-                    int quesId=c.getInt(c.getColumnIndex(DBHelper.QUESTION_ID));
-                    int catId=c.getInt(c.getColumnIndex(DBHelper.QUESTION_ID));
-                    int strId=c.getInt(c.getColumnIndex(DBHelper.QUESTION_ID));
+            do {
+                o = new JSONObject();
+                try {
+                    o.put("store_id", c.getInt(c.getColumnIndex(DBHelper.STORE_ID)));
+                    o.put("cat_id", c.getInt(c.getColumnIndex(DBHelper.CATEGORY_ID)));
+                    o.put("subcat_id", c.getInt(c.getColumnIndex(DBHelper.ANSWER_SUBCAT_ID)));
+                    o.put("question_id", c.getInt(c.getColumnIndex(DBHelper.QUESTION_ID)));
+                    int quesId = c.getInt(c.getColumnIndex(DBHelper.QUESTION_ID));
+                    int catId = c.getInt(c.getColumnIndex(DBHelper.QUESTION_ID));
+                    int strId = c.getInt(c.getColumnIndex(DBHelper.QUESTION_ID));
 
                     // For Audit Images
-                    ArrayList<StringBuilder> stringBuilders=new ArrayList<>();
-                    JSONArray imageArray=new JSONArray();
+                    ArrayList<StringBuilder> stringBuilders = new ArrayList<>();
+                    JSONArray imageArray = new JSONArray();
                     Cursor imageCursor = DbManager.getInstance().getDetails("SELECT answerImage FROM " + DBHelper.ANSWER_IMAGE_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + storeId + " AND " +
-                            DBHelper.CATEGORY_ID +"=" + categoryId + " AND " +
-                            DBHelper.QUESTION_ID +"=" + quesId);
+                            DBHelper.CATEGORY_ID + "=" + categoryId + " AND " +
+                            DBHelper.QUESTION_ID + "=" + quesId);
                     //Log.e("Image Count", imageCursor.getCount() + "");
-                    if(imageCursor.getCount()>0)
-                    {
+                    if (imageCursor.getCount() > 0) {
                         imageCursor.moveToFirst();
                         do {
 
-                            String iamge=(imageCursor.getString(imageCursor.getColumnIndex(DBHelper.ANSWER_IMAGE)));
+                            String iamge = (imageCursor.getString(imageCursor.getColumnIndex(DBHelper.ANSWER_IMAGE)));
                             String[] parts = iamge.split(">>");
                             String part1 = parts[0]; // 004
                             String part2 = parts[1];
                             imagename.add(part1);
                             imagepath.add(part2);
                             imageArray.put(part1);
-                        }while (imageCursor.moveToNext());
+                        } while (imageCursor.moveToNext());
 
                     }
                     imageCursor.close();
-                    o.put("image",imageArray);
+                    o.put("image", imageArray);
 
 //                    Cursor pathCursor = DbManager.getInstance().getDetails("SELECT answerpath FROM " + DBHelper.ANSWER_IMAGE_TBL_PATH + " WHERE " + DBHelper.STORE_ID + "=" + storeId + " AND " +
 //                            DBHelper.CATEGORY_ID +"=" + categoryId + " AND " +
@@ -720,18 +679,16 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
 //                    }
 //                    pathCursor.close();
 
-                    String sampleQuery="SELECT * FROM " + DBHelper.AUDIT_SAMPLE_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + storeId + " AND " +
+                    String sampleQuery = "SELECT * FROM " + DBHelper.AUDIT_SAMPLE_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + storeId + " AND " +
                             DBHelper.CATEGORY_ID + "=" + categoryId + " AND " +
-                            DBHelper.QUESTION_ID + "=" +quesId;
-                    Cursor samplesCursor=DbManager.getInstance().getDetails(sampleQuery);
+                            DBHelper.QUESTION_ID + "=" + quesId;
+                    Cursor samplesCursor = DbManager.getInstance().getDetails(sampleQuery);
                     //Log.e("Total Samples",samplesCursor.getCount()+"");
-                    if(samplesCursor.getCount()>0)
-                    {
+                    if (samplesCursor.getCount() > 0) {
                         samplesCursor.moveToFirst();
-                        do
-                        {
-                            StringBuilder sb=new StringBuilder();
-                            sb.append(samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.IS_SAMPLE_CLICKED))).append(",")  ;//1
+                        do {
+                            StringBuilder sb = new StringBuilder();
+                            sb.append(samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.IS_SAMPLE_CLICKED))).append(",");//1
                             sb.append(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.TEMPERATURE))).append(",");  //2
                             sb.append(samplesCursor.getString(samplesCursor.getColumnIndex(DBHelper.NO_SAMPLE_PRODUCT))).append(",");//3
                             sb.append(samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_CURRENT_RATE))).append(",");  //4
@@ -751,84 +708,76 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
 //                            auditObject.put("sample_current_rate",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_CURRENT_RATE)));
 //                            auditObject.put("sample_pos",samplesCursor.getInt(samplesCursor.getColumnIndex(DBHelper.SAMPLE_POS)));
 //                            auditSamples.put(auditObject);
-                        }while (samplesCursor.moveToNext());
+                        } while (samplesCursor.moveToNext());
 
                     }
                     samplesCursor.close();
                     StringBuilder str;
-                    JSONArray jsonArray=new JSONArray();
+                    JSONArray jsonArray = new JSONArray();
 
-                    if(stringBuilders.size()>0) {
-                        for (int q = 0; q < stringBuilders.size(); q++)
-                        {
-                            str =new StringBuilder();
+                    if (stringBuilders.size() > 0) {
+                        for (int q = 0; q < stringBuilders.size(); q++) {
+                            str = new StringBuilder();
                             str.append(stringBuilders.get(q).toString());
-                            jsonArray.put(q,str.toString());
+                            jsonArray.put(q, str.toString());
 
                         }
                         o.put("sampleAudits", jsonArray);
-                    }
-                    else
-                    {
-                        o.put("sampleAudits",jsonArray);
+                    } else {
+                        o.put("sampleAudits", jsonArray);
                     }
 
-                    o.put("comment",c.getString(c.getColumnIndex(DBHelper.ANSWER_COMMENT)));
-                    o.put("remark",c.getString(c.getColumnIndex(DBHelper.ANSWER_REMARK)));
-                    o.put("actions",c.getString(c.getColumnIndex(DBHelper.ANSWER_ACTION)));
-                    o.put("answer_type",c.getInt(c.getColumnIndex(DBHelper.ANSWER_TYPE)));
-                    o.put("cat_skip",c.getString(c.getColumnIndex(DBHelper.ANSWER_CAT_SKIP)));
-                    o.put("sec_exst",c.getString(c.getColumnIndex(DBHelper.SEC_EXISTS)));
-                    o.put("question_fail",c.getString(c.getColumnIndex(DBHelper.QUESTION_FAIL)));
-                 //   o.put("isSeen",Boolean.parseBoolean(c.getString(c.getColumnIndex(DBHelper.ANSWER_IS_SEEN))));
-                    o.put("max_no",c.getInt(c.getColumnIndex(DBHelper.ANSWER_MAX_NO)));
-                    o.put("max_sample",c.getInt(c.getColumnIndex(DBHelper.ANSWER_MAX_SAMPLE)));
-                    o.put("no_sample",c.getInt(c.getColumnIndex(DBHelper.ANSWER_NO_SAMPLE)));
-                   // o.put("ques_skip",c.getString(c.getColumnIndex(DBHelper.ANSWER_QUES_SKIP)));
-                    if(c.getString(c.getColumnIndex(DBHelper.ANSWER_QUES_SKIP)).equalsIgnoreCase("no"))
-                    {
-                        o.put("ques_skip","0");
+                    o.put("comment", c.getString(c.getColumnIndex(DBHelper.ANSWER_COMMENT)));
+                    o.put("remark", c.getString(c.getColumnIndex(DBHelper.ANSWER_REMARK)));
+                    o.put("actions", c.getString(c.getColumnIndex(DBHelper.ANSWER_ACTION)));
+                    o.put("answer_type", c.getInt(c.getColumnIndex(DBHelper.ANSWER_TYPE)));
+                    o.put("cat_skip", c.getString(c.getColumnIndex(DBHelper.ANSWER_CAT_SKIP)));
+                    o.put("sec_exst", c.getString(c.getColumnIndex(DBHelper.SEC_EXISTS)));
+                    o.put("question_fail", c.getString(c.getColumnIndex(DBHelper.QUESTION_FAIL)));
+                    //   o.put("isSeen",Boolean.parseBoolean(c.getString(c.getColumnIndex(DBHelper.ANSWER_IS_SEEN))));
+                    o.put("max_no", c.getInt(c.getColumnIndex(DBHelper.ANSWER_MAX_NO)));
+                    o.put("max_sample", c.getInt(c.getColumnIndex(DBHelper.ANSWER_MAX_SAMPLE)));
+                    o.put("no_sample", c.getInt(c.getColumnIndex(DBHelper.ANSWER_NO_SAMPLE)));
+                    // o.put("ques_skip",c.getString(c.getColumnIndex(DBHelper.ANSWER_QUES_SKIP)));
+                    if (c.getString(c.getColumnIndex(DBHelper.ANSWER_QUES_SKIP)).equalsIgnoreCase("no")) {
+                        o.put("ques_skip", "0");
+                    } else {
+                        o.put("ques_skip", "1");
                     }
-                    else
-                    {
-                        o.put("ques_skip","1");
-                    }
-                    o.put("type",c.getInt(c.getColumnIndex(DBHelper.ANSWER_CAT_TYPE)));
-                    o.put("answerDateTime",c.getString(c.getColumnIndex(DBHelper.ANSWER_DATETIME)));
+                    o.put("type", c.getInt(c.getColumnIndex(DBHelper.ANSWER_CAT_TYPE)));
+                    o.put("answerDateTime", c.getString(c.getColumnIndex(DBHelper.ANSWER_DATETIME)));
                     array.put(o);
 
-                    String categoryQuery="SELECT * FROM " + DBHelper.CATEGORY_TBL_NAME + " WHERE " + DBHelper.STORE_ID +"=" + storeId + " AND " + DBHelper.CATEGORY_ID +"=" + categoryId;
-                    Cursor catCursor=DbManager.getInstance().getDetails(categoryQuery);
-                    String startDateTime="",endDateTime="";
-                    if(catCursor.getCount()>0)
-                    {
+                    String categoryQuery = "SELECT * FROM " + DBHelper.CATEGORY_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + storeId + " AND " + DBHelper.CATEGORY_ID + "=" + categoryId;
+                    Cursor catCursor = DbManager.getInstance().getDetails(categoryQuery);
+                    String startDateTime = "", endDateTime = "";
+                    if (catCursor.getCount() > 0) {
                         catCursor.moveToFirst();
-                        startDateTime=catCursor.getString(catCursor.getColumnIndex(DBHelper.CATEGORY_START_DATE));
-                        endDateTime=catCursor.getString(catCursor.getColumnIndex(DBHelper.CATEGORY_END_DATE));
+                        startDateTime = catCursor.getString(catCursor.getColumnIndex(DBHelper.CATEGORY_START_DATE));
+                        endDateTime = catCursor.getString(catCursor.getColumnIndex(DBHelper.CATEGORY_END_DATE));
 
                     }
                     catCursor.close();
 
-                    storeObject.put("marchent_id",AppPrefrences.getMerchatId(ctx));
-                    storeObject.put("store_id",storeId);
-                    storeObject.put("cat_id",categoryId);
+                    storeObject.put("marchent_id", AppPrefrences.getMerchatId(ctx));
+                    storeObject.put("store_id", storeId);
+                    storeObject.put("cat_id", categoryId);
                     //       storeObject.put("audit_id",auditId);
                     //   storeObject.put("expiry_question","0");
-                    storeObject.put("startdateTime",startDateTime);
-                    storeObject.put("enddatetime",endDateTime);
-                    storeObject.put("data",array);
-                    storeObject.put("store_sign","");
-                    storeObject.put("audit_sign","");
+                    storeObject.put("startdateTime", startDateTime);
+                    storeObject.put("enddatetime", endDateTime);
+                    storeObject.put("data", array);
+                    storeObject.put("store_sign", "");
+                    storeObject.put("audit_sign", "");
                     //    storeObject.put("audit_contact","");
-                    storeObject.put("final_submit","false");
-                    storeObject.put("auditor_id",AppPrefrences.getUserId(ctx));
-                    storeObject.put("lat",AppPrefrences.getLatitude(ctx));
-                    storeObject.put("long",AppPrefrences.getLongitude(ctx));
+                    storeObject.put("final_submit", "false");
+                    storeObject.put("auditor_id", AppPrefrences.getUserId(ctx));
+                    storeObject.put("lat", AppPrefrences.getLatitude(ctx));
+                    storeObject.put("long", AppPrefrences.getLongitude(ctx));
 
 
-                } catch (JSONException e)
-                {
-                    Log.e("Data Binding Error ",e.getMessage());
+                } catch (JSONException e) {
+                    Log.e("Data Binding Error ", e.getMessage());
                 }
             } while (c.moveToNext());
 
@@ -839,20 +788,20 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         return storeObject;
     }
 
-    private void getStoreStartTime(){
+    private void getStoreStartTime() {
         DbManager.getInstance().openDatabase();
-        String checkStartDateTime="SELECT " + DBHelper.DATE_TIME +" FROM " + DBHelper.STORE_START_TIME_TABLE + " WHERE " + DBHelper.STORE_ID +"=" + Store_id;
-        Cursor checkStartDate=DbManager.getInstance().getDetails(checkStartDateTime);
-        if(checkStartDate.getCount()>0)
-        {
+        String checkStartDateTime = "SELECT " + DBHelper.DATE_TIME + " FROM " + DBHelper.STORE_START_TIME_TABLE + " WHERE " + DBHelper.STORE_ID + "=" + Store_id;
+        Cursor checkStartDate = DbManager.getInstance().getDetails(checkStartDateTime);
+        if (checkStartDate.getCount() > 0) {
             checkStartDate.moveToFirst();
-            storeStartTime=checkStartDate.getString(checkStartDate.getColumnIndex(DBHelper.DATE_TIME));
-            Log.e("StoreStartTime",storeStartTime);
+            storeStartTime = checkStartDate.getString(checkStartDate.getColumnIndex(DBHelper.DATE_TIME));
+            Log.e("StoreStartTime", storeStartTime);
         }
     }
 
-    int totalLocFetchTryCount=0;
-    public class GetCurrentLatLong extends AsyncTask<Void,Void,LatLng>{
+    int totalLocFetchTryCount = 0;
+
+    public class GetCurrentLatLong extends AsyncTask<Void, Void, LatLng> {
 
         TrackGPS trackGPS;
 
@@ -874,13 +823,11 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
 
         @Override
         protected void onPostExecute(LatLng latLng) {
-            if (latLng == null)
-            {
-                totalLocFetchTryCount = totalLocFetchTryCount +1;
+            if (latLng == null) {
+                totalLocFetchTryCount = totalLocFetchTryCount + 1;
                 new GetCurrentLatLong().execute();
-            } else
-            {
-                Log.e("Submit Report:> ","Location: "+latLng.toString());
+            } else {
+                Log.e("Submit Report:> ", "Location: " + latLng.toString());
                 AppPrefrences.setLatitude(ctx, latLng.latitude + "");
                 AppPrefrences.setLongiTude(ctx, latLng.longitude + "");
             }
@@ -893,8 +840,7 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         return service.isProviderEnabled(LocationManager.GPS_PROVIDER) && service.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
 
-    public void submitsignature()
-    {
+    public void submitsignature() {
 
         pd = new ProgressDialog(ctx);
         pd.setMessage("Please Wait...");
@@ -904,26 +850,24 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
         JSONObject jsonObject = new JSONObject();
 
         try {
-            JSONArray jsonArray=new JSONArray();
+            JSONArray jsonArray = new JSONArray();
             jsonObject.put("marchent_id", AppPrefrences.getMerchatId(ctx));
-            jsonObject.put("store_id",storeId);
-            jsonObject.put("audit_code",AppPrefrences.getAuditCODE(ctx));
-            if(a==0)
-            {
-            jsonObject.put("FileString",AppUtils.encodedimage);
-            }
-            else
-            {
-                jsonObject.put("FileString",AppUtils.encodedstoreimage);
+            jsonObject.put("store_id", storeId);
+            jsonObject.put("audit_code", AppPrefrences.getAuditCODE(ctx));
+            if (a == 0) {
+                jsonObject.put("FileString", AppUtils.encodedimage);
+            } else {
+                jsonObject.put("FileString", AppUtils.encodedstoreimage);
             }
 
 
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        catch (Exception e){}
 
-        String URL=Vars.BASE_URL+"upladfile";
+        String URL = Vars.BASE_URL + "upladfile";
 
-        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST, URL, jsonObject, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, jsonObject, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
 
@@ -931,44 +875,39 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
                     pd.dismiss();
 
                 try {
-                    JSONArray jsonArray=response.getJSONArray("upladfileResult");
-                    JSONObject jsonObject=jsonArray.getJSONObject(0);
+                    JSONArray jsonArray = response.getJSONArray("upladfileResult");
+                    JSONObject jsonObject = jsonArray.getJSONObject(0);
 
-                    boolean status=jsonObject.getBoolean("Status");
+                    boolean status = jsonObject.getBoolean("Status");
 
-                    if(status) {
+                    if (status) {
 
-                        JSONArray jsonArray1=jsonObject.getJSONArray("Payload");
-                        JSONObject jsonObject1=jsonArray1.getJSONObject(0);
+                        JSONArray jsonArray1 = jsonObject.getJSONArray("Payload");
+                        JSONObject jsonObject1 = jsonArray1.getJSONObject(0);
 
-                        if (a==0)
-                        {
-                            auditor_filename=jsonObject1.getString("FileName");
-                            a=1;
+                        if (a == 0) {
+                            auditor_filename = jsonObject1.getString("FileName");
+                            a = 1;
                             submitsignature();
-                        }
-                        else {
-                            storefilename=jsonObject1.getString("FileName");
+                        } else {
+                            storefilename = jsonObject1.getString("FileName");
                             submitfinalData("");
                         }
 
 
-                    }
-                    else {
+                    } else {
                         Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
                     }
 
 
-                }catch (Exception e)
-                {
+                } catch (Exception e) {
                     Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError error)
-            {
+            public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
@@ -985,15 +924,14 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
 
     }
 
-    private void uploadimage()
-    {
-       final ProgressDialog pd = new ProgressDialog(ctx);
-       image_counter=(AppPrefrences.getimageuploadcount(ctx)+1);
-        final SharedPreferences mSharedPreference1 =   PreferenceManager.getDefaultSharedPreferences(ctx);
-        image_progressdialog=(String.valueOf(image_counter)+"/"+String.valueOf(mSharedPreference1.getInt("Status_size", 0))+" image uploading...");
-        pd.setMessage(image_progressdialog);
-        pd.setCancelable(false);
-        pd.show();
+    private void uploadimage() {
+        final ProgressDialog pdImageUpload = new ProgressDialog(ctx);
+        image_counter = (AppPrefrences.getimageuploadcount(ctx) + 1);
+        final SharedPreferences mSharedPreference1 = PreferenceManager.getDefaultSharedPreferences(ctx);
+        image_progressdialog = (String.valueOf(image_counter) + "/" + String.valueOf(mSharedPreference1.getInt("Status_size", 0)) + " image uploading...");
+        pdImageUpload.setMessage(image_progressdialog);
+        pdImageUpload.setCancelable(false);
+        pdImageUpload.show();
 
         S3FileUploadHelper transferHelper = new S3FileUploadHelper(ctx);
 
@@ -1001,34 +939,28 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
 
         transferHelper.setFileTransferListener(new S3FileUploadHelper.FileTransferListener() {
             @Override
-            public void onSuccess(int id, TransferState state, String fileName)
-            {
-                if (pd != null && pd.isShowing())
-                    pd.dismiss();
-                image_counter=image_counter+1;
-                if(bb==mSharedPreference1.getInt("Status_size", 0)-1 )
-                {
+            public void onSuccess(int id, TransferState state, String fileName) {
+                if (pdImageUpload != null && pdImageUpload.isShowing()) pdImageUpload.dismiss();
+                image_counter = image_counter + 1;
+                if (bb == mSharedPreference1.getInt("Status_size", 0) - 1) {
                     AppUtils.encodedimage = "";
-                    AppUtils.encodedstoreimage="";
-                    deleteSubmittedData(String.valueOf(Store_id),String.valueOf(Cat_id));
+                    AppUtils.encodedstoreimage = "";
+                    deleteSubmittedData(String.valueOf(Store_id), String.valueOf(Cat_id));
                     Toast.makeText(ctx, "ALL DATA SUBMITTED SUCCESSFULLY", Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(ctx,MainActivity.class));
-                }
-                else
-                {
-                    imagecount.setText((bb+1)+"/"+mSharedPreference1.getInt("Status_size", 0)+" image uploaded");
-                    bb=bb+1;
+                    openHomePage();
+                } else {
+                    imagecount.setText((bb + 1) + "/" + mSharedPreference1.getInt("Status_size", 0) + " image uploaded");
+                    bb = bb + 1;
 
-                    AppPrefrences.setimageuploadcount(ctx,bb);
+                    AppPrefrences.setimageuploadcount(ctx, bb);
                     uploadimage();
                 }
-               // AppLogger.d("S3FileUpload", String.format("%s uploaded successfully!", fileName));
-               // profileImage = fileName;
+                // AppLogger.d("S3FileUpload", String.format("%s uploaded successfully!", fileName));
+                // profileImage = fileName;
             }
 
             @Override
-            public void onProgressChanged(int id, long bytesCurrent, long bytesTotal)
-            {
+            public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
                 float percentDonef = ((float) bytesCurrent / (float) bytesTotal) * 100;
                 int percentDone = (int) percentDonef;
 
@@ -1037,12 +969,11 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
             }
 
             @Override
-            public void onError(int id, Exception ex)
-            {
+            public void onError(int id, Exception ex) {
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
 
-                Toast.makeText(ctx,"Error in uploading image. Please try after some time..",Toast.LENGTH_SHORT).show();
+                Toast.makeText(ctx, "Error in uploading image. Please try after some time..", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -1051,35 +982,34 @@ public class Submit_report extends Fragment implements View.OnClickListener  {
     }
 
 
-    public void getdata()
-    {
-        o=null;
-        o=getLocalSavedData(storeId,categoryIsList.get(idPosition));
+    public void getdata() {
+        o = null;
+        o = getLocalSavedData(storeId, categoryIsList.get(idPosition));
 
-            submitFirstStep();
+        submitFirstStep();
 
     }
 
 
-    public void saveArray()
-    {
+    public void saveArray() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
         SharedPreferences.Editor i_path = sp.edit();
-        SharedPreferences.Editor i_name=sp.edit();
-        SharedPreferences.Editor image_size=sp.edit();
+        SharedPreferences.Editor i_name = sp.edit();
+        SharedPreferences.Editor image_size = sp.edit();
         image_size.putInt("Status_size", imagepath.size());
         /* sKey is an array */
 
-        for(int i=0;i<imagepath.size();i++)
-        {
+        for (int i = 0; i < imagepath.size(); i++) {
             i_path.putString("imagepath" + i, imagepath.get(i));
-            i_name.putString("imagename"+i,imagename.get(i));
+            i_name.putString("imagename" + i, imagename.get(i));
         }
 
         i_path.commit();
         i_name.commit();
         image_size.commit();
     }
+
+
 
 
 }

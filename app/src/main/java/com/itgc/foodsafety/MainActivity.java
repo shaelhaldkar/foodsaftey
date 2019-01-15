@@ -279,7 +279,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         return service.isProviderEnabled(LocationManager.GPS_PROVIDER) && service.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
 
-    @Override
+    /*@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == 1000) {
@@ -304,5 +304,5 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             }
         }
 
-    }
+    }*/
 }
