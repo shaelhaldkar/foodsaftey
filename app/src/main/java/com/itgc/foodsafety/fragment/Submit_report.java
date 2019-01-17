@@ -321,6 +321,7 @@ public class Submit_report extends Fragment implements View.OnClickListener {
                                 saveArray();
 
                                 imagecount.setText("Please click on image button");
+                                submitimagebutton.setVisibility(View.VISIBLE);
                                 submitReport.setClickable(false);
 
                             } else {

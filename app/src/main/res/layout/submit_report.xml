@@ -239,6 +239,7 @@
                 android:layout_gravity="center"
                 android:textColor="@color/white"
                 android:padding="@dimen/padding1"
+                android:visibility="gone"
                 android:layout_marginTop="20dp"
                 android:text="Submit Images"
                 android:background="@drawable/forget_btn"
