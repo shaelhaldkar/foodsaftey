@@ -146,7 +146,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="25dp"
+            android:layout_height="30dp"
             android:padding="2dp"
             android:orientation="horizontal">
 
@@ -154,27 +154,35 @@
                 android:id="@+id/list_samplemfd"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_weight="0.3"
                 android:entries="@array/array_mfd"
                 android:background="@drawable/black_border"
                 android:spinnerMode="dropdown" />
 
-            <TextView
+            <EditText
                 android:id="@+id/txt_datemfd"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
-                android:layout_weight="1"
+                android:layout_weight="0.3"
                 android:paddingLeft="5dp"
                 android:layout_marginLeft="10dp"
                 android:background="@drawable/black_border"
                 android:gravity="center_vertical"
                 android:hint="MM-DD-YYYY" />
+
+            <ImageView
+                android:id="@+id/calender_mfd"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:layout_marginRight="5dp"
+                android:src="@drawable/calendar"
+                android:layout_marginLeft="5dp"/>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="25dp"
+            android:layout_height="30dp"
             android:layout_marginTop="5dp"
             android:orientation="horizontal">
 
@@ -182,24 +190,32 @@
                 android:id="@+id/list_sampleexp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_weight="0.3"
                 android:drawSelectorOnTop="true"
                 android:entries="@array/array_bb"
                 android:background="@drawable/black_border"
                 android:spinnerMode="dropdown" />
 
-            <TextView
+            <EditText
                 android:id="@+id/txt_dateexp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
-                android:layout_weight="1"
+                android:layout_weight="0.3"
                 android:paddingLeft="5dp"
                 android:drawSelectorOnTop="true"
                 android:layout_marginLeft="10dp"
                 android:background="@drawable/black_border"
                 android:gravity="center_vertical"
                 android:hint="MM-DD-YYYY" />
+
+            <ImageView
+                android:id="@+id/calender_exp"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:layout_marginRight="5dp"
+                android:src="@drawable/calendar"
+                android:layout_marginLeft="5dp"/>
         </LinearLayout>
 
         <RelativeLayout

@@ -54,7 +54,7 @@ public class Store_DetailsFragment extends Fragment implements View.OnClickListe
     private EditText account_name,store_chiller_no, store_freezer_no, store_vendor_chiller_no, store_vendor_freezer_no, store_rodent_no,
             store_flycatcher_no, store_aircutter_no, store_thermo_no, store_manager_name, store_manager_email;
     private Button btn_submit;
-    private String store_name,submit_date;
+    private String store_name,submit_date="";
     private int store_id;
     private Bundle b;
     private ProgressDialog pd;

@@ -166,12 +166,12 @@ public class DbManager {
             JSONArray array=object.getJSONArray("auditList");
             for(int i=0;i<array.length();i++)
             {
-                savecategory(storeID,array.getJSONObject(i));
+                savecategory(storeID,array.getJSONObject(i),auditcode);
             }
         }catch (Exception e){Log.e("Error","At Second Catch saveStoreDetails()"+e.getMessage());}
     }
 
-    void savecategory(String storeId,JSONObject object)
+    void savecategory(String storeId,JSONObject object,String auditcode)
     {
         try
         {
@@ -179,6 +179,7 @@ public class DbManager {
             ContentValues c=new ContentValues();
             c.put(DBHelper.STORE_ID,storeId);
             c.put(DBHelper.CATEGORY_ID,categoryId);
+            c.put(DBHelper.AUDIT_CODE_IN_CATOERY,auditcode);
             c.put(DBHelper.CATEGORY_NAME,object.getString("categoryName"));
             c.put(DBHelper.CATEGORY_TYPE,object.getString("type"));
             c.put(DBHelper.CATEGORY_STATUS,"NULL");

@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.SeekBar;
@@ -105,7 +106,7 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
 
 
 
-        holder.txt_datemfd.setOnClickListener(new View.OnClickListener() {
+        holder.calender_mfd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 FragmentManager manager = ((Activity) c).getFragmentManager();
@@ -145,7 +146,7 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
             }
         });
 
-        holder.txt_dateexp.setOnClickListener(new View.OnClickListener() {
+        holder.calender_exp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -200,9 +201,10 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
     public class Samples extends RecyclerView.ViewHolder
     {
 
-        TextView txt_sample,txt_datemfd,txt_dateexp;
-        EditText recycle_view_sample,edit_product_name,edit_brand_name,edt_rate,temperatire;
+        TextView txt_sample;
+        EditText recycle_view_sample,edit_product_name,edit_brand_name,edt_rate,temperatire,txt_datemfd,txt_dateexp;
         SeekBar progressBar;
+        ImageView calender_mfd,calender_exp;
         RadioButton my_recycler_view_sample_fail,rdt_none,rdt_upto30,rdt_1month6mont,rdt_more6month;
         Button btn_rate;
         Spinner mfd_spinner,bb_spinner;
@@ -218,6 +220,9 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
             rdt_1month6mont=(RadioButton)itemView.findViewById(R.id.rdt_1monthto6month);
             rdt_more6month=(RadioButton)itemView.findViewById(R.id.rdt_more6months);
             temperatire=(EditText)itemView.findViewById(R.id.my_recycler_view_temp);
+            calender_exp=itemView.findViewById(R.id.calender_exp);
+            calender_mfd=itemView.findViewById(R.id.calender_mfd);
+
 
 
             edt_rate=(EditText)itemView.findViewById(R.id.edt_rate);
@@ -228,8 +233,8 @@ public class SampleAuditAdapter extends RecyclerView.Adapter<SampleAuditAdapter.
             mfd_spinner=(Spinner)itemView.findViewById(R.id.list_samplemfd);
             bb_spinner=(Spinner)itemView.findViewById(R.id.list_sampleexp);
 
-            txt_datemfd=(TextView)itemView.findViewById(R.id.txt_datemfd);
-            txt_dateexp=(TextView)itemView.findViewById(R.id.txt_dateexp);
+            txt_datemfd=(EditText)itemView.findViewById(R.id.txt_datemfd);
+            txt_dateexp=(EditText)itemView.findViewById(R.id.txt_dateexp);
 
             mfd_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override

@@ -328,13 +328,15 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String CATEGORY_TBL_NAME = "categoryInfo";
     public static final String CATEGORY_ID = "categoryId";
     public static final String CATEGORY_NAME = "categoryName";
+    public static final String AUDIT_CODE_IN_CATOERY="auditcode";
     public static final String CATEGORY_TYPE = "categoryType";
     public static final String CATEGORY_STATUS = "categoryStatus";
     public static final String CATEGORY_START_DATE = "categoryStartDate";
     public static final String CATEGORY_END_DATE = "categoryEndDate";
 
 
-    private final String TABLE_CATEGORY_CREATE = "CREATE TABLE " + CATEGORY_TBL_NAME + " (" + STORE_ID + " INTEGER,"+ CATEGORY_ID + " INTEGER,"+ CATEGORY_NAME + " TEXT,"+
+
+    private final String TABLE_CATEGORY_CREATE = "CREATE TABLE " + CATEGORY_TBL_NAME + " (" + STORE_ID + " INTEGER,"+ CATEGORY_ID + " INTEGER,"+ CATEGORY_NAME + " TEXT,"+AUDIT_CODE_IN_CATOERY + " TEXT,"+
                                                                                               CATEGORY_TYPE + " INTEGER,"+ CATEGORY_STATUS + " TEXT,"+ CATEGORY_START_DATE + " TEXT,"+ CATEGORY_END_DATE + " TEXT" +")";
     private final String TABLE_CATEGORY_DROP = "DROP TABLE IF EXISTS " + CATEGORY_TBL_NAME;
 

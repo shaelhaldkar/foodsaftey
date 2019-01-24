@@ -73,7 +73,7 @@ public class Submit_report extends Fragment implements View.OnClickListener {
     private Context ctx;
     private EditText auditerNameEditText, auditerContactNumberEditText;
     private Button signatureButton, submitReport, signatureButton1, saveLocally, submitimagebutton;
-    private String auditerName, auditerId, auditerContactNumber, Store_name, audit_sign, data = "", startTime, endTime, storeStartTime = "";
+    private String auditerName, auditocde, auditerContactNumber, Store_name, audit_sign, data = "", startTime, endTime, storeStartTime = "";
     private ArrayList<Answers> answersArrayList;
     private Bundle b;
     private int Cat_id, Store_id;
@@ -281,7 +281,7 @@ public class Submit_report extends Fragment implements View.OnClickListener {
             JSONArray jsonArray = new JSONArray();
             jsonObject.put("marchent_id", AppPrefrences.getMerchatId(ctx));
             jsonObject.put("store_id", storeId);
-            jsonObject.put("audit_code", AppPrefrences.getAuditCODE(ctx));
+            jsonObject.put("audit_code",auditocde );
             jsonObject.put("startdateTime", storeStartTime);
             jsonObject.put("store_sign", storefilename);
             jsonObject.put("audit_sign", auditor_filename);
@@ -508,7 +508,7 @@ public class Submit_report extends Fragment implements View.OnClickListener {
 
             jsonObject.put("marchent_id", AppPrefrences.getMerchatId(ctx));
             jsonObject.put("store_id", storeId);
-            jsonObject.put("audit_code", AppPrefrences.getAuditCODE(ctx));
+            jsonObject.put("audit_code", auditocde);
             jsonObject.put("startdateTime", storeStartTime);
             jsonObject.put("store_sign", "");
             jsonObject.put("audit_sign", "");
@@ -756,6 +756,7 @@ public class Submit_report extends Fragment implements View.OnClickListener {
                         catCursor.moveToFirst();
                         startDateTime = catCursor.getString(catCursor.getColumnIndex(DBHelper.CATEGORY_START_DATE));
                         endDateTime = catCursor.getString(catCursor.getColumnIndex(DBHelper.CATEGORY_END_DATE));
+                        auditocde=catCursor.getString(catCursor.getColumnIndex(DBHelper.AUDIT_CODE_IN_CATOERY));
 
                     }
                     catCursor.close();
