@@ -21,7 +21,8 @@ public class Vars {
 
 
     public static final String  STAGING= "http://13.126.249.150/api/";
-    public static final String  LIVE= "http://52.66.121.97:83/RestServiceImpl.svc/";
+  //  public static final String  LIVE= "http://52.66.121.97:83/RestServiceImpl.svc/";
+    public static final String  LIVE= "http://ylims.com:83/RestServiceImpl.svc/";
 
     //13.126.179.210
 

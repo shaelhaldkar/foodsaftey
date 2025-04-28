@@ -13,13 +13,11 @@ import android.support.v4.app.ActivityCompat;
 import android.widget.Toast;
 
 import com.amazonaws.mobile.client.AWSMobileClient;
-import com.crashlytics.android.Crashlytics;
 import com.itgc.foodsafety.service.FoodService;
 import com.itgc.foodsafety.utils.AppPrefrences;
 import com.itgc.foodsafety.utils.AppUtils;
 import com.itgc.foodsafety.utils.Methods;
 
-import io.fabric.sdk.android.Fabric;
 
 
 public class SplashActivity extends Activity {
@@ -30,7 +28,6 @@ public class SplashActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_splash);
 
         AWSMobileClient.getInstance().initialize(this).execute();

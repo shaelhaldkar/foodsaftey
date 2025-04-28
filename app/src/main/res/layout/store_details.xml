@@ -475,7 +475,7 @@
             android:paddingTop="@dimen/paddingTop"
             android:text="@string/audit_submit"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@color/audit_title" />
+            android:textColor="@color/white" />
 
     </LinearLayout>
 

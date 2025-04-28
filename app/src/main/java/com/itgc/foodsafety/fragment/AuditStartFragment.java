@@ -73,8 +73,6 @@ import com.itgc.foodsafety.utils.BitmapHelper;
 import com.itgc.foodsafety.utils.FilePathUtils;
 import com.itgc.foodsafety.utils.ImageUtils;
 import com.itgc.foodsafety.utils.Vars;
-import com.theartofdev.edmodo.cropper.CropImage;
-import com.theartofdev.edmodo.cropper.CropImageView;
 
 import org.json.JSONObject;
 
@@ -107,7 +105,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
     private Bundle b;
     private String category, formattedDate, Store_name, skip = "no", store_loc;
-    private TextView audit_date, question, max_num, txt_title, txt_subcat, discription_txt, read_more;
+    private TextView audit_date, question, max_num, txt_title, txt_subcat, discription_txt, read_more,tvNext;
     private RadioButton rg_yes, rg_no, rg_partial, rdt_isfail;
     private AutoCompleteTextView edt_remark, edt_comment;
     private LinearLayout btn_previous, btn_next;
@@ -182,7 +180,10 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        Log.i(TAG, "onCreateView: $++AuditStartFragment");
+
         view = inflater.inflate(R.layout.startauditfragment, container, false);
+
         setUpView(view);
         if (checkPlayServices()) {
             buildGoogleApiClient();
@@ -215,6 +216,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         max_num = (TextView) view.findViewById(R.id.max_num);
         audit_date = (TextView) view.findViewById(R.id.audit_date);
         txt_subcat = (TextView) view.findViewById(R.id.txt_subcat);
+        tvNext = (TextView) view.findViewById(R.id.tvNext);
 
         String formattedDate = new SimpleDateFormat("dd MMM yyyy HH:mm a").format(Calendar.getInstance().getTime());
         audit_date.setText(getResources().getText(R.string.audit_title) + " " + formattedDate);
@@ -297,6 +299,10 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
 
             }
         });
+
+
+
+
 
         btn_previous.setOnClickListener(this);
         btn_camera.setOnClickListener(this);
@@ -408,6 +414,13 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         switch (v.getId()) {
             case R.id.btn_next:
 
+                if( questionPos == (categoryQuestionsArrayList.size() - 2)) {
+                    tvNext.setText(R.string.submit_report_audit_submit);
+                }else{
+                    tvNext.setText(getString(R.string.audit_next));
+                }
+                Log.i(TAG, "onClick: "+questionPos);
+
                 if (questionPos <= 0) {
                     String checkStartDateTime = "SELECT " + DBHelper.CATEGORY_START_DATE + " FROM " + DBHelper.CATEGORY_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + Store_id + " AND " + DBHelper.CATEGORY_ID + "=" + Cat_id + " AND " + DBHelper.CATEGORY_STATUS + "='Incomplete'";
                     Cursor checkStartDate = DbManager.getInstance().getDetails(checkStartDateTime);
@@ -457,13 +470,13 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
             case R.id.btn_camera:
 
                 if (getAnswerImageCount(questionID) < 4) {
-                    //checkPermission();
+                   // checkPermission();
 
-                    CropImage.activity()
+                  /*  CropImage.activity()
                             .setGuidelines(CropImageView.Guidelines.ON)
                             .setOutputCompressQuality(40)
                             .start(getContext(), AuditStartFragment.this);
-
+*/
 
                 } else {
                     Toast.makeText(getActivity(), "Only four images are allowed", Toast.LENGTH_SHORT).show();
@@ -473,6 +486,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 break;
 
             case R.id.btn_previous:
+                tvNext.setText(getString(R.string.audit_next));
                 isClicked = false;
                 hideKeyboard(btn_previous);
                 if (questionPos == 1) {
@@ -731,7 +745,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         //super.onActivityResult(requestCode, resultCode, data);
 
 
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+     /*   if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == Activity.RESULT_OK) {
                 Uri resultUri = result.getUri();
@@ -758,7 +772,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
                 Exception error = result.getError();
                 Log.e(TAG, error != null ? error.getMessage() : "Error in getting image in onActivityResult");
             }
-        }
+        }*/
 
     }
 
@@ -857,6 +871,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     }
 
     private void getQuestionDetails(int questionId) {
+
         int strId = 0, catId = 0, qId = 0, sampleCount = 1;
         String query = "SELECT * FROM " + DBHelper.QUESTION_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + Store_id + " AND " + DBHelper.CATEGORY_ID + "=" + Cat_id + " AND " + DBHelper.QUESTION_ID + "=" + questionId;
         Cursor c = DbManager.getInstance().getDetails(query);

@@ -15,5 +15,6 @@
     <color name="radio">#ff6469</color>
     <item name="actionbar_blue" type="color">#00bedf</item>
     <item name="white" type="color">#ffffff</item>
+    <color name="blue">#5757F3</color>
     //
 </resources>

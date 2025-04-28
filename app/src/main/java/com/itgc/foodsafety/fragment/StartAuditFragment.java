@@ -290,7 +290,7 @@ public class StartAuditFragment extends Fragment implements View.OnClickListener
     private void getAllCategories(String storeId) {
         DbManager.getInstance().openDatabase();
         Cursor c = DbManager.getInstance().getDetails("SELECT * FROM " + DBHelper.CATEGORY_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + storeId);
-        Log.e("Category Count", c.getCount() + "");
+        Log.e("Category Count sss", c.getCount() + "");
 
         if (c != null) {
             categoriesArrayList.clear();

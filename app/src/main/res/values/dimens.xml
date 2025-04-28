@@ -47,4 +47,5 @@
     <dimen name="btn_camera_size">40dp</dimen>
     <dimen name="btn_ok_size">50dp</dimen>
     <dimen name="textsize">15sp</dimen>
+    <dimen name="questiontextsize">16sp</dimen>
 </resources>

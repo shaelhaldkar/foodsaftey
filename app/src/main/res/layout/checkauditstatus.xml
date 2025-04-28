@@ -103,7 +103,7 @@
             android:text="@string/audit_submit"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:background="@drawable/audit_btn"
-            android:textColor="@color/audit_title"
+            android:textColor="@color/white"
             android:paddingTop="@dimen/paddingTop"
             android:paddingBottom="@dimen/paddingBottom"
             android:paddingLeft="@dimen/paddingLeft"
