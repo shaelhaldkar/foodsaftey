@@ -3,7 +3,6 @@ package com.itgc.foodsafety.fragment;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,23 +10,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.location.Location;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.FileProvider;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.widget.RecyclerView;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -48,17 +37,18 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.itgc.foodsafety.MainActivity;
-import com.itgc.foodsafety.MySingleton;
 import com.itgc.foodsafety.R;
 import com.itgc.foodsafety.adapter.AuditStartAdapter;
 import com.itgc.foodsafety.adapter.SampleAuditAdapter;
@@ -67,14 +57,11 @@ import com.itgc.foodsafety.dao.CategoryQuestions;
 import com.itgc.foodsafety.dao.SampleDetails;
 import com.itgc.foodsafety.db.DBHelper;
 import com.itgc.foodsafety.db.DbManager;
+import com.itgc.foodsafety.ui.MYLinearLayoutManager;
 import com.itgc.foodsafety.utils.AppPrefrences;
 import com.itgc.foodsafety.utils.AppUtils;
-import com.itgc.foodsafety.utils.BitmapHelper;
-import com.itgc.foodsafety.utils.FilePathUtils;
 import com.itgc.foodsafety.utils.ImageUtils;
 import com.itgc.foodsafety.utils.Vars;
-
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -86,9 +73,8 @@ import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 
+import com.canhub.cropper.*;
 /**
  * Created by root on 10/10/15.
  */
@@ -124,7 +110,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     private CheckBox txt_skip;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
-    private com.itgc.foodsafety.ui.LinearLayoutManager mLayoutManager;
+    private MYLinearLayoutManager mLayoutManager;
     private Boolean isImg = false;
     private int audit_id = 0;
     private String Previous_data = "", is_failed = "0";
@@ -147,7 +133,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     private SampleAuditAdapter sampleAuditAdapter;
     private ArrayList<SampleDetails> samples = new ArrayList<>();
     boolean sampleBind = false;
-
+    private ActivityResultLauncher<CropImageContractOptions> cropImageLauncher;
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -157,6 +143,23 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        cropImageLauncher = registerForActivityResult(
+                new CropImageContract(),
+                result -> {
+                    if (result.isSuccessful()) {
+                        Uri croppedImageUri = result.getUriContent();
+                        String croppedImageFilePath = result.getUriFilePath(getContext(),true);
+                       // imageView.setImageURI(croppedImageUri);
+                        saveImageS(croppedImageFilePath);
+                        Log.i(TAG, "onIageget1 "+croppedImageUri);
+                    } else {
+                        Exception error = result.getError();
+                        if (error != null) {
+                            Toast.makeText(getContext(), "Crop failed: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+        );
         b = getArguments();
         Cat_id = b.getInt("Cat_id");
         category = b.getString("Cat_name");
@@ -168,6 +171,29 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         dbHelper.openDataBase();
         DbManager.initializeInstance(dbHelper, ctx);
         DbManager.getInstance().openDatabase();
+    }
+
+    private void saveImageS(String croppedImageUri) {
+        Log.i(TAG, "saveImageS: "+croppedImageUri);
+        try {
+            File targetFile = ImageUtils.createImageFile(
+                    ctx,
+                    AppPrefrences.getMerchatId(ctx),
+                    AppPrefrences.getAuditCODE(ctx),
+                    String.valueOf(Store_id),
+                    String.valueOf(questionID),
+                    String.valueOf(Cat_id),
+                    String.valueOf(questionSubCatId)
+
+            );
+
+            saveImageLocal(Uri.parse(croppedImageUri), targetFile);
+            Log.i(TAG, "onIageget2 saveImageLocal");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.i(TAG, "onIageget3 "+e.toString());
+        }
     }
 
     @Override
@@ -260,7 +286,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.list_sample);
         mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new com.itgc.foodsafety.ui.LinearLayoutManager(ctx);
+        mLayoutManager = new MYLinearLayoutManager(ctx);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
             @Override
@@ -471,7 +497,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
 
                 if (getAnswerImageCount(questionID) < 4) {
                    // checkPermission();
-
+                    startImageCropper();
                   /*  CropImage.activity()
                             .setGuidelines(CropImageView.Guidelines.ON)
                             .setOutputCompressQuality(40)
@@ -1113,6 +1139,7 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     }
 
     private void saveanswerImages(String imageString) {
+        Log.i(TAG, "saveanswerImages: "+imageString);
         ContentValues c = new ContentValues();
         c.put(DBHelper.STORE_ID, Store_id);
         c.put(DBHelper.CATEGORY_ID, Cat_id);
@@ -1138,5 +1165,15 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
         for (int i = 0; i < samples.size(); i++) {
             Log.e("Sample Rate", samples.get(i).getSampleCurrentRate() + "");
         }
+    }
+    private void startImageCropper() {
+        CropImageOptions options = new CropImageOptions();
+        options.guidelines =CropImageView.Guidelines.ON;
+        options.aspectRatioX =1;
+        options.aspectRatioY =1;
+
+        cropImageLauncher.launch(new CropImageContractOptions(null, options));
+
+       // cropImageLauncher.launch(options);
     }
 }

@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,10 +11,13 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.itgc.foodsafety.R;
 
 
-public class WebViewScreen1 extends android.support.v4.app.Fragment implements View.OnClickListener {
+public class WebViewScreen1 extends Fragment implements View.OnClickListener {
     private ProgressDialog dialog;
     private Context context;
     private WebView mWebview;

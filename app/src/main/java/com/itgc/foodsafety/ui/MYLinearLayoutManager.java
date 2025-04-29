@@ -6,25 +6,18 @@ package com.itgc.foodsafety.ui;
 
 import android.content.Context;
 import android.graphics.Rect;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.itgc.foodsafety.BuildConfig;
 
 import java.lang.reflect.Field;
-/**
- * {@link android.support.v7.widget.LinearLayoutManager} which wraps its content. Note that this class will always
- * wrap the content regardless of {@link android.support.v7.widget.RecyclerView} layout parameters.
- * <p/>
- * Now it's impossible to run add/remove animations with child views which have arbitrary dimensions (height for
- * VERTICAL orientation and width for HORIZONTAL). However if child views have fixed dimensions
- * {@link #setChildSize(int)} method might be used to let the layout manager know how big they are going to be.
- * If animations are not used at all then a normal measuring procedure will run and child views will be measured during
- * the measure pass.
- */
-public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutManager {
+
+public class MYLinearLayoutManager extends LinearLayoutManager {
     private static boolean canMakeInsetsDirty = true;
     private static Field insetsDirtyField = null;
     private static final int CHILD_WIDTH = 0;
@@ -37,23 +30,23 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
     private int overScrollMode = ViewCompat.OVER_SCROLL_ALWAYS;
     private final Rect tmpRect = new Rect();
     @SuppressWarnings("UnusedDeclaration")
-    public LinearLayoutManager(Context context) {
+    public MYLinearLayoutManager(Context context) {
         super(context);
         this.view = null;
     }
     @SuppressWarnings("UnusedDeclaration")
-    public LinearLayoutManager(Context context, int orientation, boolean reverseLayout) {
+    public MYLinearLayoutManager(Context context, int orientation, boolean reverseLayout) {
         super(context, orientation, reverseLayout);
         this.view = null;
     }
     @SuppressWarnings("UnusedDeclaration")
-    public LinearLayoutManager(RecyclerView view) {
+    public MYLinearLayoutManager(RecyclerView view) {
         super(view.getContext());
         this.view = view;
         this.overScrollMode = ViewCompat.getOverScrollMode(view);
     }
     @SuppressWarnings("UnusedDeclaration")
-    public LinearLayoutManager(RecyclerView view, int orientation, boolean reverseLayout) {
+    public MYLinearLayoutManager(RecyclerView view, int orientation, boolean reverseLayout) {
         super(view.getContext(), orientation, reverseLayout);
         this.view = view;
         this.overScrollMode = ViewCompat.getOverScrollMode(view);

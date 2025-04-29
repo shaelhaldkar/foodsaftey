@@ -5,7 +5,6 @@ package com.itgc.foodsafety.adapter;
  */
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,6 +15,8 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.itgc.foodsafety.R;
 import com.itgc.foodsafety.dao.Sample_Audit;

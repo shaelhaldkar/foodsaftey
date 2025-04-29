@@ -4,28 +4,26 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.GravityCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.itgc.foodsafety.MainActivity;
 import com.itgc.foodsafety.R;
 import com.itgc.foodsafety.adapter.DraftAdapter;
-import com.itgc.foodsafety.dao.Answers;
 import com.itgc.foodsafety.dao.DraftDetails;
 import com.itgc.foodsafety.dao.Drafts;
-import com.itgc.foodsafety.dao.StartAudit;
 import com.itgc.foodsafety.db.DBHelper;
 import com.itgc.foodsafety.db.DbManager;
 import com.itgc.foodsafety.ui.DividerItemDecoration;
+import com.itgc.foodsafety.ui.MYLinearLayoutManager;
 import com.itgc.foodsafety.utils.AppUtils;
 
 import java.io.ByteArrayInputStream;
@@ -151,11 +149,10 @@ public class DraftsFragment extends Fragment {
         AppUtils.isDraft = true;
         mRecyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
         mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(context);
+        mLayoutManager = new MYLinearLayoutManager(context);
         mRecyclerView.setLayoutManager(mLayoutManager);
-
         RecyclerView.ItemDecoration itemDecoration =
-                new DividerItemDecoration(context, LinearLayoutManager.VERTICAL);
+                new DividerItemDecoration(context, MYLinearLayoutManager.VERTICAL);
         mRecyclerView.addItemDecoration(itemDecoration);
     }
 

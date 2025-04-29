@@ -2,18 +2,15 @@
 <resources>
     <color name="colorPrimary">#EEEEEE</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
     <color name="forget_pass">#4949FF</color>
     <color name="signin_btn">#2E2E2E</color>
     <color name="register_cmpny">#D73838</color>
     <color name="forget_text">#333333</color>
-    <color name="forget_edt">#BFBF00</color>
     <color name="forget_btn">#BF1A1A</color>
     <color name="audit_title">#6A6A6A</color>
     <color name="audit_title_bck">#C3C3C3</color>
     <color name="view_bck">#CACACA</color>
     <color name="radio">#ff6469</color>
-    <item name="actionbar_blue" type="color">#00bedf</item>
     <item name="white" type="color">#ffffff</item>
     <color name="blue">#5757F3</color>
     //

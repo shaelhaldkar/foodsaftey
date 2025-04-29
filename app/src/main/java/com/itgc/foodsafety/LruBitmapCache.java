@@ -2,8 +2,8 @@ package com.itgc.foodsafety;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.support.v4.util.LruCache;
 import android.util.DisplayMetrics;
+import android.util.LruCache;
 
 import com.android.volley.toolbox.ImageLoader.ImageCache;
 

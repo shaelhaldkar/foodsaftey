@@ -2,33 +2,10 @@
     <string name="app_name">FoodSafetyHelpline</string>
     <string name="toolbar_signin">Sign-In</string>
     <string name="toolbar_forgotpass">Forgot Password</string>
-    <string name="toolbar_registercmpny">Register as Company</string>
-    <string name="toolbar_audit">Start an Audit</string>
     <string name="username_hint">Enter Email Id</string>
     <string name="password_hint">Password</string>
     <string name="forget_pass">Forgot Password?</string>
     <string name="btn_sign">Sign-In</string>
-    <string name="btn_registercmp">Register as Company</string>
-    <string name="btn_registerind">Register as Individual</string>
-    <string name="new_user">New user?</string>
-    <string name="register_cmp">If your business has branches Register as Company recommended</string>
-    <string name="ownername">Owner\'s Name</string>
-    <string name="username">User Name</string>
-    <string name="confpassword">Confirm Password</string>
-    <string name="license">FSSAI License #</string>
-    <string name="cmpnyname">Company Name</string>
-    <string name="email">Email</string>
-    <string name="phone">999 999 9999</string>
-    <string name="phone1">999 999 9998</string>
-    <string name="offaddress">Corporate Office Address</string>
-    <string name="pincode">Area Pin Code</string>
-    <string name="branchmngr">Mr. Branch Manager</string>
-    <string name="branchemail">Branch Email</string>
-    <string name="branchid">Branch ID</string>
-    <string name="address">Address</string>
-    <string name="btn_addbranch">Add More Branch</string>
-    <string name="btn_registernow">Register Now</string>
-    <string name="btn_backsignin">Back to Sign-In</string>
     <string-array name="nav_drawer_labels">
         <item>Store</item>
         <item>Drafts</item>
@@ -56,12 +33,6 @@
     <string name="forgot_text">Forgot your password! No worries, Just enter your email and we will send you the password on your mail id.</string>
     <string name="forgot_email_hint">Enter your email id</string>
     <string name="forgot_done">Done</string>
-    <string-array name="business_categories">
-        <item>Finance</item>
-        <item>Marketing</item>
-        <item>Entertainment</item>
-        <item>Cooking</item>
-    </string-array>
     <string name="contact_us_text">Enter your enquiry, we will reply you on your email...</string>
     <string name="contact_send">Send</string>
     <string name="myprofile_email">username@gmail.com</string>
@@ -73,7 +44,6 @@
 
     <string name="submit_report_audit_by">Audit By</string>
     <string name="submit_report_audit_colon">:</string>
-    <string name="submit_report_audit_id">Auditor ID</string>
     <string name="submit_report_audit_no">Auditor Contact No.</string>
     <string name="submit_report_audit_sign">Auditor Signature</string>
     <string name="submit_report_audit_sign1">Store Manager Signature</string>
@@ -93,7 +63,6 @@
     <string name="store_manager_name">Store Manager Name</string>
     <string name="store_manager_email">Store Manager Email</string>
     <string name="store_colon">:</string>
-    <string name="password_current">Enter Current Password</string>
     <string name="password_new">Enter New Password</string>
     <string name="password_confirm">Confirm New Password</string>
     <string name="expiry">Expiry Found</string>
