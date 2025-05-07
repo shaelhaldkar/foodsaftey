@@ -119,6 +119,7 @@ public class Submit_report extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        Log.i("++inside", "onCreateView: Submit_report");
         View view = inflater.inflate(R.layout.submit_report, container, false);
         restoreToolbar();
         setUpView(view);

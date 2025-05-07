@@ -55,6 +55,7 @@ public class Store_Fragement extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        Log.i("++inside", "onCreateView: Store_Fragement");
         View view = inflater.inflate(R.layout.store_fragement, container, false);
         restoreToolbar();
         getData();

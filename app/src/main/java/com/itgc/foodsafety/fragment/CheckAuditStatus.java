@@ -59,7 +59,7 @@ public class CheckAuditStatus extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Log.i("++inside", "onCreateView: CheckAuditStatus");
         b = getArguments();
         audit = (ArrayList<StartAudit>) b.getSerializable("DAO");
         getAudit = new ArrayList<>();

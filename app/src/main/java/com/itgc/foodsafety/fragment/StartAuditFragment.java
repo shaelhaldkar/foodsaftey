@@ -109,6 +109,7 @@ public class StartAuditFragment extends Fragment implements View.OnClickListener
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        Log.i("++inside", "onCreateView: StratAuditFragent");
         restoreToolbar();
         View view = inflater.inflate(R.layout.auditfragment, container, false);
         setUpView(view);

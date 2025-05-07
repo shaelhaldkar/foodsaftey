@@ -223,29 +223,38 @@
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:padding="@dimen/padding">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                <LinearLayout
                     android:layout_weight="1"
-                    android:text="@string/audit_sample_no"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@android:color/black"
-                    android:textSize="@dimen/textsize" />
-
-                <Spinner
-                    android:id="@+id/list_sampleno"
+                    android:orientation="vertical"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.8"
-                    android:gravity="center"
-                    android:spinnerMode="dropdown" />
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/audit_sample_no"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@android:color/black"
+                        android:textSize="@dimen/textsize" />
 
+                    <Spinner
+                        android:id="@+id/list_sampleno"
+                        android:layout_width="match_parent"
+                        android:layout_height="32dp"
+
+                        android:gravity="center"
+                        android:spinnerMode="dropdown" />
+                </LinearLayout>
+            <LinearLayout
+                android:layout_marginLeft="5dp"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="match_parent">
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/margin_left2"
-                    android:layout_weight="1.2"
+
                     android:text="@string/audit_max_marks"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="@android:color/black"
@@ -253,9 +262,9 @@
 
                 <TextView
                     android:id="@+id/max_num"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/margin_left3"
+
                     android:layout_weight="0.5"
                     android:text="20"
                     android:textAppearance="?android:attr/textAppearanceSmall"
@@ -263,6 +272,10 @@
                     android:textSize="@dimen/textsize" />
 
             </LinearLayout>
+            </LinearLayout>
+
+
+
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list_sample"

@@ -71,7 +71,7 @@ public class Store_DetailsFragment extends Fragment implements View.OnClickListe
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Log.i("++inside", "onCreateView: Store_DetailsFragment");
         b = getArguments();
 
         store_name = b.getString("Store_name");

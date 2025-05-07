@@ -80,7 +80,7 @@ public class DbManager {
             mDb.insert(pTblName, null, listcv);
             Log.e("Data Inserted On:> ",pTblName);
         } catch (SQLiteException e) {
-
+e.printStackTrace();
         }
     }
 
