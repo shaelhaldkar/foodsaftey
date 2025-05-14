@@ -24,6 +24,8 @@ public class MySingleton extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+
 		Stetho.initializeWithDefaults(this);
 		File f = new File(AppUtils.FOOD_DIR);
 		f.mkdirs();

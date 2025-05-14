@@ -158,6 +158,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
     }
 
     private void checkLogin(final String password, final String username) {
+        btn_sign.setEnabled(false);
+        btn_sign.setVisibility(View.GONE);
         final ProgressDialog pd = new ProgressDialog(ctx);
         pd.setMessage("Please Wait...");
         pd.setCancelable(false);
@@ -220,6 +222,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
                                 }
 
                             } else {
+                                btn_sign.setEnabled(true);
+                                btn_sign.setVisibility(View.VISIBLE);
                                 Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
                                 edt_username.setText("");
                                 edt_password.setText("");
@@ -229,10 +233,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
                             if (pd != null && pd.isShowing())
                                 pd.dismiss();
                             VolleyLog.v("Response:%n %s", response.toString(4));
-
+                            btn_sign.setEnabled(true);
+                            btn_sign.setVisibility(View.VISIBLE);
 
                         } catch (Exception e) {
                             e.printStackTrace();
+                            btn_sign.setEnabled(true);
+                            btn_sign.setVisibility(View.VISIBLE);
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -243,6 +250,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
                     pd.dismiss();
                 error.printStackTrace();
                 Toast.makeText(ctx, "Failed", Toast.LENGTH_SHORT).show();
+                btn_sign.setEnabled(true);
+                btn_sign.setVisibility(View.VISIBLE);
             }
         });
 
@@ -331,6 +340,17 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
     }
 
     class saveDatatoLocal extends AsyncTask<String, Void, String> {
+        final ProgressDialog pd = new ProgressDialog(ctx);
+        @Override
+        protected void onPreExecute() {
+
+            pd.setMessage("Data is processing ...");
+            pd.setCancelable(false);
+            pd.show();
+
+            super.onPreExecute();
+        }
+
         @Override
         protected String doInBackground(String... strings) {
             DbManager.getInstance().saveStoreDetails(storeObject.get(storePosition));

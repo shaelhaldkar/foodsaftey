@@ -32,7 +32,7 @@
     </LinearLayout>
 
 
-    <fragment
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_navigation_drawer"
         android:name="com.itgc.foodsafety.fragment.FragmentDrawer"
         android:layout_width="@dimen/nav_drawer_width"

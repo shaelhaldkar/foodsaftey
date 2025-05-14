@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,6 +20,7 @@ import com.itgc.foodsafety.utils.AppPrefrences;
 import com.itgc.foodsafety.utils.AppUtils;
 import com.itgc.foodsafety.utils.Methods;
 
+import io.sentry.Sentry;
 
 
 public class SplashActivity extends Activity {
@@ -30,9 +32,10 @@ public class SplashActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-
+        int versionCode = BuildConfig.VERSION_CODE;
+       TextView bversio = findViewById(R.id.tvversion);
+        bversio.setText("Version :"+versionCode);
         AWSMobileClient.getInstance().initialize(this).execute();
-
         handler = new Handler();
 
         String[] PERMISSIONS = {android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION,
