@@ -20,7 +20,6 @@ import com.itgc.foodsafety.utils.AppPrefrences;
 import com.itgc.foodsafety.utils.AppUtils;
 import com.itgc.foodsafety.utils.Methods;
 
-import io.sentry.Sentry;
 
 
 public class SplashActivity extends Activity {

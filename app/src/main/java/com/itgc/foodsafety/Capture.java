@@ -54,12 +54,14 @@ public class Capture extends Activity {
         //  tempDir = Environment.getExternalStorageDirectory() + "/" + getResources().getString(R.string.external_dir) + "/";
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
         //   File directory = cw.getDir(getResources().getString(R.string.external_dir), Context.MODE_PRIVATE);
+        File directory = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "GLP_Images");
 
-        File directory = new File(Environment.getExternalStorageDirectory() + "/GLP_Images");
-
-        if (!directory.exists())
-
-            directory.mkdir(); //directory is created;
+        if (!directory.exists()) {
+            if (!directory.mkdirs()) {
+                Log.e("DirectoryError", "Failed to create directory: " + directory.getAbsolutePath());
+                return;
+            }
+        }
 
         //prepareDirectory();
         uniqueId = getTodaysDate() + "_" + getCurrentTime();
@@ -164,7 +166,7 @@ public class Capture extends Activity {
     }
 
     private boolean makedirs() {
-        File tempdir = new File(tempDir);
+        File tempdir = new File(Environment.getExternalStorageDirectory(),tempDir);
         if (!tempdir.exists())
             tempdir.mkdirs();
 

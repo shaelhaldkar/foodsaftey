@@ -74,12 +74,11 @@
             android:name="io.sentry.traces.user-interaction.enable"
             android:value="true" />
 
-        <!--<receiver android:name=".broadcast.SyncBroadCast" android:exported="true">
+        <receiver android:name=".broadcast.SyncBroadCast" android:exported="true">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
--->
         <service
             android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService"
             android:enabled="true" />
