@@ -20,6 +20,7 @@ android {
         }
     }
     sourceSets { main { assets.srcDirs = ['src/main/assets', 'src/main/assets/'] } }
+    namespace 'com.itgc.foodsafety'
 }
 
 
