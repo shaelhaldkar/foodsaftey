@@ -92,13 +92,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.login_fragment, container, false);
         setUpView(view);
-        //setData();
+        setData();
         return view;
     }
 
     private void setData() {
-        edt_password.setText("admin");
-        edt_username.setText("test@gmail.com");
+        edt_password.setText("123456");
+        edt_username.setText("balwant");
     }
 
     @Override
@@ -183,6 +183,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+                        Log.i("TAG", "onResponse: "+response);
                         try {
                             JSONArray jsonArray1 = response.getJSONArray("loginResult");
                             JSONObject jsonObject1 = jsonArray1.getJSONObject(0);

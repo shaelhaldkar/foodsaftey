@@ -218,7 +218,7 @@ public class Capture extends Activity {
                 mBitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos); //bm is the bitmap object
                 byte[] b = baos.toByteArray();
                 if (type.equals("auditor"))
-                    AppUtils.encodedimage = Base64.encodeToString(b, Base64.DEFAULT);
+                    AppUtils.encodedimageAuditor = Base64.encodeToString(b, Base64.DEFAULT);
                 else if (type.equals("store"))
                     AppUtils.encodedstoreimage = Base64.encodeToString(b, Base64.DEFAULT);
 

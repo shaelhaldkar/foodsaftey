@@ -73,6 +73,7 @@ import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Locale;
 
 import com.canhub.cropper.*;
 /**
@@ -609,8 +610,11 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     }
 
     private String getDateTime() {
-        String formattedDate = new SimpleDateFormat("dd MMM yyyy kk:mm").format(Calendar.getInstance().getTime());
-        //Toast.makeText(ctx, formattedDate, Toast.LENGTH_SHORT).show();
+        String formattedDate = new SimpleDateFormat(
+                "dd MMM yyyy kk:mm",
+                Locale.ENGLISH          // force English month names
+        ).format(Calendar.getInstance().getTime());
+        Log.i("++++++++shauesss", formattedDate);
         return formattedDate;
     }
 
@@ -1052,7 +1056,8 @@ public class AuditStartFragment extends Fragment implements View.OnClickListener
     }
 
     private void saveAnswer(int storeId, int categoryId, int questionId, int subCatId, String comment, String remark, String action) {
-        String currentDateTime = new SimpleDateFormat("dd MMM yyyy HH:mm a").format(Calendar.getInstance().getTime());
+
+        String currentDateTime = new SimpleDateFormat("dd MMM yyyy HH:mm a",Locale.ENGLISH).format(Calendar.getInstance().getTime());
         Cursor checkIfExists = DbManager.getInstance().getDetails("SELECT * FROM " + DBHelper.ANSWER_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + storeId + " AND " +
                 DBHelper.CATEGORY_ID + "=" + categoryId + " AND " +
                 DBHelper.QUESTION_ID + "=" + questionId);

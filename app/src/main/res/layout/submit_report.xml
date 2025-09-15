@@ -227,10 +227,6 @@
                     android:textColor="@color/white"
                     android:padding="@dimen/padding1"/>
 
-
-
-
-
             </LinearLayout>
 
             <Button

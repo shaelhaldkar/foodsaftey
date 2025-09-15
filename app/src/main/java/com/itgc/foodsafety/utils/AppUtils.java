@@ -25,7 +25,7 @@ public class AppUtils {
     public static boolean previousclick = false;
     public static boolean isLogin = false;
     public static boolean isDraft = false;
-    public static String encodedimage = "";
+    public static String encodedimageAuditor = "";
     public static String encodedstoreimage = "";
 
     public static AlertDialog d;

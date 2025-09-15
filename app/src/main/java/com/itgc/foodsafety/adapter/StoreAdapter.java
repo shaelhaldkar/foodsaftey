@@ -22,6 +22,7 @@ import com.itgc.foodsafety.utils.AppPrefrences;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * Created by root on 9/10/15.
@@ -124,7 +125,11 @@ public class StoreAdapter extends BaseAdapter {
     }
 
     private String getDateTime() {
-        String formattedDate = new SimpleDateFormat("dd MMM yyyy kk:mm").format(Calendar.getInstance().getTime());
+        String formattedDate = new SimpleDateFormat(
+                "dd MMM yyyy kk:mm",
+                Locale.ENGLISH          // force English month names
+        ).format(Calendar.getInstance().getTime());
+      //  String formattedDate = new SimpleDateFormat("dd MMM yyyy kk:mm").format(Calendar.getInstance().getTime());
         return formattedDate;
     }
 

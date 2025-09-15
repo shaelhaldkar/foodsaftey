@@ -14,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
@@ -47,6 +48,7 @@ import com.itgc.foodsafety.utils.S3FileUploadHelper;
 import com.itgc.foodsafety.utils.TrackGPS;
 import com.itgc.foodsafety.utils.Vars;
 
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,8 +60,7 @@ import java.io.ObjectInputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Locale;
 
 import static android.content.Context.LOCATION_SERVICE;
 
@@ -71,6 +72,7 @@ import androidx.fragment.app.Fragment;
  */
 public class Submit_report extends Fragment implements View.OnClickListener {
     public static final int SIGNATURE_ACTIVITY = 4;
+    private static final org.apache.commons.logging.Log log = LogFactory.getLog(Submit_report.class);
     private Context ctx;
     private EditText auditerNameEditText, auditerContactNumberEditText;
     private Button signatureButton, submitReport, signatureButton1, saveLocally, submitimagebutton;
@@ -185,7 +187,7 @@ public class Submit_report extends Fragment implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.submitLocally:
                 String error_message = "";
-                if (AppUtils.encodedimage.equals("")) {
+                if (AppUtils.encodedimageAuditor.equals("")) {
                     error_message = "Please get Auditor sign.";
                     Toast.makeText(ctx, error_message, Toast.LENGTH_LONG).show();
                 } else if (AppUtils.encodedstoreimage.equals("")) {
@@ -218,7 +220,7 @@ public class Submit_report extends Fragment implements View.OnClickListener {
 
             case R.id.img_back:
                 getFragmentManager().popBackStack();
-                AppUtils.encodedimage = "";
+                AppUtils.encodedimageAuditor = "";
                 break;
 
             case R.id.submitReport:
@@ -236,7 +238,7 @@ public class Submit_report extends Fragment implements View.OnClickListener {
                 } else if (auditerContactNumber.length() > 10 || auditerContactNumber.length() < 10) {
                     message = "Please enter the Auditer Contact Number properly.";
                     Toast.makeText(ctx, message, Toast.LENGTH_LONG).show();
-                } else if (AppUtils.encodedimage.equals("")) {
+                } else if (AppUtils.encodedimageAuditor.equals("")) {
                     message = "Please get Auditor sign.";
                     Toast.makeText(ctx, message, Toast.LENGTH_LONG).show();
                 } else if (AppUtils.encodedstoreimage.equals("")) {
@@ -254,7 +256,7 @@ public class Submit_report extends Fragment implements View.OnClickListener {
     }
 
     private void saveSignature(int from) {
-        saveStoreSignature(String.valueOf(Store_id), String.valueOf(Cat_id), AppUtils.encodedstoreimage, AppUtils.encodedimage, from);
+        saveStoreSignature(String.valueOf(Store_id), String.valueOf(Cat_id), AppUtils.encodedstoreimage, AppUtils.encodedimageAuditor, from);
     }
 
     private void submitReport() {
@@ -327,7 +329,7 @@ public class Submit_report extends Fragment implements View.OnClickListener {
                                 submitReport.setClickable(false);
 
                             } else {
-                                AppUtils.encodedimage = "";
+                                AppUtils.encodedimageAuditor = "";
                                 AppUtils.encodedstoreimage = "";
                                 deleteSubmittedData(String.valueOf(Store_id), String.valueOf(Cat_id));
                                 Toast.makeText(ctx, "ALL DATA SUBMITTED SUCCESSFULLY", Toast.LENGTH_LONG).show();
@@ -344,7 +346,7 @@ public class Submit_report extends Fragment implements View.OnClickListener {
                         }
 
                     } else {
-                        Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
+                        Toast.makeText(ctx, "Failed 1. Please try after some time", Toast.LENGTH_LONG).show();
                     }
 
 
@@ -359,7 +361,7 @@ public class Submit_report extends Fragment implements View.OnClickListener {
                 error.printStackTrace();
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
-                Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
+                Toast.makeText(ctx, "Failed 2. Please try after some time", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -375,7 +377,10 @@ public class Submit_report extends Fragment implements View.OnClickListener {
     }
 
     private String getDateTime() {
-        String formattedDate = new SimpleDateFormat("dd MMM yyyy kk:mm").format(Calendar.getInstance().getTime());
+        String formattedDate = new SimpleDateFormat(
+                "dd MMM yyyy kk:mm",
+                Locale.ENGLISH          // force English month names
+        ).format(Calendar.getInstance().getTime());
         return formattedDate;
     }
 
@@ -465,7 +470,9 @@ public class Submit_report extends Fragment implements View.OnClickListener {
         cv.put(DBHelper.STORE_SIGNATURE_IMAGE, storeSign);
         cv.put(DBHelper.AUDIOTR_SIGNATURE_IMAGE, auditSign);
         cv.put(DBHelper.EXPIRY_QUESTION, expiry);
+
         DbManager.getInstance().insertDetails(cv, DBHelper.STORE_SIGNATURE_TBL_NAME);
+
         if (from == 1) {
             Toast.makeText(ctx, "Details saved", Toast.LENGTH_SHORT).show();
             openHomePage();
@@ -473,7 +480,11 @@ public class Submit_report extends Fragment implements View.OnClickListener {
         }
     }
 
+
+
+
     private void getStoreSignature(String storeId, String categoryId) {
+
         String query = "SELECT * FROM " + DBHelper.STORE_SIGNATURE_TBL_NAME + " WHERE " + DBHelper.STORE_ID + "=" + storeId;// + " AND " + DBHelper.CATEGORY_ID + "=" + categoryId;
         DbManager.getInstance().openDatabase();
         Cursor cursor = DbManager.getInstance().getDetails(query);
@@ -482,16 +493,18 @@ public class Submit_report extends Fragment implements View.OnClickListener {
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 AppUtils.encodedstoreimage = cursor.getString(2);
-                AppUtils.encodedimage = cursor.getString(3);
+                AppUtils.encodedimageAuditor = cursor.getString(3);
                 expiry = cursor.getString(4);
             }
         } catch (Exception e) {
             Log.e("Store Image Error", e.getMessage());
         }
 
+
     }
 
     private void submitFirstStep() {
+
         final ProgressDialog pd = new ProgressDialog(ctx);
         pd.setMessage("Please Wait...");
         pd.setCancelable(false);
@@ -526,13 +539,18 @@ public class Submit_report extends Fragment implements View.OnClickListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
+       // settImaeToSign();
 
         String URL = Vars.BASE_URL + Vars.SUBMIT_REPORT;
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, jsonObject, new Response.Listener<JSONObject>() {
+
             @Override
             public void onResponse(JSONObject response) {
 
+                Log.i("TAG", "submitFirstStep: request"+jsonObject);
+                Log.i("TAG", "submitFirstStep: request"+ URL);
+                Log.i("TAG", "submitFirstStep: "+response);
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
 
@@ -554,12 +572,13 @@ public class Submit_report extends Fragment implements View.OnClickListener {
                             submitsignature();
                         }
                     } else {
-                        Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
+
+                        Toast.makeText(ctx, "Failed 3. Please try after some time", Toast.LENGTH_LONG).show();
                     }
 
 
                 } catch (Exception e) {
-
+                    Log.i("TAG", "onResponse errroq: "+e.toString());
                 }
 
             }
@@ -567,9 +586,11 @@ public class Submit_report extends Fragment implements View.OnClickListener {
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
+                Log.i("TAG", "onResponse errroq: "+error.toString());
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
-                Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
+
+                Toast.makeText(ctx, "Failed 4. Please try after some time", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -859,7 +880,7 @@ public class Submit_report extends Fragment implements View.OnClickListener {
             jsonObject.put("store_id", storeId);
             jsonObject.put("audit_code", AppPrefrences.getAuditCODE(ctx));
             if (a == 0) {
-                jsonObject.put("FileString", AppUtils.encodedimage);
+                jsonObject.put("FileString", AppUtils.encodedimageAuditor);
             } else {
                 jsonObject.put("FileString", AppUtils.encodedstoreimage);
             }
@@ -871,9 +892,14 @@ public class Submit_report extends Fragment implements View.OnClickListener {
 
         String URL = Vars.BASE_URL + "upladfile";
 
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, jsonObject, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
+
+            /*    Log.i('+++insideupladfile1', "a="+a);
+                Log.i('+++insideupladfile2', jsonObject);
+                Log.i('+++insideupladfile3', response);*/
 
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
@@ -881,7 +907,7 @@ public class Submit_report extends Fragment implements View.OnClickListener {
                 try {
                     JSONArray jsonArray = response.getJSONArray("upladfileResult");
                     JSONObject jsonObject = jsonArray.getJSONObject(0);
-
+                    Log.i("+++++upladfile", "onResponse: "+response);
                     boolean status = jsonObject.getBoolean("Status");
 
                     if (status) {
@@ -892,20 +918,31 @@ public class Submit_report extends Fragment implements View.OnClickListener {
                         if (a == 0) {
                             auditor_filename = jsonObject1.getString("FileName");
                             a = 1;
-                            submitsignature();
+                            Log.i("+++++auditor_filename", ""+auditor_filename);
+                          new  Handler().postDelayed(new Runnable() {
+                              @Override
+                              public void run() {
+                                  submitsignature();
+                              }
+                          },1000);
+
                         } else {
                             storefilename = jsonObject1.getString("FileName");
+                            Log.i("+++++storefilename", ""+storefilename);
                             submitfinalData("");
                         }
 
 
+
                     } else {
-                        Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
+                        Log.e("+++++Failed 5", "onResponse: "+status);
+                        Toast.makeText(ctx, "Failed 5. Please try after some time", Toast.LENGTH_LONG).show();
                     }
 
 
                 } catch (Exception e) {
-                    Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
+                    Log.e("+++++Failed 6", "exp: "+e.toString());
+                    Toast.makeText(ctx, "Failed 6. Please try after some time", Toast.LENGTH_LONG).show();
                 }
 
             }
@@ -915,7 +952,7 @@ public class Submit_report extends Fragment implements View.OnClickListener {
                 error.printStackTrace();
                 if (pd != null && pd.isShowing())
                     pd.dismiss();
-                Toast.makeText(ctx, "Failed. Please try after some time", Toast.LENGTH_LONG).show();
+                Toast.makeText(ctx, "Failed 7. Please try after some time", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -947,7 +984,7 @@ public class Submit_report extends Fragment implements View.OnClickListener {
                 if (pdImageUpload != null && pdImageUpload.isShowing()) pdImageUpload.dismiss();
                 image_counter = image_counter + 1;
                 if (bb == mSharedPreference1.getInt("Status_size", 0) - 1) {
-                    AppUtils.encodedimage = "";
+                    AppUtils.encodedimageAuditor = "";
                     AppUtils.encodedstoreimage = "";
                     deleteSubmittedData(String.valueOf(Store_id), String.valueOf(Cat_id));
                     Toast.makeText(ctx, "ALL DATA SUBMITTED SUCCESSFULLY", Toast.LENGTH_LONG).show();
