@@ -90,7 +90,7 @@ e.printStackTrace();
             mDb.delete(pTblName, wheredata, null);
             Log.e("Data Deleted From:> ",pTblName);
         } catch (Exception e) {
-
+Log.e("++++excep while deleteing dataa",e.toString());
         }
     }
 
@@ -107,8 +107,20 @@ e.printStackTrace();
         mDb.execSQL("DELETE FROM " + DBHelper.AUDIT_SAMPLE_TBL_NAME);
         mDb.execSQL("DELETE FROM " + DBHelper.STORE_DETAILS_TBL_NAME1);
         mDb.execSQL("DELETE FROM " + DBHelper.STORE_START_TIME_TABLE);
+
+
         Log.e("Delete", "Data From StoreInfo,CategoryInfo & QuestionInfo Table");
     }
+    public void deleteStore(String storeId)
+    {
+
+        mDb.delete(DBHelper.STORE_INFO_TBL_NAME, DBHelper.STORE_ID + "=" + storeId, null);
+
+
+
+        Log.e("Delete", "Data From StoreInfo,CategoryInfo & QuestionInfo Table");
+    }
+
 
     public void updateCategory(String status,int storeId,int categoryId)
     {

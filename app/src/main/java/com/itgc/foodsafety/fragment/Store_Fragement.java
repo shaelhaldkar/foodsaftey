@@ -69,7 +69,7 @@ public class Store_Fragement extends Fragment
         stores_list.clear();
         DbManager.getInstance().openDatabase();
         Cursor c= DbManager.getInstance().getDetails("SELECT * FROM "+ DBHelper.STORE_INFO_TBL_NAME);
-        Log.e("Store Count",c.getCount()+"");
+        Log.e("======Store Count",c.getCount()+"");
 
         if(c.getCount()>0)
         {

@@ -11,6 +11,7 @@ import com.facebook.stetho.Stetho;
 import com.itgc.foodsafety.db.DBHelper;
 import com.itgc.foodsafety.db.DbManager;
 import com.itgc.foodsafety.utils.AppUtils;
+import com.itgc.foodsafety.utils.VolleyLogger;
 
 import java.io.File;
 
@@ -77,14 +78,18 @@ public class MySingleton extends Application {
 
 	public RequestQueue getRequestQueue() {
 		if (mRequestQueue == null) {
-			// getApplicationContext() is key, it keeps you from leaking the
-			// Activity or BroadcastReceiver if someone passes one in.
-			mRequestQueue = Volley
-					.newRequestQueue(mCtx.getApplicationContext());
+			mRequestQueue = Volley.newRequestQueue(mCtx.getApplicationContext());
+
+			// Add global request listener
+			mRequestQueue.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+				@Override
+				public void onRequestFinished(Request<Object> request) {
+					VolleyLogger.getInstance().logRequest(request);
+				}
+			});
 		}
 		return mRequestQueue;
 	}
-
 	public <T> void addToRequestQueue(Request<T> req) {
 		getRequestQueue().add(req);
 	}

@@ -150,24 +150,24 @@ public class StartAuditFragment extends Fragment implements View.OnClickListener
         if (categoriesArrayList.get(position).getCategoryStatus().equalsIgnoreCase("Complete")) {
             Toast.makeText(ctx, "Please submit the current Audit Survey", Toast.LENGTH_LONG).show();
             listPosition = position;
-            //new loadLocalData().execute();
-            //getLocalSavedData(String.valueOf(store_id),String.valueOf(categoriesArrayList.get(position).getCategoryId()));
+            new loadLocalData().execute();
+            getLocalSavedData(String.valueOf(store_id),String.valueOf(categoriesArrayList.get(position).getCategoryId()));
         } else {
 
-//            if (type == 0)
-//            {
-//                fragment = new AuditStartFragment();
-//                Bundle bundle = new Bundle();
-//                bundle.putInt("Cat_id", Integer.parseInt(categoriesArrayList.get(position).getCategoryId()));
-//                bundle.putString("Cat_name", categoriesArrayList.get(position).getCategoryName());
-//                bundle.putInt("Type", Integer.parseInt(categoriesArrayList.get(position).getCategoryType()));
-//                bundle.putInt("Store_id", store_id);
-//                bundle.putString("Store_name", store_name);
-//                bundle.putString("Store_region", store_loc);
-//                fragment.setArguments(bundle);
-//                getFragmentManager().beginTransaction().replace(R.id.container_body, fragment).addToBackStack("Audit").commit();
-//            }
-//            else
+            if (type == 0)
+           {
+                fragment = new AuditStartFragment();
+                Bundle bundle = new Bundle();
+                bundle.putInt("Cat_id", Integer.parseInt(categoriesArrayList.get(position).getCategoryId()));
+                bundle.putString("Cat_name", categoriesArrayList.get(position).getCategoryName());
+                bundle.putInt("Type", Integer.parseInt(categoriesArrayList.get(position).getCategoryType()));
+                bundle.putInt("Store_id", store_id);
+                bundle.putString("Store_name", store_name);
+                bundle.putString("Store_region", store_loc);
+                fragment.setArguments(bundle);
+                getFragmentManager().beginTransaction().replace(R.id.container_body, fragment).addToBackStack("Audit").commit();
+            }
+            else
             {
                 fragment = new CheckAuditStatus();
                 Bundle bundle = new Bundle();

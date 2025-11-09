@@ -260,7 +260,7 @@ public class Submit_report extends Fragment implements View.OnClickListener {
     }
 
     private void submitReport() {
-        //getSignature();
+        getSignature();
         saveSignature(2);
 
 
@@ -343,6 +343,7 @@ public class Submit_report extends Fragment implements View.OnClickListener {
 //                            ctx.sendBroadcast(intent);
 //                           getFragmentManager().beginTransaction().replace(R.id.container_body, new Store_Fragement()).addToBackStack("Store").commit();
                         } catch (Exception e) {
+                            Log.e("+++exception", e.toString());
                         }
 
                     } else {
@@ -623,6 +624,7 @@ public class Submit_report extends Fragment implements View.OnClickListener {
         contentValues.put(DBHelper.CATEGORY_STATUS, "NULL");
         contentValues.put(DBHelper.CATEGORY_START_DATE, "");
         contentValues.put(DBHelper.CATEGORY_END_DATE, "");
+        DbManager.getInstance().deleteStore(storeId);
         DbManager.getInstance().updateDetails(contentValues, DBHelper.CATEGORY_TBL_NAME, DBHelper.STORE_ID + "=" + storeId + " AND " + DBHelper.CATEGORY_STATUS + "='Complete'");
     }
 

@@ -27,12 +27,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -49,8 +47,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -97,8 +93,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
     }
 
     private void setData() {
-        edt_password.setText("123456");
-        edt_username.setText("balwant");
+    /*  edt_password.setText("123456");
+        edt_username.setText("balwant");*/
     }
 
     @Override
@@ -183,7 +179,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.i("TAG", "onResponse: "+response);
+                        Log.d("+++++resonse", "onResponse: "+response);
                         try {
                             JSONArray jsonArray1 = response.getJSONArray("loginResult");
                             JSONObject jsonObject1 = jsonArray1.getJSONObject(0);
@@ -255,6 +251,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Goo
                 btn_sign.setVisibility(View.VISIBLE);
             }
         });
+      //  req.toString();
+        Log.i("+++++req",req.toString());
 
 
         req.setRetryPolicy(new DefaultRetryPolicy(
